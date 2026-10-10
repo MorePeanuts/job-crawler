@@ -1,0 +1,16 @@
+.venv/
+.runtime/
+node_modules
+__pycache__/
+*.pyc
+.env
+artifacts/**/network*.json
+.ruff_cache/
+artifacts/
+outputs/**/evidence/
+outputs/**/navigation/
+outputs/**/*preview.png
+outputs/**/*.ndjson
+.DS_Store
+~$*.xlsx
+outputs/autonomous-*/
