@@ -1,0 +1,29 @@
+[crawl]
+timeout = 60
+max_requests = 20000
+delay = 0.3
+retries = 2
+chrome_channel = "chrome"
+resume_hours = 6
+
+[llm]
+enabled = false
+model = "deepseek-flash"
+base_url = "https://api.deepseek.com"
+api_key_env = "DEEPSEEK_API_KEY"
+max_calls = 20
+timeout = 60
+max_tokens = 1500
+
+[mapping]
+use_source_url_as_apply_url = true
+
+# 收到后台分类树后在此维护父子关系，例如（仅示例，不启用）：
+# [mapping.category_paths]
+# "互联网/AI" = ["软件研发", "前端开发"]
+# [mapping.categories]
+# "源站的研发类别" = ["互联网/AI", "软件研发"]
+# [mapping.education]
+# "源站明确表示本科最低要求的枚举" = "本科"
+# [mapping.locations]
+# "深圳" = "广东省/深圳市"

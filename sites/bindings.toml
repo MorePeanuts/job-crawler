@@ -1,0 +1,15 @@
+[sources.COM0002]
+adapter = "cnpc"
+version = "1"
+
+[sources.COM0008]
+adapter = "ccb"
+version = "1"
+
+[sources.COM0012]
+adapter = "pingan"
+version = "1"
+
+[sources.COM0015]
+adapter = "alibaba"
+version = "1"

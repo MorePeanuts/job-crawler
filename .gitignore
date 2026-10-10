@@ -14,3 +14,11 @@ outputs/**/*.ndjson
 .DS_Store
 ~$*.xlsx
 outputs/autonomous-*/
+outputs/
+.pytest_cache/
+.coverage
+dist/
+*.egg-info/
+*.sqlite*
+.env.*
+!.env.example
