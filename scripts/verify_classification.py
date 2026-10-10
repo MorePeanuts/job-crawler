@@ -7,7 +7,7 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 from job_crawler.config import load_settings
-from job_crawler.exporter import FIELDS, HEADERS
+from job_crawler.exporter import FIELDS, HEADERS, deadline_date
 from job_crawler.filtering import select
 from job_crawler.models import Job
 from job_crawler.storage import write_json
@@ -61,7 +61,11 @@ def main() -> None:
     assert sheet.max_row == len(after) + 1
     for job, row in zip(after, sheet.iter_rows(min_row=2), strict=True):
         for field, cell in zip(FIELDS[: sheet.max_column], row, strict=True):
-            assert (cell.value or "") == getattr(job, field), (job.key, field)
+            expected = getattr(job, field)
+            if field == "deadline":
+                assert (cell.value or "") in (expected, deadline_date(expected)), job.key
+            else:
+                assert (cell.value or "") == expected, (job.key, field)
             assert cell.data_type != "f", "文本被写为公式"
     workbook.close()
     old_report = json.loads((args.original / "report.json").read_text())

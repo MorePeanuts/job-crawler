@@ -43,10 +43,27 @@ def test_empty_output_removes_examples(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("information", [False, True])
 @pytest.mark.parametrize(
-    "deadline", ["2026-10-15", "2026-10-12T00:00:00", "", '=HYPERLINK("https://example.test","x")']
+    ("deadline", "expected"),
+    [
+        ("2026-10-15", "2026-10-15"),
+        ("2026-10-12T00:00:00", "2026-10-12"),
+        ("2026-10-11T17:00:00Z", "2026-10-12"),
+        ("2026年10月2日", "2026-10-02"),
+        ("2026/10/2", "2026-10-02"),
+        ("1970-01-01", "1970-01-01"),
+        ("0000000000", "1970-01-01"),
+        ("", ""),
+        ("尚未公布", ""),
+        ('=HYPERLINK("https://example.test","x")', ""),
+    ],
 )
 def test_optional_deadline_is_last_column_and_preserves_source(
-    tmp_path: Path, job: Job, information: bool, deadline: str, mapping: MappingConfig
+    tmp_path: Path,
+    job: Job,
+    information: bool,
+    deadline: str,
+    expected: str,
+    mapping: MappingConfig,
 ) -> None:
     job.deadline = deadline
     path = tmp_path / "deadline.xlsx"
@@ -56,7 +73,8 @@ def test_optional_deadline_is_last_column_and_preserves_source(
     assert sheet.max_column == 12
     assert sheet["K1"].value == "申请链接"
     assert sheet["L1"].value == "截止时间"
-    assert (sheet["L2"].value or "") == deadline
+    assert (sheet["L2"].value or "") == expected
+    assert job.deadline == deadline
     assert sheet["L2"].data_type != "f"
     assert sheet["L2"].number_format == "@"
     if information:

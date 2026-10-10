@@ -14,6 +14,7 @@ from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from openpyxl.utils import get_column_letter
 
 from job_crawler.config import MappingConfig
+from job_crawler.filtering import SHANGHAI, parse_date
 from job_crawler.models import Job
 
 HEADERS = [
@@ -44,6 +45,12 @@ FIELDS = [
     "apply_url",
     "deadline",
 ]
+
+
+def deadline_date(value: str) -> str:
+    """Format the export only; preserve precise source timestamps for filtering."""
+    parsed = parse_date(value)
+    return parsed[0].astimezone(SHANGHAI).date().isoformat() if parsed else ""
 
 
 def template_path() -> Path:
@@ -222,6 +229,8 @@ def export_workbook(
             value = getattr(job, field)
             if len(value) > 32767 or ILLEGAL_CHARACTERS_RE.search(value):
                 raise ValueError(f"无法无损导出 {job.key}:{field}")
+            if field == "deadline":
+                value = deadline_date(value)
             cell = sheet.cell(row_index, col_index, value)
             cell.data_type = "s"  # Untrusted website text must never become an Excel formula.
             cell._style = copy(styles[col_index - 1])
