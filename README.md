@@ -4,7 +4,7 @@
 
 已导入 **500 家企业、228 个招聘链接**，初版已接入并真实验收 **20 家企业**：原四站加 16 家北森平台企业。平台逻辑共享，企业入口和覆盖逐家核验；其他链接待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)，历史四站记录见 [首轮验收](docs/acceptance.md)。
 
-**使用前需要配置后台分类树和必要的字段映射。** 原模板的一级、二级分类没有父子关系，目前未预填猜测的分类树。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入导入表。因此抓取成功后，Excel 仍可能只有表头；配置完善后可以重新导出，无须重复爬取。
+**已配置用户提供的真实分类树：20 个一级分类、113 条二级路径。** 分类来源是 `job-position.js`，第三级岗位名称用于模型理解，Excel 仍保留原来的一级、二级两列。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入严格导入表。可以对已保存岗位进行批量分类和重新导出，无须重复爬取。
 
 ## 安装
 
@@ -97,13 +97,51 @@ uv run job-crawler bundle --inputs-file outputs/initial20-inputs.json \
 
 这次交付已保存在 `outputs/initial20-20261010-final/岗位信息汇总.xlsx`，共 **4,611 条岗位**。“企业采集情况”页列出 20 家企业的原始采集时刻、覆盖情况和排除数量。建行 3,784 条均已截止，所以当前岗位表有 19 家企业的实际岗位，企业覆盖报告仍为 20 家。其余 16 家新增企业的独立原始结果保存在 `outputs/twenty-company-validation/<来源ID>/`。
 
+**分类更新版**：`outputs/initial20-taxonomy-20261010/result/岗位信息汇总.xlsx`。原 4,611 条记录中，4,599 条已补充合法分类；其余 12 条涉及未能确定主职能的混合岗位、宽泛职位或校招行程公告，保留为空并列于 `outputs/initial20-taxonomy-20261010/classification-unresolved.json`。原始表保留不覆盖，分类验收与分企业统计见 [分类验收](docs/taxonomy-acceptance.md)。
+
 汇总不会重新访问招聘网站；按汇总时刻再次筛除已截止记录，保留原始采集时间，不宣称重新验证在线状态。同一来源若指定两轮结果会拒绝合并，需自行选择其中一轮。启用 LLM 时仍可能为缺失字段调用模型；默认关闭。
 
-`岗位信息汇总.xlsx` 包含待补全记录，使用原模板十一字段，缺失分类等值留空，正文不截断。`jobs.xlsx` 则始终是严格校验的导入表；当前分类树尚未配置，因此为空。查看 `review.json` 的原因，补充配置后可重新汇总，无需重抓。JSON 同时保留全部原始岗位（包括已排除的岗位）及证据。
+`岗位信息汇总.xlsx` 包含待补全记录，使用原模板十一字段，缺失值留空，正文不截断。`jobs.xlsx` 则始终是严格校验的导入表。分类补全后，学历或地点不合要求的记录仍进入 `review.json`，不能把分类成功等同于全部可直接导入。JSON 同时保留全部原始岗位（包括已排除的岗位）及证据。
 
 ## 分类与字段映射
 
-编辑 `config.toml`。以下仅展示语法，请填写真实后台分类路径和确认过的源站映射：
+默认 `config.toml` 已包含实际父子路径；完整三级参考保存在 `src/job_crawler/assets/job-taxonomy.json`，记录源文件 SHA256。收到新版脚本时运行下面的安全导入程序（只解析数据，不执行 JS），同步资源与配置并校验模板枚举：
+
+```sh
+uv run python scripts/import_taxonomy.py /path/job-position.js
+```
+
+批量分类已保存的完整或汇总快照：
+
+```sh
+uv run job-crawler classify outputs/initial20-20261010-final \
+  --output outputs/initial20-classified \
+  --max-calls 700 --concurrency 8 --batch-size 10 --refine
+```
+
+此命令明确启用模型分类，不要求设置 `llm.enabled=true`；使用 `[llm]` 中的模型、端点和密钥环境变量配置，默认 `deepseek-flash` / `DEEPSEEK_API_KEY`。`--max-calls` 是本次调用硬上限（含重试），独立于采集时的 `llm.max_calls`；默认每批 10 条、并发 5、最多 1000 次，单批最多重试 2 次。只发送公司名、岗位名称、来源类别、职责和要求；不访问招聘站点，也不改动学历、地点等其他字段。
+
+结果位于输出目录：
+
+- `result/岗位信息汇总.xlsx`：补充分类的完整信息表；`result/jobs.xlsx`：通过全部导入约束的子集。
+- `classification-report.json`：已分类/未分类统计、每条模型判断、原文引证、失败原因与缓存标识。
+- `classification-unresolved.json`：仅列出仍无法判断的岗位、来源链接和原因，方便业务复核。
+- `classification-audit/`：本轮模型响应和用量。
+- `classified-snapshot/` 与 `result/collections/`：持久化分类后的来源快照，可直接用于后续 `bundle` / `export`。
+
+分类沿用输入快照的筛选时刻，只处理未排除记录，并保留每个企业原始采集时间。当前支持 `window=all` 快照。成功项立即写入 `.runtime/classification/`（可用 `--cache` 修改）；中断后换一个空的输出目录并复用 cache 即可继续。内容、模型配置、分类树或提示版本变化会使缓存失效。`--max-calls 0` 可验证缓存并完全离线导出；缺少缓存的记录明确报告，不自动发起请求。语义分类属于模型推断，结构和原文校验不代替业务复核；无法确定主职能的岗位留空并说明原因。
+
+`--refine` 在同一调用总预算内，使用紧凑的完整父子路径复核未分类项及与精确三级名称不一致的项，降低模型漏读长分类树的影响。复核有独立缓存与 `classification-refinement/` 审计；不会强制把混合岗位放进兜底类别。
+
+例如后续不调用模型重新汇总已经分类的快照：
+
+```sh
+# 默认 config.toml 的 llm.enabled=false
+uv run job-crawler bundle outputs/initial20-classified/result \
+  --output outputs/initial20-classified-reexport
+```
+
+其他字段映射仍在 `config.toml` 中维护。以下仅展示语法；不要用这个示例覆盖已有完整分类树，源站类别映射只填写已经确认的精确对应关系：
 
 ```toml
 [mapping.category_paths]
