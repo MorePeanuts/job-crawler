@@ -5,6 +5,7 @@ import json
 import uuid
 from collections import Counter
 from datetime import datetime
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,7 @@ from job_crawler.storage import Store, fingerprint, write_json
 from job_crawler.transport import BrowserSession
 
 
+@cache
 def code_digest() -> str:
     root = Path(__file__).parent
     return fingerprint(

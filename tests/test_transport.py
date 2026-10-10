@@ -244,6 +244,29 @@ async def test_navigation_and_script_use_separate_timeouts(tmp_path: Path) -> No
         store.close()
 
 
+async def test_structural_shell_requires_business_json(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    session = BrowserSession("A", "run", tmp_path, store, CrawlConfig(delay=0, retries=0))
+    session.page = NavigationPage()
+
+    async def execute(*args: Any, **kwargs: Any) -> Any:
+        session.responses.append(
+            {"url": "https://example.test/api/List?page=1", "status": 200, "body": '{"Code":200}'}
+        )
+        raise CrawlError(
+            "browser_error", "Blocked by anti-bot protection: Structural: minimal_text"
+        )
+
+    monkeypatch.setattr(session, "_execute", execute)
+    try:
+        await session.open(NavigationPage.url, ready_endpoints=("/api/list?",))
+        assert session.navigation_warnings[0].code == "navigation_recovered"
+    finally:
+        store.close()
+
+
 async def test_access_denied_no_retries_and_keeps_evidence(tmp_path: Path, now: datetime) -> None:
     store = Store(tmp_path / "db.sqlite")
     store.begin("run", "hash", now, False, 6)

@@ -1,0 +1,57 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0141",
+    "company_id": "COM0141",
+    "company": "中国长安汽车集团有限公司",
+    "url": "https://changanqiche.zhiye.com/campus/",
+    "notes": "长安汽车校园招聘"
+  },
+  "adapter": "zhiye-changan",
+  "source_count": 228,
+  "payload": {
+    "Category": [
+      "2"
+    ],
+    "PageIndex": 0,
+    "PageSize": 20,
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "b0d0997f-02be-47f1-9733-99010acd7a25",
+    "DisplayFields": [
+      "Category"
+    ]
+  },
+  "list_url": "https://changanqiche.zhiye.com/api/JobAd/GetJobAdPageList",
+  "detail_url": "https://changanqiche.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=2681791615705892&jobAdId=9acc449d-1413-4c15-97f5-09923588fb98&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "9acc449d-1413-4c15-97f5-09923588fb98",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "重庆铃耀-生产管理(J28645)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [],
+    "Duty": "1.根据公司生产目标，组织并推动各项生产活动有序开展，结合实际生产状况动态优化生产组织方式与管理流程。\n2.负责生产进度的全程监控、管理与调度，确保生产计划按时达成。\n3.主动协调并快速响应生产过程中的异常情况，制定异常时间应对措施，保障生产顺畅运行。\n4.负责生产实绩数据的汇总、统计与分析，编制生产报告，为管理决策提供数据支持。",
+    "Require": "1.招聘对象：2027届本科及以上学历毕业生。\n2.专业要求：工业工程、统计学、数学、大数据管理、系统工程等相关专业。\n3.语言要求：通过CET-4。\n4.综合素质：乐观开朗、积极上进、视野开阔、思维敏捷，有较强的自主学习能力、创新能力、沟通能力及抗压能力，善于运用新的工作方法解决问题。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "9acc449d-1413-4c15-97f5-09923588fb98",
+    "PostDate": "2026-09-01T08:50:47",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "重庆铃耀-生产管理(J28645)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "重庆市"
+    ],
+    "Duty": "1.根据公司生产目标，组织并推动各项生产活动有序开展，结合实际生产状况动态优化生产组织方式与管理流程。\n2.负责生产进度的全程监控、管理与调度，确保生产计划按时达成。\n3.主动协调并快速响应生产过程中的异常情况，制定异常时间应对措施，保障生产顺畅运行。\n4.负责生产实绩数据的汇总、统计与分析，编制生产报告，为管理决策提供数据支持。",
+    "Require": "1.招聘对象：2027届本科及以上学历毕业生。\n2.专业要求：工业工程、统计学、数学、大数据管理、系统工程等相关专业。\n3.语言要求：通过CET-4。\n4.综合素质：乐观开朗、积极上进、视野开阔、思维敏捷，有较强的自主学习能力、创新能力、沟通能力及抗压能力，善于运用新的工作方法解决问题。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

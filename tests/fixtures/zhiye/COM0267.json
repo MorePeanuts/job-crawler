@@ -1,0 +1,63 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0267",
+    "company_id": "COM0267",
+    "company": "深圳传音控股股份有限公司",
+    "url": "https://transsion.zhiye.com/campus/jobs?shareId=ffad861e-9667-44f6-8126-f4dbcc18678e&shareSource=2",
+    "notes": ""
+  },
+  "adapter": "zhiye-transsion",
+  "source_count": 184,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "PostDate",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://transsion.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://transsion.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=561791615871137&jobAdId=6bae1ffa-9424-4668-9d04-207ebbd5fed5&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "6bae1ffa-9424-4668-9d04-207ebbd5fed5",
+    "PostDate": "2026-09-16T10:13:41.4262836",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "AI全栈开发工程师（重庆）(J20347)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "重庆市"
+    ],
+    "Duty": "参与内容营销相关 AI 产品与平台建设，支持内容生产、内容优化、内容分发、效果分析等业务场景。\r\n负责内容营销工具的全栈开发，包括前端交互页面、后端服务、内容处理流程与数据接口建设。\r\n推动大模型在内容营销中的落地应用，如文案生成、标题优化、多语言改写、素材整理、内容审核与智能推荐等。\r\n协助搭建内容生产与管理工作流，提升图文、短视频脚本、营销话术、活动专题页等内容产出效率。\r\n与产品、运营、设计",
+    "Require": "2027 届本科及以上学历，计算机、软件工程、人工智能、信息管理、数据科学等相关专业优先。\r\n具备良好的编程基础，熟悉至少一种后端开发语言，如 Python、JavaScript/TypeScript、Java 等。\r\n熟悉前端开发基础，了解 React、Vue 等主流框架之一，能够完成基础页面开发与交互实现。\r\n了解常见服务端开发流程，能够进行接口开发、数据存储、系统联调和问题排查。\r\n熟悉数据",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "6bae1ffa-9424-4668-9d04-207ebbd5fed5",
+    "PostDate": "2026-09-16T10:13:41.4262836",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "AI全栈开发工程师（重庆）(J20347)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "重庆市"
+    ],
+    "Duty": "参与内容营销相关 AI 产品与平台建设，支持内容生产、内容优化、内容分发、效果分析等业务场景。\r\n负责内容营销工具的全栈开发，包括前端交互页面、后端服务、内容处理流程与数据接口建设。\r\n推动大模型在内容营销中的落地应用，如文案生成、标题优化、多语言改写、素材整理、内容审核与智能推荐等。\r\n协助搭建内容生产与管理工作流，提升图文、短视频脚本、营销话术、活动专题页等内容产出效率。\r\n与产品、运营、设计",
+    "Require": "2027 届本科及以上学历，计算机、软件工程、人工智能、信息管理、数据科学等相关专业优先。\r\n具备良好的编程基础，熟悉至少一种后端开发语言，如 Python、JavaScript/TypeScript、Java 等。\r\n熟悉前端开发基础，了解 React、Vue 等主流框架之一，能够完成基础页面开发与交互实现。\r\n了解常见服务端开发流程，能够进行接口开发、数据存储、系统联调和问题排查。\r\n熟悉数据",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

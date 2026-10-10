@@ -1,0 +1,64 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0214",
+    "company_id": "COM0214",
+    "company": "三一重工股份有限公司",
+    "url": "https://sany.zhiye.com/campus/jobs?shareId=5f8a2b48-00c2-49ed-8cdc-07c882d4eac3&shareSource=2",
+    "notes": ""
+  },
+  "adapter": "zhiye-sany",
+  "source_count": 96,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "LocId",
+      "PostDate",
+      "Classification3",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://sany.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://sany.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=5391791615830105&jobAdId=38ca7dea-0156-4ab6-8772-f2e1a69a3acf&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "38ca7dea-0156-4ab6-8772-f2e1a69a3acf",
+    "PostDate": "2026-09-18T09:00:12",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "塔筒结构设计工程师",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市",
+      "湖南省·长沙市"
+    ],
+    "Duty": "1、塔筒结构设计学习与实践：在带教老师的指导下参与风力发电机组钢制塔筒及混合塔筒的主体结构设计工作，包括塔筒筒体、法兰、门框等主要承力结构件的设计与校核。\r\n2、结构计算与仿真分析：参与风电塔筒的静强度、刚度、稳定性及疲劳寿命等性能计算，学习并运用有限元分析工具（如ANSYS、Abaqus等）进行结构仿真验证。\r\n3、设计规范与标准学习：学习并逐步掌握行业相关设计规范与标准（如IEC 61400、",
+    "Require": "1、学历与专业：机械工程、力学、土木工程、结构工程等相关专业硕士及以上学历。\r\n2、专业基础：掌握结构力学、材料力学、弹性力学、有限元基础理论、疲劳理论等专业基础课程理论。\r\n3、软件技能：\r\n了解或掌握CAD、SolidWorks、Creo等常用工程设计软件\r\n了解或掌握ANSYS、Abaqus等有限元分析软件者优先\r\n具备一定的编程能力者优先\r\n4、英语能力：英语CET-6及以上，具备良好的英",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "38ca7dea-0156-4ab6-8772-f2e1a69a3acf",
+    "PostDate": "2026-09-18T09:00:12",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "塔筒结构设计工程师",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市",
+      "湖南省·长沙市"
+    ],
+    "Duty": "1、塔筒结构设计学习与实践：在带教老师的指导下参与风力发电机组钢制塔筒及混合塔筒的主体结构设计工作，包括塔筒筒体、法兰、门框等主要承力结构件的设计与校核。\r\n2、结构计算与仿真分析：参与风电塔筒的静强度、刚度、稳定性及疲劳寿命等性能计算，学习并运用有限元分析工具（如ANSYS、Abaqus等）进行结构仿真验证。\r\n3、设计规范与标准学习：学习并逐步掌握行业相关设计规范与标准（如IEC 61400、",
+    "Require": "1、学历与专业：机械工程、力学、土木工程、结构工程等相关专业硕士及以上学历。\r\n2、专业基础：掌握结构力学、材料力学、弹性力学、有限元基础理论、疲劳理论等专业基础课程理论。\r\n3、软件技能：\r\n了解或掌握CAD、SolidWorks、Creo等常用工程设计软件\r\n了解或掌握ANSYS、Abaqus等有限元分析软件者优先\r\n具备一定的编程能力者优先\r\n4、英语能力：英语CET-6及以上，具备良好的英",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

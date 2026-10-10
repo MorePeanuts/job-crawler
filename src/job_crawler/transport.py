@@ -196,7 +196,7 @@ class BrowserSession:
             candidates = [
                 r
                 for r in self.responses
-                if r["url"].startswith(expected) and 200 <= r["status"] < 300
+                if r["url"].lower().startswith(expected.lower()) and 200 <= r["status"] < 300
             ]
             valid = []
             for response in candidates:
@@ -278,6 +278,18 @@ class BrowserSession:
                     and "Timeout" in str(exc)
                     and "navigat" in str(exc)
                 )
+                structural_shell = (
+                    isinstance(exc, CrawlError)
+                    and exc.code == "browser_error"
+                    and "Structural: minimal_text" in str(exc)
+                )
+                if structural_shell and ready_endpoints:
+                    for _ in range(int(min(self.config.navigation_timeout, 60))):
+                        if await self._recover_ready_page(
+                            url, ready_endpoints, "空壳启发式提前结束，但声明的业务接口已返回"
+                        ):
+                            return
+                        await asyncio.sleep(1)
                 if navigation_timeout and await self._recover_ready_page(
                     url, ready_endpoints, "导航等待超时，但声明的业务接口已返回"
                 ):
@@ -288,10 +300,14 @@ class BrowserSession:
 
     async def observed(self, needle: str) -> dict[str, Any]:
         reloads = 0
-        for _ in range(4 + self.config.retries):
+        for _ in range(int(min(self.config.navigation_timeout, 60) / 2) + self.config.retries):
             if self.pending:
                 await asyncio.gather(*list(self.pending), return_exceptions=True)
-            matches = [r for r in self.responses if needle in r["url"] and r["status"] < 400]
+            matches = [
+                r
+                for r in self.responses
+                if needle.lower() in r["url"].lower() and r["status"] < 400
+            ]
             if matches:
                 path = self.output / f"observed-{fingerprint(needle)[:12]}.json"
                 write_json(path, matches[-1])
@@ -314,7 +330,9 @@ class BrowserSession:
                 write_json(self.output / f"resource-reload-{reloads}.json", self.resource_failures)
                 await self.open(self.url, ready_endpoints=self.ready_endpoints)
                 continue
-            await self._execute(self.url, "void 0;", delay=2)
+            # Network listeners continue running while the SPA renders. Re-extracting an
+            # incomplete shell through Crawl4AI can produce another premature failure.
+            await asyncio.sleep(2)
         write_json(self.output / "resource-failures.json", self.resource_failures)
         raise CrawlError(
             "api_not_observed", f"未观察到已适配接口 {needle}；需要检查入口、登录或改版"

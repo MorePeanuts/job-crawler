@@ -1,0 +1,63 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0371",
+    "company_id": "COM0371",
+    "company": "苏州东山精密制造股份有限公司",
+    "url": "https://dsbj.zhiye.com/campus/jobs",
+    "notes": "校园招聘"
+  },
+  "adapter": "zhiye-dsbj",
+  "source_count": 15,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "Salary",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://dsbj.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://dsbj.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=7661791615947463&jobAdId=e807f862-520c-422d-8a8d-357975030e15&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22Salary%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "e807f862-520c-422d-8a8d-357975030e15",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "2027届校园行程",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "江苏省·苏州市·昆山市"
+    ],
+    "Duty": "此链接仅用于更新2027届校招行程\n请勿在此进行岗位投递！",
+    "Require": "10月校招行程：\n10月9日下午 清华大学学生职业发展指导中心祖龙广场（时间地点持续更新）   双选会\n\n10月09日14:00-17:00 四川大学望江校区就业指导中心三、四楼                            双选会\n10月10日14:00-18:00 四川大学望江校区（地点持续更新）                                     宣讲会\n\n10月",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "e807f862-520c-422d-8a8d-357975030e15",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "2027届校园行程",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "江苏省·苏州市·昆山市"
+    ],
+    "Duty": "此链接仅用于更新2027届校招行程\n请勿在此进行岗位投递！",
+    "Require": "10月校招行程：\n10月9日下午 清华大学学生职业发展指导中心祖龙广场（时间地点持续更新）   双选会\n\n10月09日14:00-17:00 四川大学望江校区就业指导中心三、四楼                            双选会\n10月10日14:00-18:00 四川大学望江校区（地点持续更新）                                     宣讲会\n\n10月",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0200",
+    "company_id": "COM0200",
+    "company": "上海银行股份有限公司",
+    "url": "https://bosc.zhiye.com/Campus/jobs?queryId=c03f0b7c-44c9-462a-a4f2-a9a2c554476f",
+    "notes": ""
+  },
+  "adapter": "zhiye-bosc",
+  "source_count": 53,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "Org",
+      "PostDate",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://bosc.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://bosc.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=3261791615796696&jobAdId=ace8f3f2-53f9-457f-88db-42a73b1d8392&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "ace8f3f2-53f9-457f-88db-42a73b1d8392",
+    "PostDate": "2026-09-21T13:55:10",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "总行管理培训生",
+    "Org": "总行",
+    "CategoryId": "2",
+    "LocNames": [
+      "上海市"
+    ],
+    "Duty": "培养方向为总分支行管理与专业人才。",
+    "Require": "1、研究生学历应届毕业生，境内院校毕业时间为 2027 年 1 月-2027 年 7 月、境外院校毕业时间为 2026 年 8 月-2027 年 7 月，须在对应时间内取得毕业证（境外院校需取得教育部留学服务中心认证），且为初次就业。\n2、综合素质较好，自我驱动力、学习能力和抗压能力强，具有良好的团队协作精神，在校期间担任学生干部、获得奖学金及其他相关荣誉称号者优先。\n3、诚实守信、责任心强，身体",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "ace8f3f2-53f9-457f-88db-42a73b1d8392",
+    "PostDate": "2026-09-21T13:55:10",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "总行管理培训生",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "上海市"
+    ],
+    "Duty": "培养方向为总分支行管理与专业人才。",
+    "Require": "1、研究生学历应届毕业生，境内院校毕业时间为 2027 年 1 月-2027 年 7 月、境外院校毕业时间为 2026 年 8 月-2027 年 7 月，须在对应时间内取得毕业证（境外院校需取得教育部留学服务中心认证），且为初次就业。\n2、综合素质较好，自我驱动力、学习能力和抗压能力强，具有良好的团队协作精神，在校期间担任学生干部、获得奖学金及其他相关荣誉称号者优先。\n3、诚实守信、责任心强，身体",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}
