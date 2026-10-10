@@ -75,10 +75,24 @@ class Store:
             CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, fingerprint TEXT, started TEXT, status TEXT);
             CREATE TABLE IF NOT EXISTS requests (run_id TEXT, source TEXT, key TEXT, state TEXT, evidence TEXT, error TEXT, PRIMARY KEY(run_id,source,key));
             CREATE TABLE IF NOT EXISTS records (key TEXT PRIMARY KEY, first_seen TEXT, last_seen TEXT, job TEXT);
+            CREATE TABLE IF NOT EXISTS source_history (identity TEXT PRIMARY KEY, snapshot TEXT NOT NULL);
         """)
 
     def close(self) -> None:
         self.db.close()
+
+    def load_history(self, identity: str) -> str | None:
+        row = self.db.execute(
+            "SELECT snapshot FROM source_history WHERE identity=?", (identity,)
+        ).fetchone()
+        return row[0] if row else None
+
+    def save_history(self, identity: str, snapshot: str) -> None:
+        self.db.execute(
+            "INSERT OR REPLACE INTO source_history VALUES (?,?)",
+            (identity, json.dumps(redact(json.loads(snapshot)), ensure_ascii=False)),
+        )
+        self.db.commit()
 
     def begin(
         self, run_id: str, digest: str, now: datetime, resume: bool, max_age_hours: float
@@ -115,14 +129,14 @@ class Store:
         ).fetchone()
         return row[0] if row else None
 
-    def save(self, jobs: list[Job]) -> None:
+    def save(self, jobs: list[Job], *, observed_at: datetime | None = None) -> None:
         for job in jobs:
-            timestamp = job.collected_at.isoformat()
+            timestamp = (observed_at or job.collected_at).isoformat()
             self.db.execute(
                 "INSERT INTO records VALUES (?,?,?,?) ON CONFLICT(key) DO UPDATE SET last_seen=excluded.last_seen,job=excluded.job",
                 (
                     job.key,
-                    timestamp,
+                    (job.first_seen_at or job.collected_at).isoformat(),
                     timestamp,
                     json.dumps(redact(job.model_dump(mode="json")), ensure_ascii=False),
                 ),

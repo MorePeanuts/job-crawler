@@ -41,10 +41,17 @@ class MappingConfig(Model):
     use_source_url_as_apply_url: bool = True
 
 
+class IncrementalConfig(Model):
+    enabled: bool = True
+    refresh_days: float = Field(default=15, gt=0, le=365)
+    include_undated_new: bool = True
+
+
 class Settings(Model):
     crawl: CrawlConfig = Field(default_factory=CrawlConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     mapping: MappingConfig = Field(default_factory=MappingConfig)
+    incremental: IncrementalConfig = Field(default_factory=IncrementalConfig)
 
 
 def load_settings(path: Path | None = None) -> Settings:

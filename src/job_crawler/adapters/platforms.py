@@ -124,6 +124,7 @@ class CCB(Adapter):
                 scope.expected = expected
             check(expected == scope.expected, "建行源总数变化")
             rows = self.add_page(scope, data["planPostList"], seen, ccb_key)
+            list_evidence = self.session.last_evidence
             for row in rows:
                 try:
                     listing_job = self.job(
@@ -139,9 +140,21 @@ class CCB(Adapter):
                             "detail": "仅当列表截止日期明确已过期时跳过详情",
                         },
                     )
+                    listing_job.evidence = [list_evidence] if list_evidence else []
                     if select(listing_job, "all", self.as_of).reason == "expired":
+                        listing_job.detail_mode = "listing_only"
                         self.result.jobs.append(listing_job)
                         scope.skipped_expired += 1
+                        continue
+                    resolved = self.before_detail(
+                        f"job:{ccb_key(row)}",
+                        row,
+                        scope,
+                        listing_job,
+                        evidence=list_evidence,
+                    )
+                    if resolved is not None:
+                        self.result.jobs.extend(resolved)
                         continue
                     if not detail_url:
                         await self.session.open(ccb_url(row))
@@ -170,7 +183,7 @@ class CCB(Adapter):
                             location=text(detail.get("cityName", row.get("workPlace"))),
                             education=text(detail.get("education")),
                             batch=text(detail.get("planName")),
-                            published=text(detail.get("postDate")),
+                            published=text(detail.get("postDate")) or listing_job.published,
                             deadline=text(detail.get("endTime", row.get("endDate"))),
                             duties=text(detail.get("postDesc")),
                             requirements=text(detail.get("PostRequest")),
@@ -178,12 +191,13 @@ class CCB(Adapter):
                             field_sources={
                                 "duties": "NHR107.postDesc",
                                 "requirements": "NHR107.PostRequest",
-                                "published": "NHR107.postDate",
+                                "published": "NHR107.postDate or NHR104.postDate",
                                 "deadline": "NHR107.endTime or NHR104.endDate",
                             },
                         )
                     )
                     scope.details += 1
+                    self.remember(f"job:{ccb_key(row)}", row, [self.result.jobs[-1]])
                 except Exception as exc:
                     self.error(exc, ccb_key(row))
                     if isinstance(exc, CrawlError) and exc.code in {
@@ -224,14 +238,24 @@ class CNPC(Adapter):
                 scope.expected = expected
             check(expected == scope.expected, "中石油启事总数变化")
             rows = self.add_page(scope, data["recruitInfo"], seen, lambda row: str(row["id"]))
-            if rows and not detail_url:
-                await self.session.open(
-                    f"https://{self.host}/recruitInfoshow.html?id={rows[0]['id']}",
-                    ready_endpoints=("/web/recruitInfo/showN?",),
-                )
-                detail_url = (await self.session.observed("/recruitInfo/showN"))["url"]
+            list_evidence = self.session.last_evidence
             for row in rows:
                 try:
+                    resolved = self.before_detail(
+                        f"announcement:{row['id']}",
+                        row,
+                        scope,
+                        evidence=list_evidence,
+                    )
+                    if resolved is not None:
+                        self.result.jobs.extend(resolved)
+                        continue
+                    if not detail_url:
+                        await self.session.open(
+                            f"https://{self.host}/recruitInfoshow.html?id={row['id']}",
+                            ready_endpoints=("/web/recruitInfo/showN?",),
+                        )
+                        detail_url = (await self.session.observed("/recruitInfo/showN"))["url"]
                     data = await self.session.request(
                         query(detail_url, recruitId=row["id"]), detail=True
                     )
@@ -240,6 +264,7 @@ class CNPC(Adapter):
                     positions = data["post"]
                     check(isinstance(positions, list), "中石油公告岗位数组缺失")
                     ids: set[str] = set()
+                    start = len(self.result.jobs)
                     for position in positions:
                         identity = str(position["id"])
                         check(identity not in ids, "中石油同公告岗位 ID 重复")
@@ -276,6 +301,7 @@ class CNPC(Adapter):
                             )
                         )
                     scope.details += 1
+                    self.remember(f"announcement:{row['id']}", row, self.result.jobs[start:])
                 except Exception as exc:
                     self.error(exc, str(row["id"]))
                     if isinstance(exc, CrawlError) and exc.code in {

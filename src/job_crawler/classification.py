@@ -318,8 +318,9 @@ async def classify_snapshot(
     manifest = json.loads((input_path / "manifest.json").read_text(encoding="utf-8"))
     # Preserve the delivered snapshot's selection time, rather than silently losing rows later.
     as_of = datetime.fromisoformat(manifest["as_of"])
-    if manifest["window"] != "all":
-        raise ValueError("classify 当前仅支持 window=all 的完整/汇总快照")
+    window = manifest["window"]
+    if window not in {"all", "day", "week", "month"}:
+        raise ValueError("分类快照时间窗口无效")
     snapshots: dict[str, tuple[Source, Collection]] = {}
     selected: list[Job] = []
     for path in sorted((input_path / "collections").glob("*.json")):
@@ -331,7 +332,14 @@ async def classify_snapshot(
         ):
             raise ValueError("快照来源重复或岗位来源不匹配")
         snapshots[source.source_id] = (source, collection)
-        selected.extend(j for j in collection.jobs if select(j, "all", as_of).kind != "exclude")
+        selected.extend(
+            j
+            for j in collection.jobs
+            if select(
+                j, window, as_of, include_undated_new=settings.incremental.include_undated_new
+            ).kind
+            != "exclude"
+        )
     if set(snapshots) != set(manifest["source_ids"]) or not snapshots:
         raise ValueError("来源快照缺失或多余")
     if len({j.key for j in selected}) != len(selected):

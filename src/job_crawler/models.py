@@ -74,6 +74,9 @@ class Job(Model):
     visible: bool = True
     closed: bool = False
     collected_at: datetime
+    first_seen_at: datetime | None = None
+    discovery_eligible: bool = False
+    detail_mode: Literal["fresh", "cached", "listing_only"] = "fresh"
     evidence: list[str] = Field(default_factory=list)
     field_sources: dict[str, str] = Field(default_factory=dict)
 
@@ -97,6 +100,8 @@ class Scope(Model):
     unique: int = 0
     details: int = 0
     skipped_expired: int = 0
+    skipped_window: int = 0
+    reused_details: int = 0
     unit: str = "岗位"
     terminal: bool = False
     evidence: list[str] = Field(default_factory=list)
@@ -117,7 +122,11 @@ class Collection(Model):
             if (
                 not scope.terminal
                 or scope.listed != scope.unique
-                or scope.details + scope.skipped_expired != scope.unique
+                or scope.details
+                + scope.skipped_expired
+                + scope.skipped_window
+                + scope.reused_details
+                != scope.unique
                 or (scope.expected is not None and scope.unique != scope.expected)
             ):
                 issues.append(Issue(code="coverage_mismatch", message=scope.model_dump_json()))
@@ -141,5 +150,6 @@ class SourceReport(Model):
     exported: int = 0
     review: int = 0
     excluded: dict[str, int] = Field(default_factory=dict)
+    selection_basis: dict[str, int] = Field(default_factory=dict)
     issues: list[Issue] = Field(default_factory=list)
     warnings: list[Issue] = Field(default_factory=list)

@@ -181,14 +181,32 @@ async def test_truncated_response_retried_and_budget_is_bounded(
 
 
 @pytest.mark.parametrize("refine", [False, True])
+@pytest.mark.parametrize("window", ["all", "day"])
 async def test_classified_snapshot_roundtrip_preserves_source_and_reference_time(
-    tmp_path: Path, job: Job, now: datetime, monkeypatch: pytest.MonkeyPatch, refine: bool
+    tmp_path: Path,
+    job: Job,
+    now: datetime,
+    monkeypatch: pytest.MonkeyPatch,
+    refine: bool,
+    window: str,
 ) -> None:
     monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
     settings = load_settings(Path("config.toml"))
     tree = load_taxonomy(TAXONOMY)
     job.title = "市场营销" if refine else "Python 开发"
     job.category_primary = job.category_secondary = ""
+    jobs = [job]
+    if window == "day":
+        jobs.append(
+            job.model_copy(
+                update={
+                    "source_key": "old-listing-only",
+                    "published": "2020-01-01",
+                    "detail_mode": "listing_only",
+                    "title": "不应分类或导出的历史岗位",
+                }
+            )
+        )
     source = Source(source_id=job.source_id, company_id="TEST", company=job.company)
     original = tmp_path / "original"
     write_json(
@@ -196,7 +214,7 @@ async def test_classified_snapshot_roundtrip_preserves_source_and_reference_time
         {
             "run_id": "original",
             "as_of": now.isoformat(),
-            "window": "all",
+            "window": window,
             "source_ids": [source.source_id],
             "bindings": {},
         },
@@ -206,9 +224,17 @@ async def test_classified_snapshot_roundtrip_preserves_source_and_reference_time
         {
             "source": source.model_dump(),
             "collection": Collection(
-                jobs=[job],
+                jobs=jobs,
                 scopes=[
-                    Scope(name="jobs", expected=1, listed=1, unique=1, details=1, terminal=True)
+                    Scope(
+                        name="jobs",
+                        expected=len(jobs),
+                        listed=len(jobs),
+                        unique=len(jobs),
+                        details=1,
+                        skipped_window=len(jobs) - 1,
+                        terminal=True,
+                    )
                 ],
             ).model_dump(mode="json"),
         },
@@ -259,8 +285,10 @@ async def test_classified_snapshot_roundtrip_preserves_source_and_reference_time
     assert result["exported"] == 1
     manifest = json.loads((output / "result" / "manifest.json").read_text())
     assert manifest["as_of"] == now.isoformat()
+    assert manifest["window"] == window
     assert manifest["origins"][source.source_id]["as_of"] == now.isoformat()
     workbook = load_workbook(output / "result" / "岗位信息汇总.xlsx")
+    assert workbook.worksheets[0].max_row == 2
     assert workbook.worksheets[0]["D2"].value == ("市场/广告/公关" if refine else "互联网/AI")
     assert workbook.worksheets[0]["E2"].value == ("市场/品牌推广" if refine else "软件研发")
     workbook.close()

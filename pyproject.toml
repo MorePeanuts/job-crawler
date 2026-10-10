@@ -1,6 +1,6 @@
 [project]
 name = "job-crawler"
-version = "0.0.1a1"
+version = "0.0.1a2"
 description = "Adapter-based recruitment collection with import-template validation"
 requires-python = ">=3.12"
 dependencies = [

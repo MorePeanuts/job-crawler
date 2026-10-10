@@ -45,7 +45,13 @@ def window_start(window: Window, as_of: datetime) -> datetime | None:
     )
 
 
-def select(job: Job, window: Window, as_of: datetime) -> Selection:
+def select(
+    job: Job,
+    window: Window,
+    as_of: datetime,
+    *,
+    include_undated_new: bool = True,
+) -> Selection:
     since = window_start(window, as_of)
     if not job.visible or job.closed:
         return Selection(kind="exclude", reason="not_open")
@@ -71,5 +77,13 @@ def select(job: Job, window: Window, as_of: datetime) -> Selection:
         if since is not None and end < since:
             return Selection(kind="exclude", reason="outside_window")
     elif since is not None:
+        if window == "day" and include_undated_new and job.first_seen_at is not None:
+            if job.first_seen_at.tzinfo is None or job.first_seen_at > as_of:
+                return Selection(kind="review", reason="invalid_discovery_time")
+            if not job.discovery_eligible:
+                return Selection(kind="exclude", reason="undated_baseline")
+            if job.first_seen_at < since:
+                return Selection(kind="exclude", reason="discovery_outside_window")
+            return Selection(kind="include", reason="first_discovered_without_publication")
         return Selection(kind="review", reason="missing_publication")
     return Selection(kind="include", reason="eligible")

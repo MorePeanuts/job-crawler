@@ -15,6 +15,7 @@ from job_crawler.config import Settings
 from job_crawler.exporter import enums, export_workbook, import_errors, normalize, validate_mapping
 from job_crawler.field_extraction import field_audit
 from job_crawler.filtering import SHANGHAI, Window, select, window_start
+from job_crawler.incremental import IncrementalSource
 from job_crawler.llm import Enricher
 from job_crawler.models import Binding, Collection, Issue, Job, Source, SourceReport
 from job_crawler.storage import Store, fingerprint, write_json
@@ -76,6 +77,7 @@ async def prepare_export(
             )
             seen: set[str] = set()
             excluded: Counter[str] = Counter()
+            basis: Counter[str] = Counter()
             for original in collection.jobs:
                 if original.key in seen:
                     report.issues.append(
@@ -87,11 +89,18 @@ async def prepare_export(
                     )
                     continue
                 seen.add(original.key)
-                selection = select(original, window, as_of)
+                selection = select(
+                    original,
+                    window,
+                    as_of,
+                    include_undated_new=settings.incremental.include_undated_new,
+                )
                 if selection.kind == "exclude":
                     excluded[selection.reason] += 1
                     continue
                 job = normalize(original, settings.mapping)
+                job.field_sources["selection"] = selection.reason
+                basis[selection.reason] += 1
                 if binding and binding.company_name:
                     job.company = binding.company_name
                 else:
@@ -128,6 +137,7 @@ async def prepare_export(
                     report.exported += 1
                     valid.append(job)
             report.excluded = dict(excluded)
+            report.selection_basis = dict(basis)
             report.coverage = (
                 "complete"
                 if not issues and not any(i.code == "duplicate_identity" for i in report.issues)
@@ -182,6 +192,14 @@ def save_results(
     )
     write_json(output / "report.json", report)
     export_workbook(output / "jobs.xlsx", valid)
+    export_workbook(
+        output / "岗位信息汇总.xlsx",
+        sorted(
+            [*valid, *(Job.model_validate(row["job"]) for row in review)],
+            key=lambda j: (j.company, j.title, j.key),
+        ),
+        information=True,
+    )
     return report
 
 
@@ -250,6 +268,21 @@ async def run(
                 )
             else:
                 print(f"采集 {source.source_id} {source.company} ({binding.adapter})", flush=True)
+                incremental = IncrementalSource(
+                    store,
+                    fingerprint(
+                        {
+                            "source": source.model_dump(),
+                            "adapter": binding.adapter,
+                            "version": binding.version,
+                            "code": code_digest(),
+                        }
+                    ),
+                    window,
+                    as_of,
+                    now,
+                    settings.incremental,
+                )
                 try:
                     async with BrowserSession(
                         source.source_id,
@@ -259,7 +292,13 @@ async def run(
                         settings.crawl,
                         resume,
                     ) as session:
-                        adapter = REGISTRY[binding.adapter](source, session, now, as_of)
+                        adapter = REGISTRY[binding.adapter](
+                            source,
+                            session,
+                            now,
+                            as_of,
+                            incremental=incremental,
+                        )
                         collection = await adapter.collect()
                         collection.warnings.extend(session.navigation_warnings)
                 except Exception as exc:
@@ -268,8 +307,9 @@ async def run(
                             code="session_error", message=f"{type(exc).__name__}: {str(exc)[:600]}"
                         )
                     )
+                incremental.finish(collection)
             collections[source.source_id] = collection
-            store.save(collection.jobs)
+            store.save(collection.jobs, observed_at=now)
             write_json(
                 output / "collections" / f"{fingerprint(source.source_id)[:16]}.json",
                 {"source": source.model_dump(), "collection": collection.model_dump(mode="json")},
