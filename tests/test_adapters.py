@@ -218,6 +218,25 @@ async def test_detail_failure_preserves_success_and_fails_coverage(now: datetime
     assert result.coverage_issues()
 
 
+async def test_ccb_skips_only_proven_expired_details(now: datetime) -> None:
+    class ExpiredReplay(Replay):
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            response = await super().request(url, payload=payload, detail=detail)
+            for row in response.get("planPostList", []):
+                row["endDate"] = "2026-10-09"
+            return response
+
+    session = ExpiredReplay("ccb")
+    result = await CCB(source(CCB.host), session, now).collect()
+    assert not any(detail for _, _, detail in session.calls)
+    assert result.scopes[0].skipped_expired == 2
+    assert result.scopes[0].details == 0
+    assert len(result.jobs) == 2 and not result.coverage_issues()
+    assert all(job.deadline == "2026-10-09" for job in result.jobs)
+
+
 async def test_cnpc_announcements_expand_into_distinct_jobs(now: datetime) -> None:
     result = await CNPC(source(CNPC.host), Replay("cnpc"), now).collect()
     assert len(result.jobs) == 2

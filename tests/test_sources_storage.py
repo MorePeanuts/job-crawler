@@ -72,3 +72,4 @@ def test_credentials_redacted() -> None:
     )
     assert "secret" not in str(value)
     assert "id=1" in value["url"]
+    assert "secret" not in str(redact({"body": '{"access_token":"secret","id":1}'}))

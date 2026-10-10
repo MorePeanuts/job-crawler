@@ -74,5 +74,15 @@ async def test_unknown_source_run_and_reexport(tmp_path: Path) -> None:
     exported = await reexport(output, tmp_path / "exported", Settings())
     assert exported["as_of"] == report["as_of"]
     assert exported["status"] == "blocked"
+    chained = await reexport(tmp_path / "exported", tmp_path / "reexported-again", Settings())
+    assert chained["as_of"] == report["as_of"]
+    resumed = await run(
+        [source], {}, Settings(), output=output, resume=True, state=tmp_path / "state.db"
+    )
+    assert resumed["run_id"] == report["run_id"]
+    changed = Settings()
+    changed.crawl.delay = 5
+    with pytest.raises(ValueError, match="变化"):
+        await run([source], {}, changed, output=output, resume=True, state=tmp_path / "state.db")
     with pytest.raises(ValueError, match="非空"):
         await run([source], {}, Settings(), output=output, state=tmp_path / "state.db")

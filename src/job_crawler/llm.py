@@ -64,6 +64,20 @@ class Enricher:
             ],
             response_format={"type": "json_object"},
             max_tokens=self.config.max_tokens,
+            extra_body=self.config.extra_body
+            or (
+                {"thinking": {"type": "disabled"}} if self.config.model == "deepseek-flash" else {}
+            ),
+        )
+        write_json(
+            self.output / f"{self.calls:05}.json",
+            {
+                "job": job.key,
+                "model": self.config.model,
+                "finish_reason": response.choices[0].finish_reason if response.choices else None,
+                "raw_output": response.choices[0].message.content if response.choices else None,
+                "usage": response.usage.model_dump() if response.usage else None,
+            },
         )
         if not response.choices or response.choices[0].finish_reason != "stop":
             raise ValueError("LLM 输出未完整结束")
@@ -76,6 +90,15 @@ class Enricher:
         )
         for field, value in data.items():
             if value is None:
+                continue
+            expected_keys = (
+                {"value", "quote"} if field == "education" else {"primary", "secondary", "quote"}
+            )
+            if (
+                isinstance(value, dict)
+                and set(value) == expected_keys
+                and all(item is None for item in value.values())
+            ):
                 continue
             if (
                 not isinstance(value, dict)

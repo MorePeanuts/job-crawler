@@ -6,6 +6,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlencode, urljoin, urlsplit
 
 from job_crawler.adapters.base import Adapter, query, text
+from job_crawler.filtering import select
 from job_crawler.models import Scope
 from job_crawler.transport import CrawlError
 
@@ -123,11 +124,28 @@ class CCB(Adapter):
                 scope.expected = expected
             check(expected == scope.expected, "建行源总数变化")
             rows = self.add_page(scope, data["planPostList"], seen, ccb_key)
-            if rows and not detail_url:
-                await self.session.open(ccb_url(rows[0]))
-                detail_url = (await self.session.observed("TXCODE=NHR107"))["url"]
             for row in rows:
                 try:
+                    listing_job = self.job(
+                        ccb_key(row),
+                        title=text(row["planPostName"]),
+                        unit=text(row.get("orgName")),
+                        location=text(row.get("workPlace")),
+                        published=text(row.get("postDate")),
+                        deadline=text(row.get("endDate")),
+                        source_url=ccb_url(row),
+                        field_sources={
+                            "deadline": "NHR104.endDate",
+                            "detail": "仅当列表截止日期明确已过期时跳过详情",
+                        },
+                    )
+                    if select(listing_job, "all", self.as_of).reason == "expired":
+                        self.result.jobs.append(listing_job)
+                        scope.skipped_expired += 1
+                        continue
+                    if not detail_url:
+                        await self.session.open(ccb_url(row))
+                        detail_url = (await self.session.observed("TXCODE=NHR107"))["url"]
                     check(bool(row["planPost"]) and bool(row["planId"]), "建行缺少计划或岗位标识")
                     detail = await self.session.request(
                         query(
@@ -170,6 +188,7 @@ class CCB(Adapter):
                     self.error(exc, ccb_key(row))
                     if isinstance(exc, CrawlError) and exc.code in {
                         "request_budget",
+                        "time_budget",
                         "access_denied",
                     }:
                         raise
@@ -259,6 +278,7 @@ class CNPC(Adapter):
                     self.error(exc, str(row["id"]))
                     if isinstance(exc, CrawlError) and exc.code in {
                         "request_budget",
+                        "time_budget",
                         "access_denied",
                     }:
                         raise
@@ -357,7 +377,11 @@ class Alibaba(Adapter):
                 catalog.details += 1
             except Exception as exc:
                 self.error(exc, f"batch:{batch['id']}")
-                if isinstance(exc, CrawlError) and exc.code in {"request_budget", "access_denied"}:
+                if isinstance(exc, CrawlError) and exc.code in {
+                    "request_budget",
+                    "time_budget",
+                    "access_denied",
+                }:
                     raise
         await self.session.open(f"https://{self.host}/campus/alistar")
         config = await self.session.observed("new-campus-alistar/0.0.1/default.json")

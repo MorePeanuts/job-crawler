@@ -36,10 +36,17 @@ class Adapter:
     path = ""
     scope_description = ""
 
-    def __init__(self, source: Source, session: Session, collected_at: datetime):
+    def __init__(
+        self,
+        source: Source,
+        session: Session,
+        collected_at: datetime,
+        as_of: datetime | None = None,
+    ):
         self.source = source
         self.session = session
         self.collected_at = collected_at
+        self.as_of = as_of or collected_at
         self.result = Collection(scope_description=self.scope_description)
 
     async def collect(self) -> Collection:

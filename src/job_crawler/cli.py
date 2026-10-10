@@ -7,6 +7,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from job_crawler.config import load_bindings, load_settings
 from job_crawler.filtering import SHANGHAI
 from job_crawler.models import Source
@@ -155,6 +157,11 @@ def main(argv: list[str] | None = None) -> int:
             )
         )
         return 0 if report["status"] == "complete" else 2
+    except ValidationError as exc:
+        # Pydantic's default text includes the input value, which could be a pasted credential.
+        errors = exc.errors(include_input=False, include_context=False, include_url=False)
+        print(f"配置/输入错误: {json.dumps(errors, ensure_ascii=False)}", file=sys.stderr)
+        return 1
     except (ValueError, OSError, KeyError) as exc:
         print(f"配置/输入错误: {exc}", file=sys.stderr)
         return 1

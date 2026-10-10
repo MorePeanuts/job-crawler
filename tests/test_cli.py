@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from job_crawler.cli import main
 
 
@@ -30,3 +32,12 @@ def test_import_does_not_overwrite_without_explicit_flag(tmp_path: Path) -> None
     args = ["sources", "import", "sites/sources.csv", "--file", str(output)]
     assert main(args) == 0
     assert main(args) == 1
+
+
+def test_validation_error_does_not_echo_secrets(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = tmp_path / "bad.toml"
+    config.write_text('[llm]\napi_key="do-not-print-test-secret"\n')
+    assert main(["check", "--config", str(config)]) == 1
+    assert "do-not-print-test-secret" not in capsys.readouterr().err

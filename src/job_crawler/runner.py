@@ -110,7 +110,9 @@ async def prepare_export(
                             report.issues.append(
                                 Issue(
                                     code="llm_error",
-                                    message="模型调用失败、预算耗尽或输出未通过引证校验；检查配置及待补全记录",
+                                    message=str(exc)
+                                    if isinstance(exc, ValueError)
+                                    else f"模型调用失败 ({type(exc).__name__})；检查端点、网络与密钥配置",
                                     job_key=job.key,
                                 )
                             )
@@ -246,7 +248,7 @@ async def run(
                         settings.crawl,
                         resume,
                     ) as session:
-                        adapter = REGISTRY[binding.adapter](source, session, now)
+                        adapter = REGISTRY[binding.adapter](source, session, now, as_of)
                         collection = await adapter.collect()
                 except Exception as exc:
                     collection.issues.append(
@@ -300,4 +302,13 @@ async def reexport(input_dir: Path, output: Path, settings: Settings) -> dict[st
     )
     manifest["reexported_from"] = str(await asyncio.to_thread(input_dir.absolute))
     manifest["reexport_settings"] = settings.model_dump()
+    write_json(output / "manifest.json", manifest)
+    for source in sources:
+        write_json(
+            output / "collections" / f"{fingerprint(source.source_id)[:16]}.json",
+            {
+                "source": source.model_dump(),
+                "collection": collections[source.source_id].model_dump(mode="json"),
+            },
+        )
     return save_results(output, manifest, collections, valid, review, reports)

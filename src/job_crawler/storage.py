@@ -23,6 +23,10 @@ SECRET_KEYS = {
     "sessionid",
     "session_id",
     "password",
+    "accesstoken",
+    "refreshtoken",
+    "csrftoken",
+    "csrf_token",
 }
 
 
@@ -35,8 +39,15 @@ def redact(value: Any) -> Any:
     if isinstance(value, list):
         return [redact(item) for item in value]
     if isinstance(value, str):
+        if value.lstrip().startswith(("{", "[")):
+            try:
+                parsed = json.loads(value, strict=False)
+                if isinstance(parsed, (dict, list)):
+                    return json.dumps(redact(parsed), ensure_ascii=False)
+            except ValueError:
+                pass
         return re.sub(
-            r"(?i)([?&](?:token|access_token|refresh_token|sessionid|session_id|_csrf|csrf|api_key)=)[^&\s\"<>]+",
+            r"(?i)([?&](?:token|access_?token|refresh_?token|session_?id|_?csrf|api_?key)=)[^&\s\"<>]+",
             r"\1[REDACTED]",
             value,
         )

@@ -3,6 +3,7 @@
 import asyncio
 import json
 import os
+import time
 from pathlib import Path
 from typing import Any, Protocol, cast
 
@@ -50,6 +51,15 @@ class BrowserSession:
         self.responses: list[dict[str, Any]] = []
         self.pending: set[asyncio.Task[None]] = set()
         self.capture = True
+        self.started = time.monotonic()
+        self.resource_failures: list[dict[str, Any]] = []
+
+    def consume_request(self) -> None:
+        if time.monotonic() - self.started >= self.config.max_seconds:
+            raise CrawlError("time_budget", "单来源运行时间预算耗尽")
+        if self.requests >= self.config.max_requests:
+            raise CrawlError("request_budget", "请求预算耗尽")
+        self.requests += 1
 
     async def __aenter__(self) -> "BrowserSession":
         runtime = await asyncio.to_thread(Path(".runtime").resolve)
@@ -82,12 +92,21 @@ class BrowserSession:
         self.page = page
 
         def on_response(response: Any) -> None:
+            if response.status >= 400:
+                self.resource_failures.append({"url": response.url, "status": response.status})
+                self.resource_failures = self.resource_failures[-30:]
             if self.capture and response.request.resource_type in {"xhr", "fetch"}:
                 task = asyncio.create_task(self._observe(response))
                 self.pending.add(task)
                 task.add_done_callback(self.pending.discard)
 
         page.on("response", on_response)
+
+        def on_failure(request: Any) -> None:
+            self.resource_failures.append({"url": request.url, "error": request.failure})
+            self.resource_failures = self.resource_failures[-30:]
+
+        page.on("requestfailed", on_failure)
         return page
 
     async def _observe(self, response: Any) -> None:
@@ -111,9 +130,7 @@ class BrowserSession:
     async def _execute(self, url: str, js: str | None = None, delay: float = 0) -> Any:
         from crawl4ai import CacheMode, CrawlerRunConfig
 
-        if self.requests >= self.config.max_requests:
-            raise CrawlError("request_budget", "请求预算耗尽")
-        self.requests += 1
+        self.consume_request()
         await asyncio.sleep(self.config.delay)
         async with asyncio.timeout(self.config.timeout + 10):
             result = await self.crawler.arun(
@@ -139,15 +156,37 @@ class BrowserSession:
         return result
 
     async def open(self, url: str) -> None:
-        self.responses.clear()
-        result = await self._execute(url, delay=5)
-        self.url = url
-        path = self.output / f"page-{self.requests:05}.json"
-        write_json(path, {"url": url, "status": result.status_code, "html": result.html})
-        self.last_evidence = str(path)
+        for attempt in range(self.config.retries + 1):
+            self.responses.clear()
+            self.resource_failures.clear()
+            try:
+                result = await self._execute(url, delay=5)
+                self.url = url
+                path = self.output / f"page-{self.requests:05}.json"
+                write_json(path, {"url": url, "status": result.status_code, "html": result.html})
+                self.last_evidence = str(path)
+                return
+            except Exception as exc:
+                write_json(
+                    self.output / f"page-{self.requests:05}-error.json",
+                    {
+                        "url": url,
+                        "error": str(exc)[:1000],
+                        "resource_failures": self.resource_failures,
+                    },
+                )
+                retryable = (
+                    isinstance(exc, TimeoutError)
+                    or isinstance(exc, CrawlError)
+                    and exc.code == "browser_error"
+                )
+                if not retryable or attempt == self.config.retries:
+                    raise
+                await asyncio.sleep(min(2**attempt, 4))
 
     async def observed(self, needle: str) -> dict[str, Any]:
-        for _ in range(4):
+        reloads = 0
+        for _ in range(4 + self.config.retries):
             if self.pending:
                 await asyncio.gather(*list(self.pending), return_exceptions=True)
             matches = [r for r in self.responses if needle in r["url"] and r["status"] < 400]
@@ -156,7 +195,25 @@ class BrowserSession:
                 write_json(path, matches[-1])
                 self.last_evidence = str(path)
                 return matches[-1]
+            transient = any(
+                any(
+                    marker in str(failure.get("error", ""))
+                    for marker in (
+                        "ERR_INCOMPLETE_CHUNKED_ENCODING",
+                        "ERR_CONNECTION_RESET",
+                        "ERR_TIMED_OUT",
+                    )
+                )
+                or failure.get("status", 0) >= 500
+                for failure in self.resource_failures
+            )
+            if transient and reloads < self.config.retries:
+                reloads += 1
+                write_json(self.output / f"resource-reload-{reloads}.json", self.resource_failures)
+                await self.open(self.url)
+                continue
             await self._execute(self.url, "void 0;", delay=2)
+        write_json(self.output / "resource-failures.json", self.resource_failures)
         raise CrawlError(
             "api_not_observed", f"未观察到已适配接口 {needle}；需要检查入口、登录或改版"
         )
@@ -192,15 +249,21 @@ class BrowserSession:
         for attempt in range(self.config.retries + 1):
             try:
                 self.capture = False
-                if self.requests >= self.config.max_requests:
-                    raise CrawlError("request_budget", "请求预算耗尽")
-                self.requests += 1
+                self.consume_request()
                 await asyncio.sleep(self.config.delay)
                 async with asyncio.timeout(self.config.timeout + 5):
                     response = await self.page.evaluate("async () => {" + script + "}")
                 if not isinstance(response, dict) or "body" not in response:
                     raise CrawlError("api_execution", "浏览器没有返回接口响应")
                 if response["status"] >= 400:
+                    write_json(
+                        path,
+                        {
+                            "url": url,
+                            "status": response["status"],
+                            "body": response["body"][:50000],
+                        },
+                    )
                     raise CrawlError(
                         "access_denied" if response["status"] in {401, 403} else "http_error",
                         f"HTTP {response['status']}",
@@ -217,9 +280,13 @@ class BrowserSession:
                 return data
             except Exception as exc:
                 self.store.request(
-                    self.run_id, self.source_id, key, "failed", error=str(exc)[:1000]
+                    self.run_id, self.source_id, key, "failed", str(path), error=str(exc)[:1000]
                 )
-                if isinstance(exc, CrawlError) and exc.code in {"access_denied", "request_budget"}:
+                if isinstance(exc, CrawlError) and exc.code in {
+                    "access_denied",
+                    "request_budget",
+                    "time_budget",
+                }:
                     raise
                 if attempt == self.config.retries:
                     raise

@@ -96,6 +96,7 @@ class Scope(Model):
     listed: int = 0
     unique: int = 0
     details: int = 0
+    skipped_expired: int = 0
     unit: str = "岗位"
     terminal: bool = False
     evidence: list[str] = Field(default_factory=list)
@@ -115,7 +116,7 @@ class Collection(Model):
             if (
                 not scope.terminal
                 or scope.listed != scope.unique
-                or scope.details != scope.unique
+                or scope.details + scope.skipped_expired != scope.unique
                 or (scope.expected is not None and scope.unique != scope.expected)
             ):
                 issues.append(Issue(code="coverage_mismatch", message=scope.model_dump_json()))

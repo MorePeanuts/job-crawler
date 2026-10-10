@@ -2,6 +2,7 @@
 
 import tomllib
 from pathlib import Path
+from typing import Any
 
 from pydantic import Field
 
@@ -16,9 +17,11 @@ class LLMConfig(Model):
     max_calls: int = Field(default=20, ge=0)
     timeout: float = Field(default=60, gt=0)
     max_tokens: int = Field(default=1500, ge=100)
+    extra_body: dict[str, Any] = Field(default_factory=dict)
 
 
 class CrawlConfig(Model):
+    max_seconds: float = Field(default=3600, gt=0)
     timeout: float = Field(default=60, gt=0)
     max_requests: int = Field(default=20000, ge=1)
     delay: float = Field(default=0.3, ge=0)

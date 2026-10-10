@@ -45,7 +45,12 @@ async def test_custom_model_env_and_evidence(
         MappingConfig(),
         tmp_path,
     )
-    client = FakeClient({"education": {"value": "本科", "quote": "本科及以上"}})
+    client = FakeClient(
+        {
+            "education": {"value": "本科", "quote": "本科及以上"},
+            "category": {"primary": None, "secondary": None, "quote": None},
+        }
+    )
     monkeypatch.setattr(enricher, "client", client)
     result = await enricher.enrich(job)
     assert result.education == "本科"
