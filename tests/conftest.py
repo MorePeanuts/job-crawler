@@ -7,6 +7,12 @@ from job_crawler.filtering import SHANGHAI
 from job_crawler.models import Job
 
 
+@pytest.fixture(autouse=True)
+def isolate_model_credentials(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The suite must never spend the developer's configured production API key.
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+
+
 @pytest.fixture
 def now() -> datetime:
     return datetime(2026, 10, 10, 12, tzinfo=SHANGHAI)

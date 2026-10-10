@@ -12,7 +12,6 @@ from typing import Any
 from openai import AsyncOpenAI, OpenAIError
 from pydantic import Field
 
-from job_crawler.bundle import bundle
 from job_crawler.config import Settings
 from job_crawler.exporter import validate_mapping
 from job_crawler.filtering import select
@@ -125,7 +124,18 @@ class Classifier:
             "prompt": PROMPT_VERSION,
             "system": self.system,
             "taxonomy": taxonomy.model_dump(),
-            "llm": settings.llm.model_dump(exclude={"enabled", "max_calls", "api_key_env"}),
+            "llm": settings.llm.model_dump(
+                exclude={
+                    "enabled",
+                    "max_calls",
+                    "api_key_env",
+                    "batch_size",
+                    "concurrency",
+                    "refine",
+                    "cache_dir",
+                    "education_cache_dir",
+                }
+            ),
         }
         if compact:
             self.identity["tree_representation"] = "paths"
@@ -154,7 +164,7 @@ class Classifier:
                     results[key] = item
                     self.cache_hits += 1
                     continue
-                except (ValueError, KeyError):
+                except (ValueError, KeyError, TypeError, OSError):
                     pass  # Corrupt/stale cache is not an accepted classification.
             pending[key] = content
         if not pending:
@@ -165,7 +175,10 @@ class Classifier:
         config = self.settings.llm
         secret = os.getenv(config.api_key_env)
         if not secret:
-            raise ValueError(f"缺少 LLM 密钥环境变量 {config.api_key_env}")
+            self.errors.update(
+                {key: f"缺少 LLM 密钥环境变量 {config.api_key_env}" for key in pending}
+            )
+            return results
         async with AsyncOpenAI(
             api_key=secret, base_url=config.base_url, timeout=config.timeout, max_retries=0
         ) as client:
@@ -298,52 +311,20 @@ class Classifier:
         return results
 
 
-async def classify_snapshot(
-    input_path: Path,
-    output: Path,
+async def classify_jobs(
+    selected: list[Job],
     settings: Settings,
     taxonomy: Taxonomy,
+    output: Path,
     *,
     cache: Path,
-    max_calls: int = 1000,
-    concurrency: int = 5,
-    batch_size: int = 10,
-    refine: bool = False,
+    as_of: datetime,
+    max_calls: int,
+    concurrency: int,
+    batch_size: int,
+    refine: bool,
 ) -> dict[str, Any]:
-    if await asyncio.to_thread(lambda: output.exists() and any(output.iterdir())):
-        raise ValueError("分类输出目录必须为空；可用同一 cache 和新 output 继续")
-    validate_mapping(settings.mapping)
-    if taxonomy.paths() != settings.mapping.category_paths:
-        raise ValueError("分类资源与配置中的父子路径不一致，请先同步分类配置")
-    manifest = json.loads((input_path / "manifest.json").read_text(encoding="utf-8"))
-    # Preserve the delivered snapshot's selection time, rather than silently losing rows later.
-    as_of = datetime.fromisoformat(manifest["as_of"])
-    window = manifest["window"]
-    if window not in {"all", "day", "week", "month"}:
-        raise ValueError("分类快照时间窗口无效")
-    snapshots: dict[str, tuple[Source, Collection]] = {}
-    selected: list[Job] = []
-    for path in sorted((input_path / "collections").glob("*.json")):
-        raw = json.loads(path.read_text(encoding="utf-8"))
-        source = Source.model_validate(raw["source"])
-        collection = Collection.model_validate(raw["collection"])
-        if source.source_id in snapshots or any(
-            j.source_id != source.source_id for j in collection.jobs
-        ):
-            raise ValueError("快照来源重复或岗位来源不匹配")
-        snapshots[source.source_id] = (source, collection)
-        selected.extend(
-            j
-            for j in collection.jobs
-            if select(
-                j, window, as_of, include_undated_new=settings.incremental.include_undated_new
-            ).kind
-            != "exclude"
-        )
-    if set(snapshots) != set(manifest["source_ids"]) or not snapshots:
-        raise ValueError("来源快照缺失或多余")
-    if len({j.key for j in selected}) != len(selected):
-        raise ValueError("快照岗位 ID 重复")
+    """Classify supplied jobs in place with the same cache and validation as the CLI."""
     classifier = Classifier(
         settings,
         taxonomy,
@@ -353,7 +334,30 @@ async def classify_snapshot(
         concurrency=concurrency,
         batch_size=batch_size,
     )
-    results = await classifier.classify(selected)
+    # A previously successful refinement is the final decision; reuse it before
+    # retrying a base classification that may have been unresolved last time.
+    cached_refined: dict[str, Decision] = {}
+    if refine:
+        cached_reviewer = Classifier(
+            settings,
+            taxonomy,
+            cache,
+            output / "classification-refinement",
+            max_calls=0,
+            concurrency=concurrency,
+            batch_size=batch_size,
+            compact=True,
+        )
+        cached = await cached_reviewer.classify(selected)
+        for job in selected:
+            content = job_content(job)
+            item = cached.get(cached_reviewer.content_id(content))
+            if item:
+                cached_refined[classifier.content_id(content)] = item
+    results = await classifier.classify(
+        [j for j in selected if classifier.content_id(job_content(j)) not in cached_refined]
+    )
+    results.update(cached_refined)
     refinement: Classifier | None = None
     if refine:
         leaf_paths: dict[str, set[tuple[str, str]]] = {}
@@ -365,6 +369,8 @@ async def classify_snapshot(
                     )
         candidates: list[Job] = []
         for job in selected:
+            if classifier.content_id(job_content(job)) in cached_refined:
+                continue
             item = results.get(classifier.content_id(job_content(job)))
             title = re.sub(r"[（(][^()（）]*[）)]", "", job.title).strip().casefold()
             exact = leaf_paths.get(title, set())
@@ -415,6 +421,85 @@ async def classify_snapshot(
                 "error": classifier.errors.get(key),
             }
         )
+    counts = Counter(j.category_primary for j in selected)
+    classified = sum(bool(j.category_secondary) for j in selected)
+    summary = {
+        "selected": len(selected),
+        "classified": classified,
+        "unresolved": len(selected) - classified,
+        "calls": classifier.calls + (refinement.calls if refinement else 0),
+        "cache_hits": classifier.cache_hits
+        + len(cached_refined)
+        + (refinement.cache_hits if refinement else 0),
+        "refinement_calls": refinement.calls if refinement else 0,
+        "by_primary": dict(counts),
+        "taxonomy_sha256": taxonomy.sha256,
+        "model": settings.llm.model,
+        "as_of": as_of.isoformat(),
+        "items": audit,
+    }
+    return summary
+
+
+async def classify_snapshot(
+    input_path: Path,
+    output: Path,
+    settings: Settings,
+    taxonomy: Taxonomy,
+    *,
+    cache: Path,
+    max_calls: int = 1000,
+    concurrency: int = 5,
+    batch_size: int = 10,
+    refine: bool = False,
+) -> dict[str, Any]:
+    if await asyncio.to_thread(lambda: output.exists() and any(output.iterdir())):
+        raise ValueError("分类输出目录必须为空；可用同一 cache 和新 output 继续")
+    validate_mapping(settings.mapping)
+    if taxonomy.paths() != settings.mapping.category_paths:
+        raise ValueError("分类资源与配置中的父子路径不一致，请先同步分类配置")
+    manifest = json.loads((input_path / "manifest.json").read_text(encoding="utf-8"))
+    # Preserve the delivered snapshot's selection time, rather than silently losing rows later.
+    as_of = datetime.fromisoformat(manifest["as_of"])
+    window = manifest["window"]
+    if window not in {"all", "day", "week", "month"}:
+        raise ValueError("分类快照时间窗口无效")
+    snapshots: dict[str, tuple[Source, Collection]] = {}
+    selected: list[Job] = []
+    for path in sorted((input_path / "collections").glob("*.json")):
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        source = Source.model_validate(raw["source"])
+        collection = Collection.model_validate(raw["collection"])
+        if source.source_id in snapshots or any(
+            j.source_id != source.source_id for j in collection.jobs
+        ):
+            raise ValueError("快照来源重复或岗位来源不匹配")
+        snapshots[source.source_id] = (source, collection)
+        selected.extend(
+            j
+            for j in collection.jobs
+            if select(
+                j, window, as_of, include_undated_new=settings.incremental.include_undated_new
+            ).kind
+            != "exclude"
+        )
+    if set(snapshots) != set(manifest["source_ids"]) or not snapshots:
+        raise ValueError("来源快照缺失或多余")
+    if len({j.key for j in selected}) != len(selected):
+        raise ValueError("快照岗位 ID 重复")
+    summary = await classify_jobs(
+        selected,
+        settings,
+        taxonomy,
+        output,
+        cache=cache,
+        as_of=as_of,
+        max_calls=max_calls,
+        concurrency=concurrency,
+        batch_size=batch_size,
+        refine=refine,
+    )
+    audit = summary["items"]
     stage = output / "classified-snapshot"
     manifest["classification"] = {
         "taxonomy": taxonomy.sha256,
@@ -429,22 +514,9 @@ async def classify_snapshot(
         )
     offline = settings.model_copy(deep=True)
     offline.llm.enabled = False
+    from job_crawler.bundle import bundle
+
     report = await bundle([stage], output / "result", offline, as_of=as_of)
-    counts = Counter(j.category_primary for j in selected)
-    classified = sum(bool(j.category_secondary) for j in selected)
-    summary = {
-        "selected": len(selected),
-        "classified": classified,
-        "unresolved": len(selected) - classified,
-        "calls": classifier.calls + (refinement.calls if refinement else 0),
-        "cache_hits": classifier.cache_hits + (refinement.cache_hits if refinement else 0),
-        "refinement_calls": refinement.calls if refinement else 0,
-        "by_primary": dict(counts),
-        "taxonomy_sha256": taxonomy.sha256,
-        "model": settings.llm.model,
-        "as_of": as_of.isoformat(),
-        "items": audit,
-    }
     write_json(output / "classification-report.json", summary)
     job_lookup = {job.key: job for job in selected}
     write_json(
