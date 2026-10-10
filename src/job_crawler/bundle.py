@@ -14,7 +14,9 @@ from job_crawler.runner import prepare_export, save_results
 from job_crawler.storage import fingerprint, write_json
 
 
-async def bundle(inputs: list[Path], output: Path, settings: Settings) -> dict[str, Any]:
+async def bundle(
+    inputs: list[Path], output: Path, settings: Settings, *, as_of: datetime | None = None
+) -> dict[str, Any]:
     """Inputs may be entire runs or individual collections/*.json files."""
     if await asyncio.to_thread(lambda: output.exists() and any(output.iterdir())):
         raise ValueError("汇总输出目录必须为空")
@@ -62,7 +64,7 @@ async def bundle(inputs: list[Path], output: Path, settings: Settings) -> dict[s
             raise ValueError(f"运行缺少来源文件: {item}；可明确选择已完成的单个来源文件")
     if not sources:
         raise ValueError("没有输入来源")
-    as_of = datetime.now(SHANGHAI)
+    as_of = as_of or datetime.now(SHANGHAI)
     valid, review, reports = await prepare_export(
         collections, sources, bindings, settings, "all", as_of, output
     )

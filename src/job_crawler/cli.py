@@ -5,16 +5,19 @@ import asyncio
 import json
 import sys
 from datetime import datetime
+from importlib.resources import files
 from pathlib import Path
 
 from pydantic import ValidationError
 
 from job_crawler.bundle import bundle
+from job_crawler.classification import classify_snapshot
 from job_crawler.config import load_bindings, load_settings
 from job_crawler.filtering import SHANGHAI
 from job_crawler.models import Source
 from job_crawler.runner import preflight, reexport, run
 from job_crawler.sources import read_sources, write_sources
+from job_crawler.taxonomy import load_taxonomy
 
 
 def parser() -> argparse.ArgumentParser:
@@ -63,6 +66,22 @@ def parser() -> argparse.ArgumentParser:
     action.add_argument("--inputs-file", type=Path, help="包含采集目录/来源文件路径数组的 JSON")
     action.add_argument("--output", type=Path, required=True)
     action.add_argument("--config", type=Path, default=Path("config.toml"))
+    action = commands.add_parser("classify", help="用 LLM 为已保存快照批量分类并导出，不访问网站")
+    action.add_argument("input", type=Path)
+    action.add_argument("--output", type=Path, required=True)
+    action.add_argument("--config", type=Path, default=Path("config.toml"))
+    action.add_argument(
+        "--taxonomy",
+        type=Path,
+        default=Path(str(files("job_crawler").joinpath("assets/job-taxonomy.json"))),
+    )
+    action.add_argument("--cache", type=Path, default=Path(".runtime/classification"))
+    action.add_argument("--max-calls", type=int, default=1000)
+    action.add_argument("--concurrency", type=int, default=5)
+    action.add_argument("--batch-size", type=int, default=10)
+    action.add_argument(
+        "--refine", action="store_true", help="用紧凑分类树复核未分类及与精确三级名称不一致的条目"
+    )
     return result
 
 
@@ -119,7 +138,21 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"{source.source_id}\t{status}\t{source.company}\t{source.url}")
             return 0
         settings = load_settings(args.config)
-        if args.command == "bundle":
+        if args.command == "classify":
+            report = asyncio.run(
+                classify_snapshot(
+                    args.input,
+                    args.output,
+                    settings,
+                    load_taxonomy(args.taxonomy),
+                    cache=args.cache,
+                    max_calls=args.max_calls,
+                    concurrency=args.concurrency,
+                    batch_size=args.batch_size,
+                    refine=args.refine,
+                )
+            )
+        elif args.command == "bundle":
             inputs = list(args.inputs)
             if args.inputs_file:
                 saved_inputs = json.loads(args.inputs_file.read_text(encoding="utf-8"))
