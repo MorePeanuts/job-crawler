@@ -1,8 +1,8 @@
 # 企业招聘信息采集
 
-当前版本：`v0.0.1-alpha.2`（Python 包版本 `0.0.1a2`）。变更与限制见 [发布记录](CHANGELOG.md)。
+最近发布标签：`v0.0.1-alpha.2`（Python 包版本 `0.0.1a2`）。当前分支新增默认自动补全交付流程，尚未打新版本标签；变更与限制见 [发布记录](CHANGELOG.md)。
 
-维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，以及可选的 LLM 字段辅助。
+维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，默认自动进行缓存优先的 LLM 分类及必要学历补全，完成校验后直接输出最终表格。
 
 已导入 **500 家企业、228 个招聘链接**，初版已接入并真实验收 **20 家企业**：原四站加 16 家北森平台企业。平台逻辑共享，企业入口和覆盖逐家核验；其他链接待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)，历史四站记录见 [首轮验收](docs/acceptance.md)。
 
@@ -17,7 +17,7 @@ uv sync --locked
 uv run job-crawler check
 ```
 
-默认使用本机 Google Chrome。没有 Chrome 时运行 `uv run playwright install chromium`，再将 `config.toml` 的 `crawl.chrome_channel` 改为 `"chromium"`。Linux 可能还需要 Playwright 浏览器系统依赖。未启用 LLM 时无需模型密钥。
+默认使用本机 Google Chrome。没有 Chrome 时运行 `uv run playwright install chromium`，再将 `config.toml` 的 `crawl.chrome_channel` 改为 `"chromium"`。Linux 可能还需要 Playwright 浏览器系统依赖。默认 LLM 已启用，请在启动环境中配置 `DEEPSEEK_API_KEY`；已有有效缓存或规则已满足字段要求时无需请求模型。显式关闭 LLM 时不需要模型密钥。
 
 ## 维护来源
 
@@ -78,11 +78,12 @@ uv run job-crawler run --window all --output outputs/baseline-alpha2
 # 每日：更换日期/目录；省略 --output 则自动使用时间戳目录
 uv run job-crawler run --window day --output outputs/daily-20261011
 
-# 可选：对每日输出单独批量分类，复用已有分类缓存
-uv run job-crawler classify outputs/daily-20261011 --output outputs/daily-20261011-classified --refine
+# 无需另跑 classify；最终表格直接位于 outputs/daily-20261011/
+# 如模型失败或缺 key，修复配置后只重试补全/导出，不重新访问招聘网站
+uv run job-crawler export outputs/daily-20261011 --output outputs/daily-20261011-retried
 ```
 
-上面是手动命令，本版本不自动安排定时。采集退出码 2 可能表示字段待补全；检查报告后仍可对已保存结果分类，不要用简单的 `&&` 将其当作没有产物。
+上面是手动命令，本版本不自动安排定时。一次 run 已包含分类与必要学历辅助；退出码 2 表示采集不完整或字段仍待补全，先检查 report.json/review.json，修复后可用 export 重试，不代表没有输出产物。
 
 每日始终遍历完整列表，不假设按时间倒序。北森和建行的可靠列表日期早于窗口时跳过详情；列表没有日期时，已见岗位可复用最近成功的详情。中石油按公告 ID 缓存整篇展开岗位；平安/阿里列表已包含正文，仍需完整读取列表，主要获得首次发现追踪而非请求减少。
 
@@ -112,6 +113,8 @@ include_undated_new = true   # day 包含基线建立后新发现的无发布日
 | `report.json` | 每个来源的覆盖状态、目录与详情数量、过滤原因、待补全数量、障碍和导航恢复警告 |
 | `jobs.json` | 本轮获取的所有岗位及原始字段、来源和证据引用，包括被筛选排除的记录 |
 | `岗位信息汇总.xlsx` | 本次窗口内的岗位及待补全记录；保持十二列，不保证可直接导入 |
+| `delivered.json` | 本次入表及待补全岗位的规范化结果，含分类/学历补全及引证；原始 collections/jobs.json 保持源值 |
+| `enrichment-report.json` | 分类、复核、学历辅助的调用量、缓存命中与错误；同时写入 report.json 的 enrichment 字段 |
 | `review.json` | 日期不确定、分类/学历/地点不合格、LLM 失败等记录及原因 |
 | `field-audit.json` | 入表/待补全岗位的学历、详细地址原值、规范值、处理状态和原文引证 |
 | `manifest.json` | 运行 ID、代码指纹、配置、来源和筛选时刻 |
@@ -141,7 +144,7 @@ uv run job-crawler bundle --inputs-file outputs/initial20-inputs.json \
 
 **最新统一日期版**：`outputs/initial20-deadline-date-20261010/岗位信息汇总.xlsx`。保持上述 4,611 条记录和前十一列不变，最后一列“截止时间”统一为 `YYYY-MM-DD`：1,220 条有值，3,391 条留空。项目模板 `src/job_crawler/assets/job-template.xlsx` 同步更新说明；后续采集、分类与汇总自动使用这一格式。本次离线重导出保留原筛选时刻与企业采集时间，没有重爬或调用模型。
 
-汇总不会重新访问招聘网站；all 快照按汇总时刻再次筛除已截止记录，day/week/month 保留原窗口和筛选时刻。不同窗口或不同窗口基准时刻的快照拒绝混合，不会把每日预筛选的简略行重新当成全量岗位。保留原始采集时间，不宣称重新验证在线状态。同一来源若指定两轮结果会拒绝合并，需自行选择其中一轮。启用 LLM 时仍可能为缺失字段调用模型；默认关闭。
+汇总不会重新访问招聘网站；all 快照按汇总时刻再次筛除已截止记录，day/week/month 保留原窗口和筛选时刻。不同窗口或不同窗口基准时刻的快照拒绝混合，不会把每日预筛选的简略行重新当成全量岗位。保留原始采集时间，不宣称重新验证在线状态。同一来源若指定两轮结果会拒绝合并，需自行选择其中一轮。默认与 run 一样为未满足约束的字段进行缓存优先的模型补全；可能访问模型服务，但不访问招聘网站。设 llm.enabled=false 可关闭。
 
 `岗位信息汇总.xlsx` 包含待补全记录，使用更新模板的十二字段，缺失值留空，正文不截断。`jobs.xlsx` 则始终是严格校验的导入表。分类补全后，学历或地点不合要求的记录仍进入 `review.json`，不能把分类成功等同于全部可直接导入。JSON 同时保留全部原始岗位（包括已排除的岗位）及证据。
 
@@ -223,7 +226,11 @@ uv run python scripts/audit_saved_fields.py outputs/current-remapped
 
 ## LLM
 
-默认关闭，纯规则采集不需要密钥。需要学历/分类辅助时修改配置：
+默认启用。`run` 自动执行“采集 → 时间筛选 → 规则规范化 → 批量分类/复核 → 必要学历辅助 → 校验导出”，无需第二条 classify 命令。`export` / `bundle` 从保存的快照执行同样的补全流程，可在采集完成后独立重试。
+
+最终文件在指定输出目录根部：`jobs.xlsx` 是满足全部导入约束的严格表；`岗位信息汇总.xlsx` 包含窗口内岗位及待核验记录，字段可能仍有缺失。即使模型返回成功，也不强行补造源站缺失的地址、日期、地点等字段。
+
+默认配置：
 
 ```toml
 [llm]
@@ -231,7 +238,12 @@ enabled = true
 model = "deepseek-flash"
 base_url = "https://api.deepseek.com"
 api_key_env = "DEEPSEEK_API_KEY"
-max_calls = 20
+max_calls = 1000            # 分类、复核、学历及重试共用总上限
+batch_size = 10            # 分类批次
+concurrency = 5            # 分类并发
+refine = true
+cache_dir = ".runtime/classification"
+education_cache_dir = ".runtime/education"
 timeout = 60
 max_tokens = 1500
 ```
@@ -239,6 +251,12 @@ max_tokens = 1500
 在启动程序的环境中设置 `DEEPSEEK_API_KEY`。可替换 OpenAI 兼容端点、模型及环境变量名。程序不自动读取 `.env`，密钥不能写入配置或 Git。
 
 `deepseek-flash` 默认关闭思考模式，避免字段抽取的输出预算被思考过程占用；其他模型不附加这一参数。需要供应商扩展参数时，可在 `[llm.extra_body]` 中显式配置并覆盖默认行为。
+
+分类复用已有 `.runtime/classification/` 缓存，成功复核结果优先使用；学历辅助使用独立缓存，规则能确定学历时不调用模型。未变化且已成功处理的文本可以零模型请求重新交付。缓存绑定文本、模型/端点、提示及相关配置；命中仍校验路径和引证。保留这些目录即可跨轮复用，密钥不写入缓存。
+
+缺 key、模型失败或预算不足时仍保存采集快照并导出部分结果，返回退出码 2，原因在 `review.json` 和 `enrichment-report.json`。修复后使用 `export` 和新的输出目录补齐，不必重爬。需要明确禁止模型时设置 `enabled=false`；此时缺分类/学历的记录进入待补全，不能把“输出了 Excel”当成“全部岗位可导入”。`max_calls=0` 则允许读取已验证缓存，但禁止新模型请求。
+
+独立 `classify` 保留为手动重新分类工具；它显式调用分类，不受 enabled 开关控制，其 CLI 预算独立，也不会补学历。日常默认 run 无需使用它。
 
 模型只对已采集字段提供有原文引证的学历/分类建议，不决定导航、分页或完成状态。没有分类树时不会让模型自行建立业务分类。预算耗尽、失败、截断或没有引证时进入待补全；结构验证通过也不等于语义分类一定正确，需根据业务样本评估。
 

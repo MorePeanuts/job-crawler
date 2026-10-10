@@ -66,7 +66,7 @@ class NewPlatform(Adapter):
 
 Job 附带 `evidence` 与关键字段 `field_sources`。仅提交最小脱敏回放样本，不提交 Cookie、token、会话、完整日志或大批量结果。
 
-LLM 统一使用 `Enricher`/`LLMConfig`，默认 `deepseek-flash`，key 来自环境。不得绕过预算、枚举和引证校验。模型不决定完整性，不在运行过程中改写适配器。
+适配器提供原始岗位和字段证据，默认 run 通过公共 delivery 流程自动执行分类、规则无法确定的学历辅助与最终导出。LLM 统一使用 `Classifier`/`Enricher`/`LLMConfig`，默认启用 `deepseek-flash`，key 来自环境。不得在适配器中重复补全或绕过共用预算、缓存、枚举和引证校验。模型不决定采集覆盖，不在运行过程中改写适配器；具体契约见 SPEC-010。
 
 当前二十家企业接入范围均为公开目录，尚未实现授权登录会话导入。新站确需登录时先补充会话生命周期 spec；没有会话就报告 blocked。仅投递需要登录时继续采集公开岗位。
 
