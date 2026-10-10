@@ -203,6 +203,7 @@ class CNPC(Adapter):
     name = "cnpc"
     host = "zhaopin.cnpc.com.cn"
     path = "/web/recruitInfolist.html"
+    ready_endpoints = ("/web/recruitInfo/listN?",)
     scope_description = "高校毕业生 type=1 全部启事，每篇 post 数组展开为岗位；保留公告通用要求"
 
     async def harvest(self) -> None:
@@ -225,7 +226,8 @@ class CNPC(Adapter):
             rows = self.add_page(scope, data["recruitInfo"], seen, lambda row: str(row["id"]))
             if rows and not detail_url:
                 await self.session.open(
-                    f"https://{self.host}/recruitInfoshow.html?id={rows[0]['id']}"
+                    f"https://{self.host}/recruitInfoshow.html?id={rows[0]['id']}",
+                    ready_endpoints=("/web/recruitInfo/showN?",),
                 )
                 detail_url = (await self.session.observed("/recruitInfo/showN"))["url"]
             for row in rows:
@@ -293,6 +295,7 @@ class Alibaba(Adapter):
     name = "alibaba"
     host = "campus-talent.alibaba.com"
     path = "/campus/position"
+    ready_endpoints = ("/position/search?", "/searchCondition/listBatch?")
     scope_description = "graduate 正式校招全部批次，并检查阿里星目录是否为已采批次子集；不含实习"
 
     async def pages(
@@ -389,7 +392,7 @@ class Alibaba(Adapter):
             f"https://{self.host}/campus/alistar", json.loads(config["body"])["common"]["btnUrl"]
         )
         check(urlsplit(star_url).hostname == self.host, "阿里星跳转到未声明平台")
-        await self.session.open(star_url)
+        await self.session.open(star_url, ready_endpoints=("/position/search?",))
         star = await self.session.observed("/position/search?")
         star_ids = await self.pages(
             star["url"], json.loads(star["post_data"]), Scope(name="alistar-subset"), emit=False

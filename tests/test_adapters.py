@@ -30,7 +30,7 @@ class Replay:
         self.calls: list[tuple[str, dict[str, Any] | None, bool]] = []
         self.opened: list[str] = []
 
-    async def open(self, url: str) -> None:
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
         self.opened.append(url)
 
     async def observed(self, needle: str) -> dict[str, Any]:

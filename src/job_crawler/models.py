@@ -106,6 +106,7 @@ class Collection(Model):
     jobs: list[Job] = Field(default_factory=list)
     scopes: list[Scope] = Field(default_factory=list)
     issues: list[Issue] = Field(default_factory=list)
+    warnings: list[Issue] = Field(default_factory=list)
     scope_description: str = ""
 
     def coverage_issues(self) -> list[Issue]:
@@ -141,3 +142,4 @@ class SourceReport(Model):
     review: int = 0
     excluded: dict[str, int] = Field(default_factory=dict)
     issues: list[Issue] = Field(default_factory=list)
+    warnings: list[Issue] = Field(default_factory=list)

@@ -35,6 +35,7 @@ class Adapter:
     host = ""
     path = ""
     scope_description = ""
+    ready_endpoints: tuple[str, ...] = ()
 
     def __init__(
         self,
@@ -53,7 +54,9 @@ class Adapter:
         try:
             if urlsplit(self.source.url).hostname != self.host:
                 raise CrawlError("entry_mismatch", "来源 URL 与绑定平台不匹配，需要重新接入")
-            await self.session.open(f"https://{self.host}{self.path}")
+            await self.session.open(
+                f"https://{self.host}{self.path}", ready_endpoints=self.ready_endpoints
+            )
             await self.harvest()
         except Exception as exc:
             self.error(exc)

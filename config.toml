@@ -1,6 +1,7 @@
 [crawl]
 max_seconds = 3600
 timeout = 60
+navigation_timeout = 180
 max_requests = 20000
 delay = 0.3
 retries = 2

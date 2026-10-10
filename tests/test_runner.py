@@ -46,6 +46,20 @@ async def test_capture_complete_is_not_import_complete(
     assert reports[0].review == 1
 
 
+async def test_recovered_navigation_warning_kept_without_false_coverage_failure(
+    tmp_path: Path, now: datetime, job: Job, mapping: MappingConfig
+) -> None:
+    source = Source(source_id="TEST", company_id="A", company="公司")
+    collection = complete([job])
+    collection.warnings.append(Issue(code="navigation_recovered", message="HTTP 412 + valid API"))
+    valid, review, reports = await prepare_export(
+        {"TEST": collection}, [source], {}, Settings(mapping=mapping), "all", now, tmp_path
+    )
+    saved = save_results(tmp_path, {}, {"TEST": collection}, valid, review, reports)
+    assert saved["status"] == "complete"
+    assert saved["sources"][0]["warnings"][0]["code"] == "navigation_recovered"
+
+
 async def test_filter_before_import_validation(tmp_path: Path, now: datetime, job: Job) -> None:
     job.deadline = "2026-10-09"
     source = Source(source_id="TEST", company_id="A", company="公司")

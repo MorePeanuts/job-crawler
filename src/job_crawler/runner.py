@@ -69,6 +69,7 @@ async def prepare_export(
                 scopes=collection.scopes,
                 collected=len(collection.jobs),
                 issues=issues,
+                warnings=collection.warnings,
             )
             seen: set[str] = set()
             excluded: Counter[str] = Counter()
@@ -250,6 +251,7 @@ async def run(
                     ) as session:
                         adapter = REGISTRY[binding.adapter](source, session, now, as_of)
                         collection = await adapter.collect()
+                        collection.warnings.extend(session.navigation_warnings)
                 except Exception as exc:
                     collection.issues.append(
                         Issue(

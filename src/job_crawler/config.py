@@ -24,6 +24,7 @@ class CrawlConfig(Model):
     max_seconds: float = Field(default=3600, gt=0)
     timeout: float = Field(default=60, gt=0)
     max_requests: int = Field(default=20000, ge=1)
+    navigation_timeout: float = Field(default=180, gt=0)
     delay: float = Field(default=0.3, ge=0)
     retries: int = Field(default=2, ge=0, le=5)
     chrome_channel: str = "chrome"

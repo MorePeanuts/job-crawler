@@ -6,8 +6,10 @@ import os
 import time
 from pathlib import Path
 from typing import Any, Protocol, cast
+from urllib.parse import urlsplit
 
 from job_crawler.config import CrawlConfig
+from job_crawler.models import Issue
 from job_crawler.storage import Store, fingerprint, write_json
 
 
@@ -20,7 +22,7 @@ class CrawlError(Exception):
 class Session(Protocol):
     last_evidence: str
 
-    async def open(self, url: str) -> None: ...
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None: ...
     async def observed(self, needle: str) -> dict[str, Any]: ...
     async def request(
         self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
@@ -53,6 +55,11 @@ class BrowserSession:
         self.capture = True
         self.started = time.monotonic()
         self.resource_failures: list[dict[str, Any]] = []
+        self.navigation_warnings: list[Issue] = []
+        self.navigation_generation = 0
+        self.request_generations: dict[Any, int] = {}
+        self.hooked_pages: set[int] = set()
+        self.ready_endpoints: tuple[str, ...] = ()
 
     def consume_request(self) -> None:
         if time.monotonic() - self.started >= self.config.max_seconds:
@@ -90,30 +97,44 @@ class BrowserSession:
 
     async def _hook(self, page: Any, context: Any, **kwargs: Any) -> Any:
         self.page = page
+        if id(page) in self.hooked_pages:
+            return page
+        self.hooked_pages.add(id(page))
+
+        def on_request(request: Any) -> None:
+            self.request_generations[request] = self.navigation_generation
 
         def on_response(response: Any) -> None:
+            generation = self.request_generations.get(response.request, -1)
+            if generation != self.navigation_generation:
+                return
             if response.status >= 400:
                 self.resource_failures.append({"url": response.url, "status": response.status})
                 self.resource_failures = self.resource_failures[-30:]
             if self.capture and response.request.resource_type in {"xhr", "fetch"}:
-                task = asyncio.create_task(self._observe(response))
+                task = asyncio.create_task(self._observe(response, generation))
                 self.pending.add(task)
                 task.add_done_callback(self.pending.discard)
 
+        page.on("request", on_request)
         page.on("response", on_response)
+        page.on("requestfinished", lambda request: self.request_generations.pop(request, None))
 
         def on_failure(request: Any) -> None:
+            generation = self.request_generations.pop(request, -1)
+            if generation != self.navigation_generation:
+                return
             self.resource_failures.append({"url": request.url, "error": request.failure})
             self.resource_failures = self.resource_failures[-30:]
 
         page.on("requestfailed", on_failure)
         return page
 
-    async def _observe(self, response: Any) -> None:
+    async def _observe(self, response: Any, generation: int) -> None:
         try:
             async with asyncio.timeout(min(self.config.timeout, 8)):
                 body = await response.text()
-            if len(body) <= 5_000_000:
+            if len(body) <= 5_000_000 and generation == self.navigation_generation:
                 self.responses.append(
                     {
                         "url": response.url,
@@ -132,7 +153,8 @@ class BrowserSession:
 
         self.consume_request()
         await asyncio.sleep(self.config.delay)
-        async with asyncio.timeout(self.config.timeout + 10):
+        timeout_seconds = self.config.navigation_timeout if js is None else self.config.timeout
+        async with asyncio.timeout(timeout_seconds + 10):
             result = await self.crawler.arun(
                 url=url,
                 config=CrawlerRunConfig(
@@ -141,29 +163,99 @@ class BrowserSession:
                     js_only=js is not None,
                     js_code=js or "",
                     wait_until="domcontentloaded",
-                    page_timeout=int(self.config.timeout * 1000),
+                    page_timeout=int(timeout_seconds * 1000),
                     delay_before_return_html=delay,
                     verbose=False,
                 ),
             )
         if not result.success:
             raise CrawlError("browser_error", str(result.error_message)[:1000])
-        if js is None and result.status_code and result.status_code >= 400:
-            raise CrawlError(
-                "access_denied" if result.status_code in {401, 403} else "http_error",
-                f"HTTP {result.status_code}",
-            )
         return result
 
-    async def open(self, url: str) -> None:
+    async def _recover_ready_page(self, url: str, endpoints: tuple[str, ...], reason: str) -> bool:
+        """Recover navigation only; adapter schemas and coverage remain mandatory."""
+        if not endpoints or self.page is None:
+            return False
+        target, current = urlsplit(url), urlsplit(self.page.url)
+        if (target.scheme, target.netloc, target.path.rstrip("/"), target.query) != (
+            current.scheme,
+            current.netloc,
+            current.path.rstrip("/"),
+            current.query,
+        ):
+            return False
+        if self.pending:
+            await asyncio.gather(*list(self.pending), return_exceptions=True)
+        matches = []
+        for endpoint in endpoints:
+            expected = (
+                endpoint
+                if endpoint.startswith("https://")
+                else f"{target.scheme}://{target.netloc}{endpoint}"
+            )
+            candidates = [
+                r
+                for r in self.responses
+                if r["url"].startswith(expected) and 200 <= r["status"] < 300
+            ]
+            valid = []
+            for response in candidates:
+                try:
+                    if isinstance(json.loads(response["body"]), (dict, list)):
+                        valid.append(response)
+                except ValueError:
+                    continue
+            if not valid:
+                return False
+            matches.append(valid[-1])
+        try:
+            async with asyncio.timeout(5):
+                html = await self.page.content()
+        except Exception:
+            return False
+        self.url = url
+        path = self.output / f"page-{self.requests:05}-recovered.json"
+        write_json(
+            path,
+            {
+                "url": url,
+                "current_url": self.page.url,
+                "navigation_warning": reason,
+                "readiness": matches,
+                "html": html,
+            },
+        )
+        self.last_evidence = str(path)
+        self.navigation_warnings.append(
+            Issue(
+                code="navigation_recovered",
+                source_id=self.source_id,
+                url=url,
+                message=f"{reason}；本轮声明的业务接口已返回 JSON，继续适配器字段与覆盖核验。证据：{path}",
+            )
+        )
+        return True
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        self.ready_endpoints = ready_endpoints
         for attempt in range(self.config.retries + 1):
+            self.navigation_generation += 1
             self.responses.clear()
             self.resource_failures.clear()
             try:
                 result = await self._execute(url, delay=5)
-                self.url = url
                 path = self.output / f"page-{self.requests:05}.json"
                 write_json(path, {"url": url, "status": result.status_code, "html": result.html})
+                if result.status_code and result.status_code >= 400:
+                    if result.status_code == 412 and await self._recover_ready_page(
+                        url, ready_endpoints, "入口 HTTP 412，但浏览器业务页已就绪"
+                    ):
+                        return
+                    raise CrawlError(
+                        "access_denied" if result.status_code in {401, 403} else "http_error",
+                        f"HTTP {result.status_code}",
+                    )
+                self.url = url
                 self.last_evidence = str(path)
                 return
             except Exception as exc:
@@ -180,6 +272,16 @@ class BrowserSession:
                     or isinstance(exc, CrawlError)
                     and exc.code == "browser_error"
                 )
+                navigation_timeout = isinstance(exc, TimeoutError) or (
+                    isinstance(exc, CrawlError)
+                    and exc.code == "browser_error"
+                    and "Timeout" in str(exc)
+                    and "navigat" in str(exc)
+                )
+                if navigation_timeout and await self._recover_ready_page(
+                    url, ready_endpoints, "导航等待超时，但声明的业务接口已返回"
+                ):
+                    return
                 if not retryable or attempt == self.config.retries:
                     raise
                 await asyncio.sleep(min(2**attempt, 4))
@@ -210,7 +312,7 @@ class BrowserSession:
             if transient and reloads < self.config.retries:
                 reloads += 1
                 write_json(self.output / f"resource-reload-{reloads}.json", self.resource_failures)
-                await self.open(self.url)
+                await self.open(self.url, ready_endpoints=self.ready_endpoints)
                 continue
             await self._execute(self.url, "void 0;", delay=2)
         write_json(self.output / "resource-failures.json", self.resource_failures)
