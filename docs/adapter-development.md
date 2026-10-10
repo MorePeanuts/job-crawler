@@ -68,7 +68,9 @@ Job 附带 `evidence` 与关键字段 `field_sources`。仅提交最小脱敏回
 
 LLM 统一使用 `Enricher`/`LLMConfig`，默认 `deepseek-flash`，key 来自环境。不得绕过预算、枚举和引证校验。模型不决定完整性，不在运行过程中改写适配器。
 
-当前四站为公开目录，尚未实现授权登录会话导入。新站确需登录时先补充会话生命周期 spec；没有会话就报告 blocked。仅投递需要登录时继续采集公开岗位。
+当前二十家企业接入范围均为公开目录，尚未实现授权登录会话导入。新站确需登录时先补充会话生命周期 spec；没有会话就报告 blocked。仅投递需要登录时继续采集公开岗位。
+
+北森新版可复用 `adapters/zhiye.py`，但必须逐租户确认 Category=2、无局部筛选的入口、GetJobAdInfo 详情与 GUID 关联。只有真实全量验收后才启用绑定；不能把该平台的旧版站点或仅有静态首页的入口直接登记为已支持。`scripts/probe_sites.py` 用于有限探测，`scripts/collect_batch.py` 可将每家企业结果独立保存；使用 `job-crawler bundle` 合并已保存结果，不要为了输出一份总表重复采集。
 
 ## 测试与交付
 

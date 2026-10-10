@@ -1,6 +1,6 @@
 # SPEC-004 二十家企业接入与开发结果汇总
 
-状态：开发中。
+状态：已实现并完成二十家企业覆盖核验。结果见 `docs/initial20-acceptance.md`。
 
 ## 目标
 
@@ -25,5 +25,9 @@
 ## 已观察的平台契约
 
 北森新版：`/api/Jobad/GetJobAdPageList`，请求 `Category=["2"]` 为实际校招页面观察值，`PageIndex=0` 开始，`Count` 为总数，`Data` 为岗位。保留站点实际筛选参数，不跨租户复用负载。列表包含 Duty/Require，详情日期等字段需对照详情确认。`0001-01-01` 为 .NET 未设置日期哨兵，不当作真实截止日期。
+
+通过实际点击确认详情路由 `/campus/detail?jobAdId=<GUID>`，详情接口 `GetJobAdInfo` 的请求由各租户真实详情页面观察取得，保留 category 和 displayFields。逐岗位读取详情并核对 GUID 与 CategoryId，详情最大并发 3；错误保留其他岗位，认证拒绝和预算耗尽终止后续详情。日期优先详情，详情未公开时保留列表明确提供的值，不使用 ChangeDate 替代发布时间。信息汇总表额外包含“企业采集情况”页，严格导入表仍保持原模板。
+
+最终候选为 COM0053、COM0056、COM0141、COM0173、COM0200、COM0207、COM0214、COM0267、COM0328、COM0344、COM0371、COM0399、COM0413、COM0430、COM0476、COM0483。仅在完整真实验证后启用绑定；另外的探测/备用结果不混入首版二十家。
 
 部分北森页面正常加载前被 Crawl4AI 的 `Structural: minimal_text` 空壳启发式提前判为失败。仅当适配器声明的业务端点在有限等待内返回成功 JSON 且目标地址匹配时可恢复；验证码或真正 403 不放行。成功后仍核验 Category、业务 Code、分页总数和详情。
