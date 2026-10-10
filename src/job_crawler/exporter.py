@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 from openpyxl import load_workbook
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+from openpyxl.utils import get_column_letter
 
 from job_crawler.config import MappingConfig
 from job_crawler.models import Job
@@ -27,6 +28,7 @@ HEADERS = [
     "岗位职责",
     "任职要求",
     "申请链接",
+    "截止时间",
 ]
 FIELDS = [
     "company",
@@ -40,6 +42,7 @@ FIELDS = [
     "duties",
     "requirements",
     "apply_url",
+    "deadline",
 ]
 
 
@@ -147,7 +150,7 @@ def export_workbook(
             ["长正文", "单元格保存完整正文并自动换行；超过 Excel 最大行高时可在编辑栏查看全文。"]
         )
         sheet.freeze_panes = "C2"
-        sheet.auto_filter.ref = f"A1:K{max(1, len(jobs) + 1)}"
+        sheet.auto_filter.ref = f"A1:{get_column_letter(len(HEADERS))}{max(1, len(jobs) + 1)}"
         for column, width in {"A": 32, "B": 42, "I": 64, "J": 64, "K": 42}.items():
             sheet.column_dimensions[column].width = width
         if source_rows is not None:

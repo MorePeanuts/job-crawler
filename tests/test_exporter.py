@@ -41,6 +41,31 @@ def test_empty_output_removes_examples(tmp_path: Path) -> None:
     workbook.close()
 
 
+@pytest.mark.parametrize("information", [False, True])
+@pytest.mark.parametrize(
+    "deadline", ["2026-10-15", "2026-10-12T00:00:00", "", '=HYPERLINK("https://example.test","x")']
+)
+def test_optional_deadline_is_last_column_and_preserves_source(
+    tmp_path: Path, job: Job, information: bool, deadline: str, mapping: MappingConfig
+) -> None:
+    job.deadline = deadline
+    path = tmp_path / "deadline.xlsx"
+    export_workbook(path, [job], information=information)
+    workbook = load_workbook(path)
+    sheet = workbook.worksheets[0]
+    assert sheet.max_column == 12
+    assert sheet["K1"].value == "申请链接"
+    assert sheet["L1"].value == "截止时间"
+    assert (sheet["L2"].value or "") == deadline
+    assert sheet["L2"].data_type != "f"
+    assert sheet["L2"].number_format == "@"
+    if information:
+        assert sheet.auto_filter.ref == "A1:L2"
+    if not deadline:
+        assert import_errors(job, mapping, enums()) == []
+    workbook.close()
+
+
 def test_category_tree_never_inferred_from_enum_rows(job: Job) -> None:
     assert "invalid:category_path" in import_errors(job, MappingConfig(), enums())
     with pytest.raises(ValueError, match="分类映射"):

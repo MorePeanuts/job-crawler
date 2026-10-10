@@ -56,10 +56,11 @@ def main() -> None:
             assert new.category_secondary in tree.get(new.category_primary, [])
     workbook = load_workbook(result / "岗位信息汇总.xlsx")
     sheet = workbook.worksheets[0]
-    assert [cell.value for cell in sheet[1]] == HEADERS
+    # Historical classification deliveries predate the optional deadline column.
+    assert [cell.value for cell in sheet[1]] in (HEADERS, HEADERS[:-1])
     assert sheet.max_row == len(after) + 1
     for job, row in zip(after, sheet.iter_rows(min_row=2), strict=True):
-        for field, cell in zip(FIELDS, row, strict=True):
+        for field, cell in zip(FIELDS[: sheet.max_column], row, strict=True):
             assert (cell.value or "") == getattr(job, field), (job.key, field)
             assert cell.data_type != "f", "文本被写为公式"
     workbook.close()
