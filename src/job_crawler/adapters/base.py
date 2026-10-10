@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from bs4 import BeautifulSoup
 
+from job_crawler.incremental import IncrementalSource
 from job_crawler.models import Collection, Issue, Job, Scope, Source
 from job_crawler.transport import CrawlError, Session
 
@@ -43,12 +44,38 @@ class Adapter:
         session: Session,
         collected_at: datetime,
         as_of: datetime | None = None,
+        *,
+        incremental: IncrementalSource | None = None,
     ):
         self.source = source
         self.session = session
         self.collected_at = collected_at
         self.as_of = as_of or collected_at
         self.result = Collection(scope_description=self.scope_description)
+        self.incremental = incremental
+
+    def before_detail(
+        self,
+        entity: str,
+        listing: object,
+        scope: Scope,
+        listing_job: Job | None = None,
+        *,
+        evidence: str | None = None,
+    ) -> list[Job] | None:
+        if self.incremental is None:
+            return None
+        return self.incremental.before_detail(
+            entity,
+            listing,
+            scope,
+            self.session.last_evidence if evidence is None else evidence,
+            listing_job,
+        )
+
+    def remember(self, entity: str, listing: object, jobs: list[Job]) -> None:
+        if self.incremental is not None:
+            self.incremental.remember(entity, listing, jobs)
 
     async def collect(self) -> Collection:
         try:

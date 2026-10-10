@@ -8,7 +8,7 @@ from typing import Any
 
 from job_crawler.config import Settings
 from job_crawler.exporter import export_workbook
-from job_crawler.filtering import SHANGHAI
+from job_crawler.filtering import SHANGHAI, Window
 from job_crawler.models import Binding, Collection, Job, Source
 from job_crawler.runner import prepare_export, save_results
 from job_crawler.storage import fingerprint, write_json
@@ -24,10 +24,23 @@ async def bundle(
     collections: dict[str, Collection] = {}
     bindings: dict[str, Binding] = {}
     origins: dict[str, Any] = {}
+    window: Window | None = None
+    window_as_of: datetime | None = None
     for item in inputs:
         is_file = await asyncio.to_thread(item.is_file)
         root = item.parent.parent if is_file else item
         manifest = json.loads(await asyncio.to_thread((root / "manifest.json").read_text))
+        current_window = manifest.get("window", "all")
+        if current_window not in {"all", "day", "week", "month"}:
+            raise ValueError("输入快照的时间窗口无效")
+        if window is not None and window != current_window:
+            raise ValueError("不能混合不同时间窗口的快照")
+        window = current_window
+        if window != "all":
+            current_as_of = datetime.fromisoformat(manifest["as_of"])
+            if window_as_of is not None and window_as_of != current_as_of:
+                raise ValueError("窗口快照必须使用相同的筛选时刻")
+            window_as_of = current_as_of
         paths = [item] if is_file else sorted((root / "collections").glob("*.json"))
         if not paths:
             raise ValueError(f"没有已保存的来源结果: {item}")
@@ -64,13 +77,16 @@ async def bundle(
             raise ValueError(f"运行缺少来源文件: {item}；可明确选择已完成的单个来源文件")
     if not sources:
         raise ValueError("没有输入来源")
-    as_of = as_of or datetime.now(SHANGHAI)
+    if window_as_of is not None and as_of is not None and as_of != window_as_of:
+        raise ValueError("不能改变窗口快照的筛选时刻；请重新采集")
+    as_of = window_as_of or as_of or datetime.now(SHANGHAI)
+    assert window is not None
     valid, review, reports = await prepare_export(
-        collections, sources, bindings, settings, "all", as_of, output
+        collections, sources, bindings, settings, window, as_of, output
     )
     manifest = {
         "run_id": f"bundle-{fingerprint(origins)[:16]}",
-        "window": "all",
+        "window": window,
         "as_of": as_of.isoformat(),
         "source_ids": [s.source_id for s in sources],
         "bindings": {k: v.model_dump() for k, v in bindings.items()},

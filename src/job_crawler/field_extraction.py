@@ -256,6 +256,9 @@ def field_audit(originals: dict[str, Job], jobs: list[Job]) -> dict[str, object]
                 "key": job.key,
                 "company": job.company,
                 "title": job.title,
+                "selection_basis": job.field_sources.get("selection", "unknown"),
+                "detail_mode": job.detail_mode,
+                "first_seen_at": job.first_seen_at.isoformat() if job.first_seen_at else None,
                 "evidence": job.evidence,
                 "fields": {
                     field: {

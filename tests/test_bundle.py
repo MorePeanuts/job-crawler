@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -90,3 +91,23 @@ async def test_merge_rejects_duplicate_source_and_incomplete_run(
     )
     with pytest.raises(ValueError, match="缺少来源"):
         await bundle([tmp_path / "first"], tmp_path / "output", Settings())
+
+
+async def test_daily_bundle_preserves_window_and_rejects_mixed_windows(
+    tmp_path: Path,
+    job: Job,
+    now: datetime,
+) -> None:
+    old = job.model_copy(update={"published": "2026-01-01", "detail_mode": "listing_only"})
+    daily = tmp_path / "daily"
+    snapshot(daily, old, now)
+    manifest = json.loads((daily / "manifest.json").read_text())
+    manifest["window"] = "day"
+    write_json(daily / "manifest.json", manifest)
+    result = await bundle([daily], tmp_path / "result", Settings())
+    assert result["window"] == "day" and result["as_of"] == now.isoformat()
+    assert result["information_rows"] == 0
+    assert result["sources"][0]["excluded"] == {"outside_window": 1}
+    snapshot(tmp_path / "all", job.model_copy(update={"source_id": "OTHER"}), now)
+    with pytest.raises(ValueError, match="不同时间窗口"):
+        await bundle([daily, tmp_path / "all"], tmp_path / "mixed", Settings())

@@ -43,6 +43,8 @@ class Zhiye(Adapter):
         size = max(20, int(payload["PageSize"]))
         detail_url = ""
         limit = asyncio.Semaphore(3)
+        detail_lock = asyncio.Lock()
+        list_evidence = ""
         abort: CrawlError | None = None
 
         async def read_job(listed: dict[str, Any]) -> Job | None:
@@ -51,6 +53,24 @@ class Zhiye(Adapter):
                 if abort is not None:
                     return None
                 try:
+                    listing = self.job(
+                        str(listed["Id"]),
+                        title=text(listed.get("JobAdName")),
+                        source_url=f"https://{self.host}/campus/detail?{urlencode({'jobAdId': listed['Id']})}",
+                        published=date_text(listed.get("PostDate")),
+                        deadline=date_text(listed.get("EndTime")),
+                    )
+                    listing.evidence = [list_evidence] if list_evidence else []
+                    resolved = self.before_detail(
+                        f"job:{listed['Id']}",
+                        listed,
+                        scope,
+                        listing,
+                        evidence=list_evidence,
+                    )
+                    if resolved is not None:
+                        return resolved[0]
+                    await ensure_detail(listed)
                     data = await self.session.request(
                         query(detail_url, jobAdId=listed["Id"]), detail=True
                     )
@@ -84,6 +104,7 @@ class Zhiye(Adapter):
                         },
                     )
                     scope.details += 1
+                    self.remember(f"job:{listed['Id']}", listed, [job])
                     return job
                 except Exception as exc:
                     self.error(exc, str(listed.get("Id", "")))
@@ -94,6 +115,16 @@ class Zhiye(Adapter):
                     }:
                         abort = exc
                     return None
+
+        async def ensure_detail(listed: dict[str, Any]) -> None:
+            nonlocal detail_url
+            async with detail_lock:
+                if not detail_url:
+                    await self.session.open(
+                        f"https://{self.host}/campus/detail?{urlencode({'jobAdId': listed['Id']})}",
+                        ready_endpoints=("/api/JobAd/GetJobAdInfo?",),
+                    )
+                    detail_url = (await self.session.observed("/api/JobAd/GetJobAdInfo?"))["url"]
 
         while True:
             result = await self.session.request(
@@ -106,12 +137,7 @@ class Zhiye(Adapter):
                 scope.expected = expected
             check(expected == scope.expected, "北森目录总数变化")
             rows = self.add_page(scope, result["Data"], seen, lambda row: str(row["Id"]))
-            if rows and not detail_url:
-                await self.session.open(
-                    f"https://{self.host}/campus/detail?{urlencode({'jobAdId': rows[0]['Id']})}",
-                    ready_endpoints=("/api/JobAd/GetJobAdInfo?",),
-                )
-                detail_url = (await self.session.observed("/api/JobAd/GetJobAdInfo?"))["url"]
+            list_evidence = self.session.last_evidence
             jobs = await asyncio.gather(*(read_job(row) for row in rows))
             self.result.jobs.extend(job for job in jobs if job is not None)
             if abort is not None:

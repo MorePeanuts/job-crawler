@@ -17,6 +17,11 @@ max_calls = 20
 timeout = 60
 max_tokens = 1500
 
+[incremental]
+enabled = true
+refresh_days = 15
+include_undated_new = true
+
 [mapping]
 use_source_url_as_apply_url = true
 education_policy = "minimum_eligible"
