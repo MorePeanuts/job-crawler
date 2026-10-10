@@ -59,7 +59,8 @@ def parser() -> argparse.ArgumentParser:
     action.add_argument("--output", type=Path, required=True)
     action.add_argument("--config", type=Path, default=Path("config.toml"))
     action = commands.add_parser("bundle", help="离线合并指定采集快照，生成岗位信息汇总表")
-    action.add_argument("inputs", type=Path, nargs="+")
+    action.add_argument("inputs", type=Path, nargs="*")
+    action.add_argument("--inputs-file", type=Path, help="包含采集目录/来源文件路径数组的 JSON")
     action.add_argument("--output", type=Path, required=True)
     action.add_argument("--config", type=Path, default=Path("config.toml"))
     return result
@@ -119,7 +120,15 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         settings = load_settings(args.config)
         if args.command == "bundle":
-            report = asyncio.run(bundle(args.inputs, args.output, settings))
+            inputs = list(args.inputs)
+            if args.inputs_file:
+                saved_inputs = json.loads(args.inputs_file.read_text(encoding="utf-8"))
+                if not isinstance(saved_inputs, list) or not all(
+                    isinstance(p, str) for p in saved_inputs
+                ):
+                    raise ValueError("inputs-file 必须是路径字符串数组")
+                inputs.extend(Path(p) for p in saved_inputs)
+            report = asyncio.run(bundle(inputs, args.output, settings))
         elif args.command == "export":
             report = asyncio.run(reexport(args.input, args.output, settings))
         else:

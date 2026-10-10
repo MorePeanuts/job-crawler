@@ -41,3 +41,10 @@ def test_validation_error_does_not_echo_secrets(
     config.write_text('[llm]\napi_key="do-not-print-test-secret"\n')
     assert main(["check", "--config", str(config)]) == 1
     assert "do-not-print-test-secret" not in capsys.readouterr().err
+
+
+def test_bundle_requires_input_and_valid_path_array(tmp_path: Path) -> None:
+    assert main(["bundle", "--output", str(tmp_path / "empty")]) == 1
+    path = tmp_path / "bad.json"
+    path.write_text('{"not":"an array"}')
+    assert main(["bundle", "--inputs-file", str(path), "--output", str(tmp_path / "bad")]) == 1

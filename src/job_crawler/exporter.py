@@ -1,9 +1,13 @@
 """Template-compatible output with a separate, lossless review channel."""
 
 from copy import copy
+from datetime import datetime
 from importlib.resources import files
+from math import ceil
 from pathlib import Path
+from unicodedata import east_asian_width
 from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo
 
 from openpyxl import load_workbook
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -119,7 +123,13 @@ def import_errors(job: Job, mapping: MappingConfig, allowed: dict[str, set[str]]
     return errors
 
 
-def export_workbook(path: Path, jobs: list[Job], *, information: bool = False) -> None:
+def export_workbook(
+    path: Path,
+    jobs: list[Job],
+    *,
+    information: bool = False,
+    source_rows: list[list[str | int]] | None = None,
+) -> None:
     workbook = load_workbook(template_path())
     sheet = workbook["岗位导入"]
     if [cell.value for cell in sheet[1]] != HEADERS:
@@ -133,9 +143,78 @@ def export_workbook(path: Path, jobs: list[Job], *, information: bool = False) -
                 "此表含待补全或待核验信息，不保证可直接导入。采集时刻和覆盖报告见 report.json；严格导入表为 jobs.xlsx。"
             ]
         )
+        workbook["填写说明"].append(
+            ["长正文", "单元格保存完整正文并自动换行；超过 Excel 最大行高时可在编辑栏查看全文。"]
+        )
         sheet.freeze_panes = "C2"
         sheet.auto_filter.ref = f"A1:K{max(1, len(jobs) + 1)}"
+        for column, width in {"A": 32, "B": 42, "I": 64, "J": 64, "K": 42}.items():
+            sheet.column_dimensions[column].width = width
+        if source_rows is not None:
+            coverage = workbook.create_sheet("企业采集情况", 1)
+            coverage.append(
+                [
+                    "企业",
+                    "招聘入口",
+                    "原始采集时刻",
+                    "目录覆盖",
+                    "采集岗位数",
+                    "筛选排除数",
+                    "汇总表岗位数",
+                    "待补全岗位数",
+                ]
+            )
+            for values in source_rows:
+                coverage.append(values)
+            for row in coverage.iter_rows(min_row=2):
+                if isinstance(row[1].value, str) and row[1].value.startswith(
+                    ("https://", "http://")
+                ):
+                    row[1].hyperlink = row[1].value
+                    row[1].value = urlsplit(row[1].value).netloc
+                if isinstance(row[2].value, str):
+                    row[2].value = (
+                        datetime.fromisoformat(row[2].value)
+                        .astimezone(ZoneInfo("Asia/Shanghai"))
+                        .replace(tzinfo=None)
+                    )
+                    row[2].number_format = "yyyy-mm-dd hh:mm:ss"
+            for row in coverage:
+                for cell in row:
+                    if isinstance(cell.value, str):
+                        cell.data_type = "s"
+            for i, cell in enumerate(coverage[1], 1):
+                cell._style = copy(sheet.cell(1, i)._style)
+            for column, width in {
+                "A": 38,
+                "B": 65,
+                "C": 34,
+                "D": 16,
+                "E": 16,
+                "F": 16,
+                "G": 18,
+                "H": 18,
+            }.items():
+                coverage.column_dimensions[column].width = width
+            coverage.freeze_panes = "B2"
+            coverage.auto_filter.ref = f"A1:H{len(source_rows) + 1}"
     for row_index, job in enumerate(jobs, 2):
+        if information:
+            lines = 1
+            for index, field in enumerate(FIELDS, 1):
+                width = sheet.column_dimensions[sheet.cell(1, index).column_letter].width
+                count = sum(
+                    max(
+                        1,
+                        ceil(
+                            sum(2 if east_asian_width(c) in "WF" else 1 for c in line)
+                            / max(1, width - 2)
+                        ),
+                    )
+                    for line in getattr(job, field).split("\n")
+                )
+                lines = max(lines, count)
+            sheet.row_dimensions[row_index].height = min(409, max(60, lines * 16 + 8))
         for col_index, field in enumerate(FIELDS, 1):
             value = getattr(job, field)
             if len(value) > 32767 or ILLEGAL_CHARACTERS_RE.search(value):
@@ -143,6 +222,12 @@ def export_workbook(path: Path, jobs: list[Job], *, information: bool = False) -
             cell = sheet.cell(row_index, col_index, value)
             cell.data_type = "s"  # Untrusted website text must never become an Excel formula.
             cell._style = copy(styles[col_index - 1])
+            if information:
+                alignment = copy(cell.alignment)
+                alignment.vertical = "top"
+                cell.alignment = alignment
+            if information and field == "apply_url" and value.startswith(("https://", "http://")):
+                cell.hyperlink = value
     for validation in sheet.data_validations.dataValidation:
         column = str(validation.sqref).split("2:")[0]
         validation.sqref = f"{column}2:{column}{max(1000, len(jobs) + 1)}"

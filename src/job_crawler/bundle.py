@@ -1,4 +1,4 @@
-"""Combine explicitly chosen collection snapshots without network requests."""
+"""Combine chosen collection snapshots without revisiting recruitment websites."""
 
 import asyncio
 import json
@@ -7,9 +7,9 @@ from pathlib import Path
 from typing import Any
 
 from job_crawler.config import Settings
-from job_crawler.exporter import export_workbook, normalize
-from job_crawler.filtering import SHANGHAI, select
-from job_crawler.models import Binding, Collection, Source
+from job_crawler.exporter import export_workbook
+from job_crawler.filtering import SHANGHAI
+from job_crawler.models import Binding, Collection, Job, Source
 from job_crawler.runner import prepare_export, save_results
 from job_crawler.storage import fingerprint, write_json
 
@@ -53,6 +53,11 @@ async def bundle(inputs: list[Path], output: Path, settings: Settings) -> dict[s
                 "as_of": manifest["as_of"],
                 "code_digest": manifest.get("code_digest"),
             }
+            if source.source_id in manifest.get("origins", {}):
+                origins[source.source_id] = {
+                    **manifest["origins"][source.source_id],
+                    "bundled_input": str(await asyncio.to_thread(path.absolute)),
+                }
         if not is_file and loaded != set(manifest["source_ids"]):
             raise ValueError(f"运行缺少来源文件: {item}；可明确选择已完成的单个来源文件")
     if not sources:
@@ -81,13 +86,27 @@ async def bundle(inputs: list[Path], output: Path, settings: Settings) -> dict[s
             },
         )
     report = save_results(output, manifest, collections, valid, review, reports)
-    information = [
-        normalize(job, settings.mapping)
-        for source in sources
-        for job in collections[source.source_id].jobs
-        if select(job, "all", as_of).kind != "exclude"
+    information = sorted(
+        [*valid, *(Job.model_validate(item["job"]) for item in review)],
+        key=lambda job: (job.company, job.title, job.key),
+    )
+    source_lookup = {source.source_id: source for source in sources}
+    source_rows: list[list[str | int]] = [
+        [
+            r.company,
+            source_lookup[r.source_id].url,
+            origins[r.source_id]["as_of"],
+            r.coverage,
+            r.collected,
+            sum(r.excluded.values()),
+            r.exported + r.review,
+            r.review,
+        ]
+        for r in reports
     ]
-    export_workbook(output / "岗位信息汇总.xlsx", information, information=True)
+    export_workbook(
+        output / "岗位信息汇总.xlsx", information, information=True, source_rows=source_rows
+    )
     report["information_rows"] = len(information)
     report["information_notice"] = (
         "信息汇总含待补全/待核验岗位，非可直接导入表；严格导入表为 jobs.xlsx。"
