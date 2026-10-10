@@ -12,11 +12,11 @@ from typing import Any
 from job_crawler import __version__
 from job_crawler.adapters import REGISTRY
 from job_crawler.config import Settings
+from job_crawler.delivery import enrich_delivery
 from job_crawler.exporter import enums, export_workbook, import_errors, normalize, validate_mapping
 from job_crawler.field_extraction import field_audit
 from job_crawler.filtering import SHANGHAI, Window, select, window_start
 from job_crawler.incremental import IncrementalSource
-from job_crawler.llm import Enricher
 from job_crawler.models import Binding, Collection, Issue, Job, Source, SourceReport
 from job_crawler.storage import Store, fingerprint, write_json
 from job_crawler.transport import BrowserSession
@@ -59,93 +59,88 @@ async def prepare_export(
     valid: list[Job] = []
     review: list[dict[str, Any]] = []
     reports: list[SourceReport] = []
-    enricher = Enricher(settings.llm, settings.mapping, output / "llm")
-    try:
-        for source in sources:
-            collection = collections[source.source_id]
-            binding = bindings.get(source.source_id)
-            issues = collection.coverage_issues()
-            report = SourceReport(
-                source_id=source.source_id,
-                company=source.company,
-                adapter=f"{binding.adapter}@{binding.version}" if binding else "",
-                scope_description=collection.scope_description,
-                scopes=collection.scopes,
-                collected=len(collection.jobs),
-                issues=issues,
-                warnings=collection.warnings,
+    prepared: dict[str, Job] = {}
+    eligible: list[Job] = []
+    for source in sources:
+        binding = bindings.get(source.source_id)
+        for original in collections[source.source_id].jobs:
+            selection = select(
+                original,
+                window,
+                as_of,
+                include_undated_new=settings.incremental.include_undated_new,
             )
-            seen: set[str] = set()
-            excluded: Counter[str] = Counter()
-            basis: Counter[str] = Counter()
-            for original in collection.jobs:
-                if original.key in seen:
-                    report.issues.append(
-                        Issue(
-                            code="duplicate_identity",
-                            message="重复岗位唯一键",
-                            job_key=original.key,
-                        )
+            if selection.kind == "exclude" or original.key in prepared:
+                continue
+            job = normalize(original, settings.mapping)
+            job.company = (
+                binding.company_name if binding and binding.company_name else source.company
+            )
+            job.field_sources["selection"] = selection.reason
+            prepared[job.key] = job
+            if selection.kind == "include":
+                eligible.append(job)
+    enrichment_errors = await enrich_delivery(eligible, settings, output, as_of)
+    for source in sources:
+        collection = collections[source.source_id]
+        binding = bindings.get(source.source_id)
+        issues = collection.coverage_issues()
+        report = SourceReport(
+            source_id=source.source_id,
+            company=source.company,
+            adapter=f"{binding.adapter}@{binding.version}" if binding else "",
+            scope_description=collection.scope_description,
+            scopes=collection.scopes,
+            collected=len(collection.jobs),
+            issues=issues,
+            warnings=collection.warnings,
+        )
+        seen: set[str] = set()
+        excluded: Counter[str] = Counter()
+        basis: Counter[str] = Counter()
+        for original in collection.jobs:
+            if original.key in seen:
+                report.issues.append(
+                    Issue(
+                        code="duplicate_identity",
+                        message="重复岗位唯一键",
+                        job_key=original.key,
                     )
-                    continue
-                seen.add(original.key)
-                selection = select(
-                    original,
-                    window,
-                    as_of,
-                    include_undated_new=settings.incremental.include_undated_new,
                 )
-                if selection.kind == "exclude":
-                    excluded[selection.reason] += 1
-                    continue
-                job = normalize(original, settings.mapping)
-                job.field_sources["selection"] = selection.reason
-                basis[selection.reason] += 1
-                if binding and binding.company_name:
-                    job.company = binding.company_name
-                else:
-                    job.company = source.company
-                problems: list[str] = []
-                if selection.kind == "review":
-                    problems.append(selection.reason)
-                else:
-                    report.selected += 1
-                    # Model is called only where it can help; lack of taxonomy alone doesn't burn calls.
-                    needs_education = job.education not in allowed["education"]
-                    needs_category = (
-                        bool(settings.mapping.category_paths) and not job.category_secondary
-                    )
-                    if settings.llm.enabled and (needs_education or needs_category):
-                        try:
-                            job = await enricher.enrich(job)
-                        except Exception as exc:
-                            problems.append(f"llm_error:{type(exc).__name__}")
-                            report.issues.append(
-                                Issue(
-                                    code="llm_error",
-                                    message=str(exc)
-                                    if isinstance(exc, ValueError)
-                                    else f"模型调用失败 ({type(exc).__name__})；检查端点、网络与密钥配置",
-                                    job_key=job.key,
-                                )
-                            )
-                problems.extend(import_errors(job, settings.mapping, allowed))
-                if problems:
-                    report.review += 1
-                    review.append({"job": job.model_dump(mode="json"), "reasons": problems})
-                else:
-                    report.exported += 1
-                    valid.append(job)
-            report.excluded = dict(excluded)
-            report.selection_basis = dict(basis)
-            report.coverage = (
-                "complete"
-                if not issues and not any(i.code == "duplicate_identity" for i in report.issues)
-                else ("partial" if collection.jobs else "blocked")
+                continue
+            seen.add(original.key)
+            selection = select(
+                original,
+                window,
+                as_of,
+                include_undated_new=settings.incremental.include_undated_new,
             )
-            reports.append(report)
-    finally:
-        await enricher.close()
+            if selection.kind == "exclude":
+                excluded[selection.reason] += 1
+                continue
+            job = prepared[original.key]
+            basis[selection.reason] += 1
+            problems: list[str] = []
+            if selection.kind == "review":
+                problems.append(selection.reason)
+            else:
+                report.selected += 1
+            problems.extend(enrichment_errors.get(job.key, []))
+            problems.extend(import_errors(job, settings.mapping, allowed))
+            if problems:
+                report.review += 1
+                review.append({"job": job.model_dump(mode="json"), "reasons": problems})
+            else:
+                report.exported += 1
+                valid.append(job)
+        report.excluded = dict(excluded)
+        report.selection_basis = dict(basis)
+        report.coverage = (
+            "complete"
+            if not issues and not any(i.code == "duplicate_identity" for i in report.issues)
+            else ("partial" if collection.jobs else "blocked")
+        )
+        reports.append(report)
     return valid, review, reports
 
 
@@ -183,6 +178,16 @@ def save_results(
         ],
     )
     write_json(output / "review.json", review)
+    write_json(
+        output / "delivered.json",
+        [
+            *(job.model_dump(mode="json") for job in valid),
+            *(row["job"] for row in review),
+        ],
+    )
+    enrichment_path = output / "enrichment-report.json"
+    if enrichment_path.exists():
+        report["enrichment"] = json.loads(enrichment_path.read_text(encoding="utf-8"))
     write_json(
         output / "field-audit.json",
         field_audit(

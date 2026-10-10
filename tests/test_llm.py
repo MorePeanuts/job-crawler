@@ -31,7 +31,7 @@ class FakeClient:
 
 
 async def test_disabled_llm_needs_no_secret(tmp_path: Path, job: Job) -> None:
-    enricher = Enricher(LLMConfig(), MappingConfig(), tmp_path)
+    enricher = Enricher(LLMConfig(enabled=False), MappingConfig(), tmp_path)
     assert await enricher.enrich(job) == job
     assert enricher.calls == 0
 

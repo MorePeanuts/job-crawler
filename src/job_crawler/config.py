@@ -10,11 +10,16 @@ from job_crawler.models import Binding, Model
 
 
 class LLMConfig(Model):
-    enabled: bool = False
+    enabled: bool = True
     model: str = "deepseek-flash"
     base_url: str = "https://api.deepseek.com"
     api_key_env: str = "DEEPSEEK_API_KEY"
-    max_calls: int = Field(default=20, ge=0)
+    max_calls: int = Field(default=1000, ge=0)
+    batch_size: int = Field(default=10, ge=1, le=20)
+    concurrency: int = Field(default=5, ge=1, le=16)
+    refine: bool = True
+    cache_dir: str = ".runtime/classification"
+    education_cache_dir: str = ".runtime/education"
     timeout: float = Field(default=60, gt=0)
     max_tokens: int = Field(default=1500, ge=100)
     extra_body: dict[str, Any] = Field(default_factory=dict)
