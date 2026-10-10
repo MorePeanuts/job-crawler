@@ -1,6 +1,6 @@
 # SPEC-009 每日详情请求优化
 
-状态：开发中。目标版本 `v0.0.1-alpha.2`（Python `0.0.1a2`）。
+状态：已实现并完成离线验收，见 [验收记录](../docs/daily-incremental-acceptance.md)。目标版本 `v0.0.1-alpha.2`（Python `0.0.1a2`）。
 
 ## 目标与边界
 
