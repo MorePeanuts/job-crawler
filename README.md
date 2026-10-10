@@ -74,6 +74,7 @@ uv run job-crawler run --all-sources
 | `report.json` | 每个来源的覆盖状态、目录与详情数量、过滤原因、待补全数量、障碍和导航恢复警告 |
 | `jobs.json` | 本轮获取的所有岗位及原始字段、来源和证据引用，包括被筛选排除的记录 |
 | `review.json` | 日期不确定、分类/学历/地点不合格、LLM 失败等记录及原因 |
+| `field-audit.json` | 入表/待补全岗位的学历、详细地址原值、规范值、处理状态和原文引证 |
 | `manifest.json` | 运行 ID、代码指纹、配置、来源和筛选时刻 |
 | `collections/` | 各来源独立结果，用于重新导出 |
 | `evidence/` | 页面、接口与错误证据；异常站点可能仅有错误证据 |
@@ -159,7 +160,11 @@ uv run job-crawler bundle outputs/initial20-classified/result \
 "深圳" = "广东省/深圳市"
 ```
 
-分类名称必须来自模板枚举，父子关系由后台配置确认。学历“不限”不可随意填本科；多城市/多学历不自动缩减为一个值。地点可为省/市/区、省/市或直辖市/区，不能补造未知行政区。申请链接缺失时默认使用岗位详情页作为入口，可用 `use_source_url_as_apply_url = false` 关闭。
+分类名称必须来自模板枚举，父子关系由后台配置确认。学历默认按用户确认的**最低可报名学历**填写，例如明确接受本科/硕士/博士时填本科，“硕士研究生”规范为硕士。该规则在采集、重导出、汇总中统一生效，不需要调用模型。`[mapping]` 下的 `education_policy = "minimum_eligible"` 可改为 `"explicit_only"`，恢复不缩减并列学历的保守模式；`[mapping.education]` 中的显式映射优先。
+
+空学历会从任职要求中的明确要求补全，保留原文；仅有优先项、放宽条件、年龄说明或冲突要求时留空并报告。详细地址仅从岗位自身明确的工作/办公地址提取，不拿企业联系地址或总部地址代替；只有城市的地点不会自动补成详细地址。原始 `jobs.json` 不改写，处理结果见表格、`review.json` 与 `field-audit.json`。
+
+地点可为省/市/区、省/市或直辖市/区，多城市不自动缩减，不能补造未知行政区。申请链接缺失时默认使用岗位详情页作为入口，可用 `use_source_url_as_apply_url = false` 关闭。
 
 修改映射后，从历史结果重新导出：
 
@@ -168,6 +173,14 @@ uv run job-crawler export outputs/current --output outputs/current-remapped
 ```
 
 重新导出保留原采集范围、原筛选时刻和覆盖状态，报告标记来源运行；不代表重新确认岗位仍在招聘。
+
+对本地留存证据进一步核对岗位 ID 及学历/地址字段（无网络请求），可运行：
+
+```sh
+uv run python scripts/audit_saved_fields.py outputs/current-remapped
+```
+
+输出 `saved-evidence-field-audit.json`，未匹配或缺失证据会明确报告。此检查只覆盖已经抓取的字段，不能证明未访问的详情页没有地址。20 家历史快照的本轮学历/地址核验结果见 [字段验收记录](docs/education-address-acceptance.md)。
 
 ## LLM
 
