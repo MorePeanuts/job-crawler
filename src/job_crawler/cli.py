@@ -9,6 +9,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from job_crawler.bundle import bundle
 from job_crawler.config import load_bindings, load_settings
 from job_crawler.filtering import SHANGHAI
 from job_crawler.models import Source
@@ -55,6 +56,10 @@ def parser() -> argparse.ArgumentParser:
             action.add_argument("--resume", action="store_true")
     action = commands.add_parser("export", help="修改映射后从历史采集结果重新导出，不访问网站")
     action.add_argument("input", type=Path)
+    action.add_argument("--output", type=Path, required=True)
+    action.add_argument("--config", type=Path, default=Path("config.toml"))
+    action = commands.add_parser("bundle", help="离线合并指定采集快照，生成岗位信息汇总表")
+    action.add_argument("inputs", type=Path, nargs="+")
     action.add_argument("--output", type=Path, required=True)
     action.add_argument("--config", type=Path, default=Path("config.toml"))
     return result
@@ -113,7 +118,9 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"{source.source_id}\t{status}\t{source.company}\t{source.url}")
             return 0
         settings = load_settings(args.config)
-        if args.command == "export":
+        if args.command == "bundle":
+            report = asyncio.run(bundle(args.inputs, args.output, settings))
+        elif args.command == "export":
             report = asyncio.run(reexport(args.input, args.output, settings))
         else:
             sources, _ = read_sources(args.sources)

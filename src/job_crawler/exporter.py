@@ -119,13 +119,22 @@ def import_errors(job: Job, mapping: MappingConfig, allowed: dict[str, set[str]]
     return errors
 
 
-def export_workbook(path: Path, jobs: list[Job]) -> None:
+def export_workbook(path: Path, jobs: list[Job], *, information: bool = False) -> None:
     workbook = load_workbook(template_path())
     sheet = workbook["岗位导入"]
     if [cell.value for cell in sheet[1]] != HEADERS:
         raise ValueError("模板表头与导出契约不一致")
     styles = [copy(cell._style) for cell in sheet[2]]
     sheet.delete_rows(2, sheet.max_row)
+    if information:
+        sheet.title = "岗位信息（待补全）"
+        workbook["填写说明"].append(
+            [
+                "此表含待补全或待核验信息，不保证可直接导入。采集时刻和覆盖报告见 report.json；严格导入表为 jobs.xlsx。"
+            ]
+        )
+        sheet.freeze_panes = "C2"
+        sheet.auto_filter.ref = f"A1:K{max(1, len(jobs) + 1)}"
     for row_index, job in enumerate(jobs, 2):
         for col_index, field in enumerate(FIELDS, 1):
             value = getattr(job, field)
