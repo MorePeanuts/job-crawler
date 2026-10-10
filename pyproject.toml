@@ -1,0 +1,41 @@
+[project]
+name = "job-crawler"
+version = "0.0.1a1"
+description = "Adapter-based recruitment collection with import-template validation"
+requires-python = ">=3.12"
+dependencies = [
+  "beautifulsoup4>=4.12",
+  "crawl4ai==0.9.4",
+  "openai>=2.0",
+  "openpyxl>=3.1.5",
+  "pydantic>=2.0",
+  "socksio>=1.0",
+]
+
+[project.scripts]
+job-crawler = "job_crawler.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["ruff>=0.14", "ty>=0.0.1", "pytest>=8", "pytest-asyncio>=1"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+ignore = ["E501"]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/job_crawler"]

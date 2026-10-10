@@ -1,0 +1,64 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0053",
+    "company_id": "COM0053",
+    "company": "中国保利集团有限公司",
+    "url": "https://polycareer.zhiye.com/campus/jobs?1=%5B%7B%22id%22%3A%2244%22%2C%22label%22%3A%22%E2%80%9C%E5%90%AF%E8%88%AA%E8%AE%A1%E5%88%92%E2%80%9D%E7%AE%A1%E5%9F%B9%E7%94%9F%22%7D%5D",
+    "notes": "保利发展启航计划管培生"
+  },
+  "adapter": "zhiye-poly",
+  "source_count": 213,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "PostDate",
+      "ClassificationOne",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://polycareer.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://polycareer.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=8511791615674766&jobAdId=e7d64f31-0005-41a0-b340-f0ed9459cf1b&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "e7d64f31-0005-41a0-b340-f0ed9459cf1b",
+    "PostDate": "2026-10-02T11:49:32",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "计划运营岗（湖北公司）-秋招(J29691)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "湖北省"
+    ],
+    "Duty": "1. 负责项目开发全周期计划管理，编制项目总控计划、年度经营计划，管控关键开发节点。\n2. 负责项目现金流及动态利润监控，定期开展经营分析，识别经营风险并预警。\n3. 负责跨部门协同督办，统筹设计、工程、成本、营销解决项目卡点，推动问题闭环落地。\n4. 负责组织经营会议、项目复盘及投后评估，输出经营报表与专项分析报告，保障经营目标达成。",
+    "Require": "1.2027届应届本科及以上学历毕业生，房地产管理/房地产经济/经济统计学/工程管理等相关专业；\n2.具备较强的计划组织能力、分析判断能力、文字表达能力;\n3.严谨，踏实，思维敏捷、具有较好的人际沟通能力。",
+    "ClassificationOne": "品质和伙人",
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "e7d64f31-0005-41a0-b340-f0ed9459cf1b",
+    "PostDate": "2026-10-02T11:49:32",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "计划运营岗（湖北公司）-秋招(J29691)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "湖北省"
+    ],
+    "Duty": "1. 负责项目开发全周期计划管理，编制项目总控计划、年度经营计划，管控关键开发节点。\n2. 负责项目现金流及动态利润监控，定期开展经营分析，识别经营风险并预警。\n3. 负责跨部门协同督办，统筹设计、工程、成本、营销解决项目卡点，推动问题闭环落地。\n4. 负责组织经营会议、项目复盘及投后评估，输出经营报表与专项分析报告，保障经营目标达成。",
+    "Require": "1.2027届应届本科及以上学历毕业生，房地产管理/房地产经济/经济统计学/工程管理等相关专业；\n2.具备较强的计划组织能力、分析判断能力、文字表达能力;\n3.严谨，踏实，思维敏捷、具有较好的人际沟通能力。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

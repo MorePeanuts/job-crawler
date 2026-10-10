@@ -1,0 +1,62 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0430",
+    "company_id": "COM0430",
+    "company": "青岛啤酒股份有限公司",
+    "url": "https://tsingtao.zhiye.com/campus/jobs",
+    "notes": "校园招聘"
+  },
+  "adapter": "zhiye-tsingtao",
+  "source_count": 17,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://tsingtao.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://tsingtao.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=8871791616013579&jobAdId=4bae30ca-58f8-44d4-bf36-cfc6319c5520&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "4bae30ca-58f8-44d4-bf36-cfc6319c5520",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "菁英计划（销售）(J12700)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "山东省"
+    ],
+    "Duty": "1、\t终端（客户）拜访，客情维护，收集并维护市场信息；\n2、\t通过谈判与宣导，获取和拓展销售机会并达成，从而提高终端（客户）铺货率、产品组合到位率等数据；\n3、\t终端（客户）生动化、终端销售行为引导，销售政策、促销活动等宣传和落地执行，提高市场、终端（客户）份额；\n4、\t跟踪和掌握终端（客户）及渠道的销售数据，推动销售目标达成；\n5、\t衔接并维护好公司、经销商、终端（客户）三者之间的关系，维护区域",
+    "Require": "1、2026届海内外高校应届生，以及2025届、2024届本科及以上学历毕业生，毕业时所有证件齐备、真实、有效，能够按时报到；\n2、专业不限；\n3、具有较好的沟通与表达能力，有良好的团队协作意识；\n4、对生活充满热情，积极主动，勇于担当；\n5、身体健康，遵纪守法；\n6、中国共产党党员/预备党员、学生干部优先录用；\n7、工作地点服从山东省内分配/调配。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "4bae30ca-58f8-44d4-bf36-cfc6319c5520",
+    "PostDate": "2025-09-17T10:06:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "菁英计划（销售）(J12700)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "山东省"
+    ],
+    "Duty": "1、\t终端（客户）拜访，客情维护，收集并维护市场信息；\n2、\t通过谈判与宣导，获取和拓展销售机会并达成，从而提高终端（客户）铺货率、产品组合到位率等数据；\n3、\t终端（客户）生动化、终端销售行为引导，销售政策、促销活动等宣传和落地执行，提高市场、终端（客户）份额；\n4、\t跟踪和掌握终端（客户）及渠道的销售数据，推动销售目标达成；\n5、\t衔接并维护好公司、经销商、终端（客户）三者之间的关系，维护区域",
+    "Require": "1、2026届海内外高校应届生，以及2025届、2024届本科及以上学历毕业生，毕业时所有证件齐备、真实、有效，能够按时报到；\n2、专业不限；\n3、具有较好的沟通与表达能力，有良好的团队协作意识；\n4、对生活充满热情，积极主动，勇于担当；\n5、身体健康，遵纪守法；\n6、中国共产党党员/预备党员、学生干部优先录用；\n7、工作地点服从山东省内分配/调配。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

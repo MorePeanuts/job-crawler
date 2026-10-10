@@ -1,0 +1,63 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0344",
+    "company_id": "COM0344",
+    "company": "长沙银行股份有限公司",
+    "url": "https://cscb.zhiye.com/campus/jobs",
+    "notes": "校园招聘"
+  },
+  "adapter": "zhiye-cscb",
+  "source_count": 47,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Kind",
+      "LocId",
+      "Org",
+      "Classification3",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://cscb.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://cscb.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=7111791615935028&jobAdId=c8c61872-f050-4f7f-8a47-35d3850622d3&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22LocId%22%2C%22Org%22%2C%22HeadCount%22%2C%22Degree%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "c8c61872-f050-4f7f-8a47-35d3850622d3",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "总行专业高潜校招生\n（金融市场方向）",
+    "Org": "长沙银行",
+    "CategoryId": "2",
+    "LocNames": [
+      "湖南省·长沙市"
+    ],
+    "Duty": "1、岗位职责：通过高潜人才培养计划，为全行各条线培育有产研能力的专业型人才。\r\n2、工地地点：长沙",
+    "Require": "1.任职要求：统招硕士及以上学历的2027届毕业生（国内高校毕业时间为2027年1月1日—2027年7月31日，国外高校2027年1月1日-2027年12月31日）；\n2.年龄要求：硕士年龄要求2000年1月1日及以后出生的、博士年龄要求1997年1月1日以后出生的；\n3.专业要求：金融学类，财政、经济、贸易类，电子信息和计算机类，工商管理类，数学与统计类等专业；\n4.综合素质高，具备较强的学习能",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "c8c61872-f050-4f7f-8a47-35d3850622d3",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "总行专业高潜校招生\n（金融市场方向）",
+    "Org": "长沙银行",
+    "CategoryId": "2",
+    "LocNames": [
+      "湖南省·长沙市"
+    ],
+    "Duty": "1、岗位职责：通过高潜人才培养计划，为全行各条线培育有产研能力的专业型人才。\r\n2、工地地点：长沙",
+    "Require": "1.任职要求：统招硕士及以上学历的2027届毕业生（国内高校毕业时间为2027年1月1日—2027年7月31日，国外高校2027年1月1日-2027年12月31日）；\n2.年龄要求：硕士年龄要求2000年1月1日及以后出生的、博士年龄要求1997年1月1日以后出生的；\n3.专业要求：金融学类，财政、经济、贸易类，电子信息和计算机类，工商管理类，数学与统计类等专业；\n4.综合素质高，具备较强的学习能",
+    "ClassificationOne": null,
+    "Degree": "硕士研究生",
+    "DetailAddress": null
+  }
+}

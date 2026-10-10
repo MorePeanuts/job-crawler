@@ -1,0 +1,61 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0056",
+    "company_id": "COM0056",
+    "company": "厦门象屿集团有限公司",
+    "url": "https://xiangyu.zhiye.com/campus/jobs",
+    "notes": "校园招聘"
+  },
+  "adapter": "zhiye-xiangyu",
+  "source_count": 94,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "LocId",
+      "Classification4",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://xiangyu.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://xiangyu.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=9041791615657876&jobAdId=b57d41b1-dc24-494a-bb0f-8769e273948c&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22LocId%22%2C%22Classification3%22%2C%22Classification4%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "b57d41b1-dc24-494a-bb0f-8769e273948c",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "象屿铝业本部-投资/投管岗(J17527)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "辽宁省·辽阳市"
+    ],
+    "Duty": "1.完成6-12个月跨区域、专业部门内轮岗；\n2.参与轮岗区域、专业部门的模块工作；熟悉、掌握企业、部门的运营机制；助力运营优化与创新；\n3.参与公司投资项目论证（项目立项、尽职调查、合作方案设计、估值测算、可行性研究报告撰写、项目跟进等），股权管理与公司治理（股权调整、并购重组、重大资产处置、设立、清算、注销等),协助投资企业董事会组织，承担董事会秘书相关工作;\n4.参与团队推动流程改进与跨部门",
+    "Require": "1.2027应届毕业生，本科及以上学历；金融、经济、财会、投资、产业经济类等相关专业；\n2.有意愿在铝加工、铝贸易行业工作，渴望获得快速发展的机会； \n3.综合素质高，具备良好的学习力、内驱力、沟通力、抗压力及领导潜力；\n4.中共党员、校级学生会/研究生会主要干部优先。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "b57d41b1-dc24-494a-bb0f-8769e273948c",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "象屿铝业本部-投资/投管岗(J17527)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "辽宁省·辽阳市"
+    ],
+    "Duty": "1.完成6-12个月跨区域、专业部门内轮岗；\n2.参与轮岗区域、专业部门的模块工作；熟悉、掌握企业、部门的运营机制；助力运营优化与创新；\n3.参与公司投资项目论证（项目立项、尽职调查、合作方案设计、估值测算、可行性研究报告撰写、项目跟进等），股权管理与公司治理（股权调整、并购重组、重大资产处置、设立、清算、注销等),协助投资企业董事会组织，承担董事会秘书相关工作;\n4.参与团队推动流程改进与跨部门",
+    "Require": "1.2027应届毕业生，本科及以上学历；金融、经济、财会、投资、产业经济类等相关专业；\n2.有意愿在铝加工、铝贸易行业工作，渴望获得快速发展的机会； \n3.综合素质高，具备良好的学习力、内驱力、沟通力、抗压力及领导潜力；\n4.中共党员、校级学生会/研究生会主要干部优先。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

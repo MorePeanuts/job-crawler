@@ -1,0 +1,64 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0476",
+    "company_id": "COM0476",
+    "company": "北京东方雨虹防水技术股份有限公司",
+    "url": "https://yuhongzp.zhiye.com/campus/jobs",
+    "notes": "校园招聘"
+  },
+  "adapter": "zhiye-yuhong",
+  "source_count": 143,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "PostDate",
+      "Classification3",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://yuhongzp.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://yuhongzp.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=5271791616030394&jobAdId=c5c6e059-f423-4f57-9e62-99eed5ad81af&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22Classification3%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "c5c6e059-f423-4f57-9e62-99eed5ad81af",
+    "PostDate": "2026-09-30T11:20:55",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "产品管培生（民建）(J17066)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市"
+    ],
+    "Duty": "1、资料台账管理：负责产品手册、技术参数、送检备案等资料的整理、更新与归档，维护产品各类台账，确保信息准确可追溯；\n2、数据复盘分析：定期统计产品销售、品类、竞品、落地应用数据，整理分析并输出报表，为产品迭代、市场策略调整提供数据支撑；\n3、产品迭代跟进：对接销售、研发、生产、技术等部门，收集市场及一线产品需求、应用痛点，协助跟进产品测试、优化与迭代工作；\n4、跨部门协同：跟进产品上新、工艺优化、",
+    "Require": "1、化工、材料、高分子、应用化学、精细化工等相关专业；\n2、具备良好逻辑思维、文字功底与数据敏感度，擅长信息梳理、台账统筹；\n3、工作细心严谨、执行力强、有闭环思维，能耐心处理精细化、重复性工作；\n4、沟通顺畅，善于跨部门对接协作，高效推进各项工作落地；\n5、学习能力强，可快速掌握工业涂料产品、工艺及行业知识，适配岗位工作；\n6、具备基本的英语沟通能力，通过CET-6或持有同等级别英语语言类证书（",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "c5c6e059-f423-4f57-9e62-99eed5ad81af",
+    "PostDate": "2026-09-30T11:20:55",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "产品管培生（民建）(J17066)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市"
+    ],
+    "Duty": "1、资料台账管理：负责产品手册、技术参数、送检备案等资料的整理、更新与归档，维护产品各类台账，确保信息准确可追溯；\n2、数据复盘分析：定期统计产品销售、品类、竞品、落地应用数据，整理分析并输出报表，为产品迭代、市场策略调整提供数据支撑；\n3、产品迭代跟进：对接销售、研发、生产、技术等部门，收集市场及一线产品需求、应用痛点，协助跟进产品测试、优化与迭代工作；\n4、跨部门协同：跟进产品上新、工艺优化、",
+    "Require": "1、化工、材料、高分子、应用化学、精细化工等相关专业；\n2、具备良好逻辑思维、文字功底与数据敏感度，擅长信息梳理、台账统筹；\n3、工作细心严谨、执行力强、有闭环思维，能耐心处理精细化、重复性工作；\n4、沟通顺畅，善于跨部门对接协作，高效推进各项工作落地；\n5、学习能力强，可快速掌握工业涂料产品、工艺及行业知识，适配岗位工作；\n6、具备基本的英语沟通能力，通过CET-6或持有同等级别英语语言类证书（",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

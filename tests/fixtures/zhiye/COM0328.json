@@ -1,0 +1,61 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0328",
+    "company_id": "COM0328",
+    "company": "成都银行股份有限公司",
+    "url": "https://bocd.zhiye.com/campus/jobs",
+    "notes": ""
+  },
+  "adapter": "zhiye-bocd",
+  "source_count": 7,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "PostDate",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://bocd.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://bocd.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=2531791615913393&jobAdId=a8057a70-df30-4530-9392-ddbd1aa8a1d7&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Kind%22%2C%22HeadCount%22%2C%22YearsOfWorking%22%2C%22Degree%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "a8057a70-df30-4530-9392-ddbd1aa8a1d7",
+    "PostDate": "2026-09-17T14:19:22",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "总行管理培训生",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "四川省·成都市"
+    ],
+    "Duty": "入职后，经培训、支行轮岗、总行跟岗等流程，培养成为基层管理人才或总行业务骨干人才，负责基层网点管理、项目推进、业务拓展等。",
+    "Require": "1.2027年应届毕业生，境内外普通高等院校硕士研究生及以上学历，境内高校毕业生应于2027年7月31日前取得毕业证及学位证，境外高校毕业生应于2027年7月31日前取得国家教育部留学服务中心国外学历学位认证；\n2.专业不限，以经济学类、管理学类、理学类、工学类为主；\n3.大学英语六级（CET6）500分及以上，或具备相应英语能力水平：托业TOEIC听读公开考试800分及以上、雅思IELTS 7分",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "a8057a70-df30-4530-9392-ddbd1aa8a1d7",
+    "PostDate": "0001-01-01T00:00:00",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "总行管理培训生",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [],
+    "Duty": "入职后，经培训、支行轮岗、总行跟岗等流程，培养成为基层管理人才或总行业务骨干人才，负责基层网点管理、项目推进、业务拓展等。",
+    "Require": "1.2027年应届毕业生，境内外普通高等院校硕士研究生及以上学历，境内高校毕业生应于2027年7月31日前取得毕业证及学位证，境外高校毕业生应于2027年7月31日前取得国家教育部留学服务中心国外学历学位认证；\n2.专业不限，以经济学类、管理学类、理学类、工学类为主；\n3.大学英语六级（CET6）500分及以上，或具备相应英语能力水平：托业TOEIC听读公开考试800分及以上、雅思IELTS 7分",
+    "ClassificationOne": null,
+    "Degree": "硕士研究生",
+    "DetailAddress": null
+  }
+}

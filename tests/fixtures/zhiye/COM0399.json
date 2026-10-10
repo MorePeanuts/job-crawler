@@ -1,0 +1,63 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0399",
+    "company_id": "COM0399",
+    "company": "赛轮集团股份有限公司",
+    "url": "https://sailuntire.zhiye.com/campus/jobs",
+    "notes": "校园招聘"
+  },
+  "adapter": "zhiye-sailun",
+  "source_count": 92,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "PostDate",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://sailuntire.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://sailuntire.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=2061791615988942&jobAdId=d874663f-7eb9-484f-be5f-e57efa031da2&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "d874663f-7eb9-484f-be5f-e57efa031da2",
+    "PostDate": "2026-08-19T17:47:45.8934597",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "人力资源管理岗（集团总部）(J15977)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "山东省·青岛市"
+    ],
+    "Duty": "1、负责人力资源组织发展、人才培养与人才发展、人事运营等某一模块工作，如招聘、培训、人才发展、干部管理、组织管理、绩效、HRBP；\n2、规划执行区域人力资源开发与管理工作,参与拟定各类人力资源规划方案,协助体系建设；\n3、协助执行人力资源各项实务的操作流程和各类规章制度的实施，并监督各项计划的实施。",
+    "Require": "1、人力资源管理、工商管理、社会学等管理类专业或语言类专业,本科及以上学历，英语能力优秀者优先；\n2、为人亲和踏实，眼界开阔，善于沟通表达和人际交往；\n3、思维逻辑清晰、分析能力强；\n4、具备较强的具备较强的执行力、工作主动性，善于思考，有补位意识；\n5、优秀的沟通表达能力，能清晰的表述自己的观点；\n6、接受国内外出差或外派",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "d874663f-7eb9-484f-be5f-e57efa031da2",
+    "PostDate": "2026-08-19T17:47:45.8934597",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "人力资源管理岗（集团总部）(J15977)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "山东省·青岛市"
+    ],
+    "Duty": "1、负责人力资源组织发展、人才培养与人才发展、人事运营等某一模块工作，如招聘、培训、人才发展、干部管理、组织管理、绩效、HRBP；\n2、规划执行区域人力资源开发与管理工作,参与拟定各类人力资源规划方案,协助体系建设；\n3、协助执行人力资源各项实务的操作流程和各类规章制度的实施，并监督各项计划的实施。",
+    "Require": "1、人力资源管理、工商管理、社会学等管理类专业或语言类专业,本科及以上学历，英语能力优秀者优先；\n2、为人亲和踏实，眼界开阔，善于沟通表达和人际交往；\n3、思维逻辑清晰、分析能力强；\n4、具备较强的具备较强的执行力、工作主动性，善于思考，有补位意识；\n5、优秀的沟通表达能力，能清晰的表述自己的观点；\n6、接受国内外出差或外派",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

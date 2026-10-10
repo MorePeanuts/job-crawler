@@ -1,0 +1,78 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0413",
+    "company_id": "COM0413",
+    "company": "中信建投证券股份有限公司",
+    "url": "https://csc108.zhiye.com/campus/jobs",
+    "notes": "校园招聘"
+  },
+  "adapter": "zhiye-csc108",
+  "source_count": 30,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "LocId",
+      "Org",
+      "EndTime",
+      "PostDate",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://csc108.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://csc108.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=6271791615989650&jobAdId=7c4525ea-5fe5-486a-a7c9-1eb319905ffb&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "7c4525ea-5fe5-486a-a7c9-1eb319905ffb",
+    "PostDate": "2026-08-31T11:54:29",
+    "EndTime": "2026-10-12T00:00:00",
+    "JobAdName": "（2027届校招）投资银行股权业务线助理",
+    "Org": "投资银行业务管理委员会",
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市",
+      "上海市",
+      "广东省·广州市/深圳市",
+      "四川省·成都市",
+      "浙江省·杭州市",
+      "江苏省·南京市",
+      "陕西省·西安市",
+      "福建省·厦门市"
+    ],
+    "Duty": "1、辅助项目团队起草项目建议书，协助进行方案设计及文件制作等；\n2、协助进行相关行业、案例研究及市场统计分析等工作；\n3、协助进行相关文件和信息的搜集、整理、撰写和归档等工作；\n4、完成上级领导交办的其他事宜。",
+    "Require": "1、2026年1月至2027年7月期间毕业的境内外高等院校硕士研究生及以上学历应届毕业生，且在2027年7月31日前获得国家认可的毕业证、学位证或国家教育部留学服务中心的学历学位认证；\n2、金融、财务、信息技术、生物医药、机械电子、电力电气等相关专业优先，理工与金融复合专业背景者优先；\n3、具备较强的持续学习能力、敬业精神、沟通能力、团队合作精神以及良好的品行。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "7c4525ea-5fe5-486a-a7c9-1eb319905ffb",
+    "PostDate": "2026-08-31T11:54:29",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "（2027届校招）投资银行股权业务线助理",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市",
+      "上海市",
+      "广东省·广州市/深圳市",
+      "四川省·成都市",
+      "浙江省·杭州市",
+      "江苏省·南京市",
+      "陕西省·西安市",
+      "福建省·厦门市"
+    ],
+    "Duty": "1、辅助项目团队起草项目建议书，协助进行方案设计及文件制作等；\n2、协助进行相关行业、案例研究及市场统计分析等工作；\n3、协助进行相关文件和信息的搜集、整理、撰写和归档等工作；\n4、完成上级领导交办的其他事宜。",
+    "Require": "1、2026年1月至2027年7月期间毕业的境内外高等院校硕士研究生及以上学历应届毕业生，且在2027年7月31日前获得国家认可的毕业证、学位证或国家教育部留学服务中心的学历学位认证；\n2、金融、财务、信息技术、生物医药、机械电子、电力电气等相关专业优先，理工与金融复合专业背景者优先；\n3、具备较强的持续学习能力、敬业精神、沟通能力、团队合作精神以及良好的品行。",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}

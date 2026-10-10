@@ -1,0 +1,79 @@
+[sources.COM0002]
+adapter = "cnpc"
+version = "1"
+
+[sources.COM0008]
+adapter = "ccb"
+version = "1"
+
+[sources.COM0012]
+adapter = "pingan"
+version = "1"
+
+[sources.COM0015]
+adapter = "alibaba"
+version = "1"
+
+[sources.COM0053]
+adapter = "zhiye-poly"
+version = "1"
+
+[sources.COM0056]
+adapter = "zhiye-xiangyu"
+version = "1"
+
+[sources.COM0141]
+adapter = "zhiye-changan"
+version = "1"
+
+[sources.COM0173]
+adapter = "zhiye-digitalchina"
+version = "1"
+
+[sources.COM0200]
+adapter = "zhiye-bosc"
+version = "1"
+
+[sources.COM0207]
+adapter = "zhiye-sinotrans"
+version = "1"
+
+[sources.COM0214]
+adapter = "zhiye-sany"
+version = "1"
+
+[sources.COM0267]
+adapter = "zhiye-transsion"
+version = "1"
+
+[sources.COM0328]
+adapter = "zhiye-bocd"
+version = "1"
+
+[sources.COM0344]
+adapter = "zhiye-cscb"
+version = "1"
+
+[sources.COM0371]
+adapter = "zhiye-dsbj"
+version = "1"
+
+[sources.COM0399]
+adapter = "zhiye-sailun"
+version = "1"
+
+[sources.COM0413]
+adapter = "zhiye-csc108"
+version = "1"
+
+[sources.COM0430]
+adapter = "zhiye-tsingtao"
+version = "1"
+
+[sources.COM0476]
+adapter = "zhiye-yuhong"
+version = "1"
+
+[sources.COM0483]
+adapter = "zhiye-iflytek"
+version = "1"

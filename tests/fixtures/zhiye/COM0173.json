@@ -1,0 +1,64 @@
+{
+  "note": "真实字段最小样本；正文截取200字符。回放只核验结构，不代替完整实时验收。",
+  "source": {
+    "source_id": "COM0173",
+    "company_id": "COM0173",
+    "company": "神州数码集团股份有限公司",
+    "url": "https://digitalchina.zhiye.com/campus/jobs?queryId=3cefd727-55b9-43b4-99b3-ab299be0462c",
+    "notes": ""
+  },
+  "adapter": "zhiye-digitalchina",
+  "source_count": 97,
+  "payload": {
+    "PageIndex": 0,
+    "PageSize": 20,
+    "Category": [
+      "2"
+    ],
+    "KeyWords": "",
+    "SpecialType": 0,
+    "PortalId": "",
+    "DisplayFields": [
+      "Category",
+      "Kind",
+      "LocId",
+      "PostDate",
+      "ClassificationTwo",
+      "WorkWeChatQrCode"
+    ]
+  },
+  "list_url": "https://digitalchina.zhiye.com/api/Jobad/GetJobAdPageList",
+  "detail_url": "https://digitalchina.zhiye.com/api/JobAd/GetJobAdInfo?_timestamp=5051791615762243&jobAdId=b7a99002-7e08-4fc6-85d7-d7280fe2d11f&category=2&displayFields=%5B%22jobAdName%22%2C%22Duty%22%2C%22Require%22%2C%22Category%22%2C%22Kind%22%2C%22LocId%22%2C%22PostDate%22%2C%22WorkWeChatQrCode%22%5D",
+  "listed": {
+    "Id": "b7a99002-7e08-4fc6-85d7-d7280fe2d11f",
+    "PostDate": "2026-10-10T14:12:29",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "2027届校招—集团英才—数字化BP专员(J23809)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市"
+    ],
+    "Duty": "1. 深入了解所负责业务的业务模式核心需求和痛点。\n2. 解决业务对AI、数据和系统的需求。\n3. 深入掌握集团内部的系统方案架构，能够为业务设计方案，实现业务价值。\n4. 了解对应业务的主权AI（AI及数字化规划架构），并逐步通过项目落地。",
+    "Require": "1. 本科及以上应届毕业生（985/211院校优先），人工智能、计算机、管理科学等相关专业优先。\n2. 具备较好的英语听说读写能力，能够把英语作为工作语言。\n3. 具备系统化思维能力，能够主动引导和思考问题，将业务目标、流程和需求逐步转化为可验证的方案。\n4. 具备较强的学习能力和沟通能力、结果导向，愿意深入业务现场，全面了解公司系统产品，并将实践经验分享和赋能给更多同事。 \n5. 对AI Age",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  },
+  "detail": {
+    "Id": "b7a99002-7e08-4fc6-85d7-d7280fe2d11f",
+    "PostDate": "2026-10-10T14:12:29",
+    "EndTime": "0001-01-01T00:00:00",
+    "JobAdName": "2027届校招—集团英才—数字化BP专员(J23809)",
+    "Org": null,
+    "CategoryId": "2",
+    "LocNames": [
+      "北京市"
+    ],
+    "Duty": "1. 深入了解所负责业务的业务模式核心需求和痛点。\n2. 解决业务对AI、数据和系统的需求。\n3. 深入掌握集团内部的系统方案架构，能够为业务设计方案，实现业务价值。\n4. 了解对应业务的主权AI（AI及数字化规划架构），并逐步通过项目落地。",
+    "Require": "1. 本科及以上应届毕业生（985/211院校优先），人工智能、计算机、管理科学等相关专业优先。\n2. 具备较好的英语听说读写能力，能够把英语作为工作语言。\n3. 具备系统化思维能力，能够主动引导和思考问题，将业务目标、流程和需求逐步转化为可验证的方案。\n4. 具备较强的学习能力和沟通能力、结果导向，愿意深入业务现场，全面了解公司系统产品，并将实践经验分享和赋能给更多同事。 \n5. 对AI Age",
+    "ClassificationOne": null,
+    "Degree": null,
+    "DetailAddress": null
+  }
+}
