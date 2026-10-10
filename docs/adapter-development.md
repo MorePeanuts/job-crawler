@@ -40,6 +40,8 @@ class NewPlatform(Adapter):
 
 `Session` 为可替换协议：测试注入回放，正式使用 `BrowserSession`。JSON 边界允许 `dict[str, Any]`，随后必须校验；跨模块使用 `Job`、`Scope`、`Collection`。不得为每个适配器另建独立 Cookie 的 HTTP 客户端。
 
+如果页面导航状态不能代表业务页是否就绪，可声明 `ready_endpoints`，或调用 `session.open(url, ready_endpoints=(... ,))`。每项必须是已观察到的同源完整路径前缀（如 `/web/recruitInfo/listN?`），跨源接口必须填写完整 HTTPS URL。参考 SPEC-003：恢复只适用于入口 412 或导航超时，要求本轮目标页面和全部声明接口的成功 JSON；后续仍须验证业务结构与覆盖。不能使用任意 XHR、历史响应或标题作为依据。恢复警告进入报告，不等同于覆盖成功。
+
 可恢复详情失败调用 `self.error(exc, key)` 并继续其他详情。认证拒绝、重复页、预算耗尽停止受影响范围。`collect()` 保存异常和已获得岗位，不得清空已有结果或吞掉问题后返回成功。
 
 ## 覆盖规则
