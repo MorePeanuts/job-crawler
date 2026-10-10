@@ -13,6 +13,7 @@ from job_crawler import __version__
 from job_crawler.adapters import REGISTRY
 from job_crawler.config import Settings
 from job_crawler.exporter import enums, export_workbook, import_errors, normalize, validate_mapping
+from job_crawler.field_extraction import field_audit
 from job_crawler.filtering import SHANGHAI, Window, select, window_start
 from job_crawler.llm import Enricher
 from job_crawler.models import Binding, Collection, Issue, Job, Source, SourceReport
@@ -172,6 +173,13 @@ def save_results(
         ],
     )
     write_json(output / "review.json", review)
+    write_json(
+        output / "field-audit.json",
+        field_audit(
+            {j.key: j for c in collections.values() for j in c.jobs},
+            [*valid, *(Job.model_validate(row["job"]) for row in review)],
+        ),
+    )
     write_json(output / "report.json", report)
     export_workbook(output / "jobs.xlsx", valid)
     return report

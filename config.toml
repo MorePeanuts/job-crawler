@@ -19,6 +19,7 @@ max_tokens = 1500
 
 [mapping]
 use_source_url_as_apply_url = true
+education_policy = "minimum_eligible"
 
 # 源站类别的人工确认映射可以另外配置，避免宽泛类别覆盖逐岗位推断。
 # [mapping.categories]

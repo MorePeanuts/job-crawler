@@ -55,6 +55,7 @@ async def test_custom_model_env_and_evidence(
     result = await enricher.enrich(job)
     assert result.education == "本科"
     assert client.options["model"] == "custom"
+    assert "最低可报名学历" in client.options["messages"][0]["content"]
     assert "test-secret" not in (tmp_path / "00001.json").read_text()
     with pytest.raises(ValueError, match="预算"):
         await enricher.enrich(job)

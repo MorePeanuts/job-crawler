@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -68,6 +69,28 @@ async def test_filter_before_import_validation(tmp_path: Path, now: datetime, jo
     )
     assert not valid and not review
     assert reports[0].excluded == {"expired": 1}
+
+
+async def test_field_audit_preserves_source_and_explains_normalized_rows(
+    tmp_path: Path, now: datetime, job: Job
+) -> None:
+    job.education = ""
+    job.requirements = "本科、硕士、博士学历，计算机专业。"
+    job.address = ""
+    source = Source(source_id="TEST", company_id="A", company="公司")
+    collections = {"TEST": complete([job])}
+    valid, review, reports = await prepare_export(
+        collections, [source], {}, Settings(), "all", now, tmp_path
+    )
+    save_results(tmp_path, {}, collections, valid, review, reports)
+    raw = json.loads((tmp_path / "jobs.json").read_text())
+    audit = json.loads((tmp_path / "field-audit.json").read_text())
+    assert raw[0]["education"] == ""
+    assert audit["summary"]["education"]["after_nonempty"] == 1
+    fields = audit["records"][0]["fields"]
+    assert fields["education"]["value"] == "本科"
+    assert "本科、硕士、博士学历" in fields["education"]["provenance"]
+    assert fields["address"]["status"] == "no_job_address_in_saved_fields"
 
 
 async def test_empty_but_verified_directory(tmp_path: Path, now: datetime) -> None:

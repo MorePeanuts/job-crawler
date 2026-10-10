@@ -2,7 +2,7 @@
 
 import tomllib
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import Field
 
@@ -32,6 +32,7 @@ class CrawlConfig(Model):
 
 
 class MappingConfig(Model):
+    education_policy: Literal["minimum_eligible", "explicit_only"] = "minimum_eligible"
     category_paths: dict[str, list[str]] = Field(default_factory=dict)
     # Exact source category -> explicit template pair, never title guessing.
     categories: dict[str, list[str]] = Field(default_factory=dict)

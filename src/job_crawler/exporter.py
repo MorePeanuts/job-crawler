@@ -14,6 +14,7 @@ from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from openpyxl.utils import get_column_letter
 
 from job_crawler.config import MappingConfig
+from job_crawler.field_extraction import enrich_fields
 from job_crawler.filtering import SHANGHAI, parse_date
 from job_crawler.models import Job
 
@@ -95,7 +96,7 @@ def normalize(job: Job, mapping: MappingConfig) -> Job:
     if not result.apply_url and mapping.use_source_url_as_apply_url:
         result.apply_url = result.source_url
         result.field_sources["apply_url"] = "source_url:原始岗位详情入口，不保证免登录投递"
-    return result
+    return enrich_fields(result, mapping.education_policy)
 
 
 def import_errors(job: Job, mapping: MappingConfig, allowed: dict[str, set[str]]) -> list[str]:
