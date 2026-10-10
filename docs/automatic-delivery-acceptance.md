@@ -2,6 +2,8 @@
 
 对应 [SPEC-010](../specs/010-automatic-delivery.md)。本轮只运行模拟浏览器、模拟模型和离线回归；没有访问真实招聘网站或调用付费模型，也没有重新生成二十家企业的实时岗位表。
 
+发布版本 `v0.0.1-alpha.3`：全套 226 项测试再次通过；uv 锁文件、Ruff、ty、sdist/wheel 构建及 `0.0.1a3` 版本一致性检查通过。发布测试记录在 `outputs/alpha3-verification/junit.xml`（不入库）。
+
 ## 已交付行为
 
 默认 `run` 在抓取并保存原始快照后自动筛选、规则规范化、批量分类/复核、必要学历辅助和校验导出。最终 `jobs.xlsx`、`岗位信息汇总.xlsx` 在同一输出根目录，不需要用户再运行 classify。原始 jobs.json/collections 与规范化 delivered.json 分离，字段来源和未解决项可复核。

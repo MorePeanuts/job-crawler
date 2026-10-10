@@ -1,6 +1,6 @@
 # SPEC-010 默认采集自动完成岗位交付
 
-状态：已实现并完成离线验收，见 [验收记录](../docs/automatic-delivery-acceptance.md)。尚未发布新版本标签。
+状态：已实现并完成离线验收，见 [验收记录](../docs/automatic-delivery-acceptance.md)。交付版本 `v0.0.1-alpha.3`（Python `0.0.1a3`）。
 
 ## 目标与非目标
 
