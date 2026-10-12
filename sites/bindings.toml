@@ -6,12 +6,32 @@ version = "1"
 adapter = "ccb"
 version = "1"
 
+[sources.COM0009]
+adapter = "jd-campus"
+version = "1"
+
 [sources.COM0012]
 adapter = "pingan"
 version = "1"
 
 [sources.COM0015]
 adapter = "alibaba"
+version = "1"
+
+[sources.COM0027]
+adapter = "tencent-campus"
+version = "1"
+
+[sources.COM0040]
+adapter = "lenovo-campus"
+version = "1"
+
+[sources.COM0043]
+adapter = "coapi-cofco"
+version = "1"
+
+[sources.COM0048]
+adapter = "bankcomm-campus"
 version = "1"
 
 [sources.COM0053]
@@ -26,6 +46,22 @@ version = "1"
 adapter = "moka-catl"
 version = "1"
 
+[sources.COM0069]
+adapter = "zhaopin-unicom"
+version = "1"
+
+[sources.COM0073]
+adapter = "gac-2027-static"
+version = "1"
+
+[sources.COM0076]
+adapter = "meituan-campus"
+version = "1"
+
+[sources.COM0084]
+adapter = "sf-campus"
+version = "1"
+
 [sources.COM0099]
 adapter = "hzsteel-static"
 version = "1"
@@ -36,6 +72,10 @@ version = "1"
 
 [sources.COM0121]
 adapter = "ansteel-static"
+version = "1"
+
+[sources.COM0136]
+adapter = "coapi-scg"
 version = "1"
 
 [sources.COM0141]
@@ -54,12 +94,24 @@ version = "1"
 adapter = "hotjob-jintian"
 version = "1"
 
+[sources.COM0172]
+adapter = "moka-muyuan"
+version = "1"
+
 [sources.COM0173]
 adapter = "zhiye-digitalchina"
 version = "1"
 
+[sources.COM0198]
+adapter = "moka-wens"
+version = "1"
+
 [sources.COM0200]
 adapter = "zhiye-bosc"
+version = "1"
+
+[sources.COM0202]
+adapter = "moka-xcmg"
 version = "1"
 
 [sources.COM0207]
@@ -102,6 +154,10 @@ version = "1"
 adapter = "zhiye-leapmotor"
 version = "1"
 
+[sources.COM0284]
+adapter = "moka-chint"
+version = "1"
+
 [sources.COM0289]
 adapter = "moka-sto"
 version = "1"
@@ -128,6 +184,10 @@ version = "1"
 
 [sources.COM0371]
 adapter = "zhiye-dsbj"
+version = "1"
+
+[sources.COM0373]
+adapter = "zhaopin-sipg"
 version = "1"
 
 [sources.COM0388]
@@ -166,8 +226,16 @@ version = "1"
 adapter = "zhiye-csc108"
 version = "1"
 
+[sources.COM0420]
+adapter = "zhaopin-cqbank"
+version = "1"
+
 [sources.COM0426]
 adapter = "hotjob-liugong"
+version = "1"
+
+[sources.COM0429]
+adapter = "feishu-desaysv"
 version = "1"
 
 [sources.COM0430]
@@ -176,6 +244,10 @@ version = "1"
 
 [sources.COM0439]
 adapter = "moka-sanhua"
+version = "1"
+
+[sources.COM0446]
+adapter = "bilibili-campus"
 version = "1"
 
 [sources.COM0452]
@@ -204,6 +276,14 @@ version = "1"
 
 [sources.COM0484]
 adapter = "zhiye-juhua"
+version = "1"
+
+[sources.COM0489]
+adapter = "coapi-nbhx"
+version = "1"
+
+[sources.COM0491]
+adapter = "zhaopin-lbjt"
 version = "1"
 
 [sources.COM0496]
