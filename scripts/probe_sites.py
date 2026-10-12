@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import json
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 from job_crawler.config import CrawlConfig
 from job_crawler.models import Source
@@ -20,6 +21,7 @@ async def main() -> None:
     parser.add_argument("--settle", type=float, default=0)
     parser.add_argument("--click", default="")
     parser.add_argument("--url")
+    parser.add_argument("--fragment", help="替换每个来源 URL 的 fragment；用于多租户 SPA 路由")
     args = parser.parse_args()
     sources, _ = read_sources(Path("sites/sources.csv"))
     limit = asyncio.Semaphore(2)
@@ -39,7 +41,10 @@ async def main() -> None:
                 ) as session:
                     error = ""
                     try:
-                        await session.open(args.url or source.url)
+                        target = args.url or source.url
+                        if args.fragment is not None:
+                            target = urlunsplit(urlsplit(target)._replace(fragment=args.fragment))
+                        await session.open(target)
                     except Exception as exc:
                         error = str(exc)[:1000]
                     if args.settle:

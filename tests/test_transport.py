@@ -17,9 +17,11 @@ class Page:
     def __init__(self, status: int = 200):
         self.calls = 0
         self.status = status
+        self.scripts: list[str] = []
 
     async def evaluate(self, script: str) -> dict[str, Any]:
         self.calls += 1
+        self.scripts.append(script)
         return {"status": self.status, "body": '{"value":1}', "url": "https://example.test/api"}
 
 
@@ -41,6 +43,51 @@ async def test_only_successful_details_are_reused(tmp_path: Path, now: datetime)
         # A new detail payload must not reuse another job's cached response.
         await session.request("https://example.test/detail", payload={"id": "other"}, detail=True)
         assert page.calls == 4
+    finally:
+        store.close()
+
+
+async def test_form_post_is_encoded_and_cached_by_fields(tmp_path: Path, now: datetime) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    store.begin("run", "hash", now, False, 6)
+    session = BrowserSession(
+        "A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0), resume=True
+    )
+    page = Page()
+    session.page = page
+    try:
+        await session.request("https://example.test/api", form={"postId": "a&b"}, detail=True)
+        await session.request("https://example.test/api", form={"postId": "a&b"}, detail=True)
+        await session.request("https://example.test/api", form={"postId": "other"}, detail=True)
+        assert page.calls == 2
+        assert "application/x-www-form-urlencoded" in page.scripts[0]
+        assert "postId=a%26b" in page.scripts[0]
+        with pytest.raises(ValueError, match="不能同时"):
+            await session.request("https://example.test/api", payload={}, form={})
+    finally:
+        store.close()
+
+
+async def test_observed_path_ignores_similarly_named_api(tmp_path: Path) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    session = BrowserSession("A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0))
+    session.responses.extend(
+        [
+            {
+                "url": "https://example.test/api/website/jobs/v2",
+                "status": 200,
+                "body": '{"jobs":[]}',
+            },
+            {
+                "url": "https://example.test/api/website/jobs/v2/filterFieldsAggregations",
+                "status": 200,
+                "body": '{"filters":[]}',
+            },
+        ]
+    )
+    try:
+        observed = await session.observed_path("/api/website/jobs/v2")
+        assert observed["body"] == '{"jobs":[]}'
     finally:
         store.close()
 
