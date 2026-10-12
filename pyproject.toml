@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
   "beautifulsoup4>=4.12",
   "crawl4ai==0.9.4",
+  "cryptography>=45",
   "openai>=2.0",
   "openpyxl>=3.1.5",
   "pydantic>=2.0",

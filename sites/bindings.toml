@@ -22,8 +22,36 @@ version = "1"
 adapter = "zhiye-xiangyu"
 version = "1"
 
+[sources.COM0066]
+adapter = "moka-catl"
+version = "1"
+
+[sources.COM0099]
+adapter = "hzsteel-static"
+version = "1"
+
+[sources.COM0104]
+adapter = "wtmec-static"
+version = "1"
+
+[sources.COM0121]
+adapter = "ansteel-static"
+version = "1"
+
 [sources.COM0141]
 adapter = "zhiye-changan"
+version = "1"
+
+[sources.COM0151]
+adapter = "moka-huaqin"
+version = "1"
+
+[sources.COM0155]
+adapter = "hotjob-huaxia"
+version = "1"
+
+[sources.COM0168]
+adapter = "hotjob-jintian"
 version = "1"
 
 [sources.COM0173]
@@ -42,8 +70,20 @@ version = "1"
 adapter = "zhiye-sany"
 version = "1"
 
+[sources.COM0215]
+adapter = "moka-sungrow"
+version = "1"
+
 [sources.COM0267]
 adapter = "zhiye-transsion"
+version = "1"
+
+[sources.COM0268]
+adapter = "moka-jinko"
+version = "1"
+
+[sources.COM0289]
+adapter = "moka-sto"
 version = "1"
 
 [sources.COM0328]
@@ -54,26 +94,74 @@ version = "1"
 adapter = "zhiye-cscb"
 version = "1"
 
+[sources.COM0345]
+adapter = "hotjob-gf"
+version = "1"
+
+[sources.COM0349]
+adapter = "moka-eastchinapharm"
+version = "1"
+
+[sources.COM0369]
+adapter = "moka-lygend"
+version = "1"
+
 [sources.COM0371]
 adapter = "zhiye-dsbj"
+version = "1"
+
+[sources.COM0389]
+adapter = "moka-digiloong"
+version = "1"
+
+[sources.COM0398]
+adapter = "moka-yadea"
 version = "1"
 
 [sources.COM0399]
 adapter = "zhiye-sailun"
 version = "1"
 
+[sources.COM0403]
+adapter = "moka-fehorizon"
+version = "1"
+
+[sources.COM0404]
+adapter = "moka-hfsp"
+version = "1"
+
 [sources.COM0413]
 adapter = "zhiye-csc108"
+version = "1"
+
+[sources.COM0426]
+adapter = "hotjob-liugong"
 version = "1"
 
 [sources.COM0430]
 adapter = "zhiye-tsingtao"
 version = "1"
 
+[sources.COM0439]
+adapter = "moka-sanhua"
+version = "1"
+
+[sources.COM0460]
+adapter = "hotjob-haitian"
+version = "1"
+
 [sources.COM0476]
 adapter = "zhiye-yuhong"
 version = "1"
 
+[sources.COM0478]
+adapter = "moka-dasenlin"
+version = "1"
+
 [sources.COM0483]
 adapter = "zhiye-iflytek"
+version = "1"
+
+[sources.COM0496]
+adapter = "hotjob-minth"
 version = "1"

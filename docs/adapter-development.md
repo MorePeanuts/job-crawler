@@ -4,7 +4,7 @@
 
 ## 可直接使用的任务说明
 
-> 阅读 AGENTS.md、specs/001-production.md 和 docs/adapter-development.md，为以下来源接入适配器：企业 ID、主体名称、招聘 URL（填入）。先编写该站 spec，确认平台、校招范围、目录/单位树/分页/详情与终止依据。探测和采集全部由程序执行，不手工补录岗位。优先复用现有适配器；新增逻辑须有回放测试和真实验收。使用 uv、Ruff、ty，走功能分支与分阶段提交。按原模板导出，不改变字段。遇到登录、验证码、403、附件或分类障碍如实报告。更新来源绑定、支持范围和验收记录。
+> 阅读 AGENTS.md、specs/001-production.md、specs/011-publication-and-adapter-rollout.md 和 docs/adapter-development.md，为以下来源接入适配器：企业 ID、主体名称、招聘 URL（填入）。先编写该站 spec，确认平台、校招范围、目录/单位树/分页/详情与终止依据。探测和采集全部由程序执行，不手工补录岗位。优先复用现有适配器；新增逻辑须有回放测试和真实验收。使用 uv、Ruff、ty，走功能分支与分阶段提交。按当前十三列模板导出，不改变字段。遇到登录、验证码、403、附件或分类障碍如实报告。更新来源绑定、支持范围和验收记录。
 
 仅有企业名称与 URL 也可开始调查。不要将链接加入清单就称为已完成接入。
 
@@ -74,6 +74,12 @@ Job 附带 `evidence` 与关键字段 `field_sources`。仅提交最小脱敏回
 
 北森新版可复用 `adapters/zhiye.py`，但必须逐租户确认 Category=2、无局部筛选的入口、GetJobAdInfo 详情与 GUID 关联。只有真实全量验收后才启用绑定；不能把该平台的旧版站点或仅有静态首页的入口直接登记为已支持。`scripts/probe_sites.py` 用于有限探测，`scripts/collect_batch.py` 可将每家企业结果独立保存；使用 `job-crawler bundle` 合并已保存结果，不要为了输出一份总表重复采集。
 
+Hotjob `pb/school.html` 租户可参考 `adapters/hotjob.py`。新租户仍须先观察 `listPosition` 的原始表单，确认 `recruitType=1`、第一页无局部筛选、`dataCount` 与末页，再核对 `listPositionDetail` 的 `postId`。表单请求走同一 Crawl4AI 浏览器会话，不能把 JSON POST 直接套用。`publishFirstDate` 是首次发布时间；页面的“更新日期”对应 `publishDate`，不能拿来做每日新发布筛选。部分租户将职责和资格放在同一正文，只有明确小标题时拆分；源站未给资格则留空并报告。`mc/position/campus` 移动入口不能未经验证复用 `pb` 的路径和表单。
+
+Moka `campus-recruitment` 与 `campus_apply` 的已验收单站点租户可参考 `adapters/moka.py` 和 SPEC-013。该平台公开页面在 `window.TurboApply.data.aesIv` 给出本页响应 IV，接口通过响应中的 `necromancer` 解码；不要复用另一轮保存的 IV、密钥或已解码目录。先直接访问该租户的 `#/jobs`，确认 `website/jobs/v2` 是同组织/同 siteId 的无筛选目录，`jobStats.total` 与每页岗位数一致，再核对 `website/job` 详情 ID。观察接口时按完整 URL 路径精确匹配；`/website/jobs/v2/filterFieldsAggregations` 不是职位列表。`publishedAt` 是发布时间，`updatedAt` 只是更新；移动链接仅在核对公开跳转后的同租户目录时复用，跨多个 siteId 的首页门户必须另做范围设计。即使租户同属 Moka，也不能只因域名相同就启用绑定。
+
+前程无忧 `campus.51job.com` 的活动页通常按企业定制。参考 `adapters/wtmec.py`、`adapters/hzsteel.py` 和 `adapters/ansteel.py` 处理三类已验收页面；新活动页必须重新检查实际导航、招聘企业选项、岗位卡片与占位元素、分页或弹窗、申请 ID 以及公开日期，不套用同域名的选择器。鞍钢默认只显示一个招聘企业，必须逐选项点击并保存各选项证据才能报告整个集团的覆盖。若页面没有发布/截止日期或某项岗位字段，保留空值和字段来源说明。公开申请链接进入登录页不阻止采集公开岗位正文，也不能据此推断投递状态。
+
 ## 测试与交付
 
 | 范围 | 要求 |
@@ -82,7 +88,7 @@ Job 附带 `evidence` 与关键字段 `field_sources`。仅提交最小脱敏回
 | 层级 | 多批次/单位；其他分支失败不被成功分支掩盖 |
 | 详情 | 参数关联、部分失败、公告展开、复合 ID |
 | 日期 | 日粒度、未知发布、当天截止、精确时刻、未来/无效日期 |
-| 导出 | 12 列、分类路径、未知枚举、待补全、超长文本、公式安全、保持日/周/月窗口 |
+| 导出 | 13 列、分类路径、未知枚举、待补全、超长文本、公式安全、保持日/周/月窗口 |
 | 执行 | 有限重试、预算、恢复失配、错误退出码 |
 | 真实验收 | 命令、时刻、范围、数量、证据和障碍；历史样本不能冒充实时结果 |
 

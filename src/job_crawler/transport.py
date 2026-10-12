@@ -3,10 +3,11 @@
 import asyncio
 import json
 import os
+import re
 import time
 from pathlib import Path
 from typing import Any, Protocol, cast
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit
 
 from job_crawler.config import CrawlConfig
 from job_crawler.models import Issue
@@ -25,7 +26,11 @@ class Session(Protocol):
     async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None: ...
     async def observed(self, needle: str) -> dict[str, Any]: ...
     async def request(
-        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        self,
+        url: str,
+        *,
+        payload: dict[str, Any] | None = None,
+        detail: bool = False,
     ) -> dict[str, Any]: ...
 
 
@@ -338,10 +343,49 @@ class BrowserSession:
             "api_not_observed", f"未观察到已适配接口 {needle}；需要检查入口、登录或改版"
         )
 
+    async def observed_path(self, path: str) -> dict[str, Any]:
+        """Observe one exact API path; avoid matching similarly named filter endpoints."""
+        if not path.startswith("/"):
+            raise ValueError("接口路径必须以 / 开头")
+        for _ in range(int(min(self.config.navigation_timeout, 60) / 2) + 1):
+            if self.pending:
+                await asyncio.gather(*list(self.pending), return_exceptions=True)
+            matches = [
+                response
+                for response in self.responses
+                if urlsplit(response["url"]).path == path and response["status"] < 400
+            ]
+            if matches:
+                evidence = self.output / f"observed-{fingerprint(path)[:12]}.json"
+                write_json(evidence, matches[-1])
+                self.last_evidence = str(evidence)
+                return matches[-1]
+            await asyncio.sleep(2)
+        raise CrawlError("api_not_observed", f"未观察到精确接口 {path}")
+
+    def snapshot(self, label: str, html: str) -> str:
+        """Retain the current DOM after an in-page state change such as a tab click."""
+        if not re.fullmatch(r"[a-z0-9-]{1,40}", label):
+            raise ValueError("页面证据标签无效")
+        path = self.output / f"page-{self.requests:05}-{label}.json"
+        write_json(path, {"url": self.url, "html": html})
+        self.last_evidence = str(path)
+        return str(path)
+
     async def request(
-        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        self,
+        url: str,
+        *,
+        payload: dict[str, Any] | None = None,
+        form: dict[str, str] | None = None,
+        detail: bool = False,
     ) -> dict[str, Any]:
-        key = fingerprint({"url": url, "payload": payload})
+        if payload is not None and form is not None:
+            raise ValueError("同一次请求不能同时发送 JSON 和表单")
+        identity: dict[str, Any] = {"url": url, "payload": payload}
+        if form is not None:
+            identity["form"] = form
+        key = fingerprint(identity)
         path = self.output / f"request-{key[:20]}.json"
         if self.resume and detail:
             cached = self.store.cached(self.run_id, self.source_id, key)
@@ -350,13 +394,16 @@ class BrowserSession:
                 return json.loads(await asyncio.to_thread(Path(cached).read_text))["data"]
         self.store.request(self.run_id, self.source_id, key, "pending")
         options: dict[str, Any] = {
-            "method": "POST" if payload is not None else "GET",
+            "method": "POST" if payload is not None or form is not None else "GET",
             "credentials": "include",
             "headers": {},
         }
         if payload is not None:
             options["headers"]["Content-Type"] = "application/json"
             options["body"] = json.dumps(payload, ensure_ascii=False)
+        elif form is not None:
+            options["headers"]["Content-Type"] = "application/x-www-form-urlencoded"
+            options["body"] = urlencode(form)
         script = (
             "const options="
             + json.dumps(options)
@@ -393,7 +440,13 @@ class BrowserSession:
                     raise CrawlError("schema_changed", "预期 JSON 对象，接口结构已改变")
                 write_json(
                     path,
-                    {"url": url, "payload": payload, "status": response["status"], "data": data},
+                    {
+                        "url": url,
+                        "payload": payload,
+                        "form": form,
+                        "status": response["status"],
+                        "data": data,
+                    },
                 )
                 self.store.request(self.run_id, self.source_id, key, "done", str(path))
                 self.last_evidence = str(path)
