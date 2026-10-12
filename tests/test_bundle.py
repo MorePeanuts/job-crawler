@@ -62,7 +62,7 @@ async def test_merge_preserves_times_and_exports_review_rows(
     assert job.collected_at == original_time
     workbook = load_workbook(tmp_path / "bundle" / "岗位信息汇总.xlsx")
     assert workbook["岗位信息（待补全）"].max_row == 2
-    assert workbook["岗位信息（待补全）"].max_column == 12
+    assert workbook["岗位信息（待补全）"].max_column == 13
     assert workbook["企业采集情况"].max_row == 3
     assert workbook["企业采集情况"].cell(3, 7).value == 0
     workbook.close()

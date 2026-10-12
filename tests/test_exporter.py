@@ -70,17 +70,48 @@ def test_optional_deadline_is_last_column_and_preserves_source(
     export_workbook(path, [job], information=information)
     workbook = load_workbook(path)
     sheet = workbook.worksheets[0]
-    assert sheet.max_column == 12
+    assert sheet.max_column == 13
     assert sheet["K1"].value == "申请链接"
     assert sheet["L1"].value == "截止时间"
+    assert sheet["M1"].value == "发布时间"
     assert (sheet["L2"].value or "") == expected
     assert job.deadline == deadline
     assert sheet["L2"].data_type != "f"
     assert sheet["L2"].number_format == "@"
     if information:
-        assert sheet.auto_filter.ref == "A1:L2"
+        assert sheet.auto_filter.ref == "A1:M2"
     if not deadline:
         assert import_errors(job, mapping, enums()) == []
+    workbook.close()
+
+
+@pytest.mark.parametrize("information", [False, True])
+@pytest.mark.parametrize(
+    ("published", "expected"),
+    [
+        ("2026-10-10", "2026-10-10"),
+        ("2026-10-11T17:00:00Z", "2026-10-12"),
+        ("2026年10月2日", "2026-10-02"),
+        ("1791763200", "2026-10-12"),
+        ("", ""),
+        ("未公布", ""),
+        ('=HYPERLINK("https://example.test","x")', ""),
+    ],
+)
+def test_publication_is_last_column_and_preserves_source(
+    tmp_path: Path, job: Job, information: bool, published: str, expected: str
+) -> None:
+    job.published = published
+    path = tmp_path / "publication.xlsx"
+    export_workbook(path, [job], information=information)
+    workbook = load_workbook(path)
+    sheet = workbook.worksheets[0]
+    assert sheet.max_column == 13
+    assert sheet["M1"].value == "发布时间"
+    assert (sheet["M2"].value or "") == expected
+    assert sheet["M2"].data_type != "f"
+    assert sheet["M2"].number_format == "@"
+    assert job.published == published
     workbook.close()
 
 

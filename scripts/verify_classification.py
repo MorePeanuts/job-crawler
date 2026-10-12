@@ -57,12 +57,12 @@ def main() -> None:
     workbook = load_workbook(result / "岗位信息汇总.xlsx")
     sheet = workbook.worksheets[0]
     # Historical classification deliveries predate the optional deadline column.
-    assert [cell.value for cell in sheet[1]] in (HEADERS, HEADERS[:-1])
+    assert [cell.value for cell in sheet[1]] in (HEADERS, HEADERS[:12], HEADERS[:11])
     assert sheet.max_row == len(after) + 1
     for job, row in zip(after, sheet.iter_rows(min_row=2), strict=True):
         for field, cell in zip(FIELDS[: sheet.max_column], row, strict=True):
             expected = getattr(job, field)
-            if field == "deadline":
+            if field in {"deadline", "published"}:
                 assert (cell.value or "") in (expected, deadline_date(expected)), job.key
             else:
                 assert (cell.value or "") == expected, (job.key, field)

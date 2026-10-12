@@ -31,6 +31,7 @@ HEADERS = [
     "任职要求",
     "申请链接",
     "截止时间",
+    "发布时间",
 ]
 FIELDS = [
     "company",
@@ -45,6 +46,7 @@ FIELDS = [
     "requirements",
     "apply_url",
     "deadline",
+    "published",
 ]
 
 
@@ -230,7 +232,7 @@ def export_workbook(
             value = getattr(job, field)
             if len(value) > 32767 or ILLEGAL_CHARACTERS_RE.search(value):
                 raise ValueError(f"无法无损导出 {job.key}:{field}")
-            if field == "deadline":
+            if field in {"deadline", "published"}:
                 value = deadline_date(value)
             cell = sheet.cell(row_index, col_index, value)
             cell.data_type = "s"  # Untrusted website text must never become an Excel formula.

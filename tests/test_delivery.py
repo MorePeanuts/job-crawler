@@ -155,7 +155,7 @@ def test_one_cli_command_delivers_and_next_run_uses_both_caches(
         assert main([*args, "--output", str(output)]) == 0
         workbook = load_workbook(output / "jobs.xlsx")
         sheet = workbook.worksheets[0]
-        assert sheet.max_column == 12 and sheet.max_row == 2
+        assert sheet.max_column == 13 and sheet.max_row == 2
         assert [sheet.cell(2, col).value for col in (4, 5, 6)] == ["互联网/AI", "软件研发", "本科"]
         workbook.close()
         report = json.loads((output / "report.json").read_text())
