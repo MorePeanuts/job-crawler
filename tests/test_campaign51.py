@@ -101,6 +101,20 @@ async def test_lens_duplicate_or_missing_body_fails_coverage(now: datetime) -> N
     ).coverage_issues()
 
 
+async def test_lens_robot_company_tab_uses_explicit_address_for_location(now: datetime) -> None:
+    url = source(Lens).url
+    html = f"<div class='tab'><div>智能机器人公司</div></div><div class='zw'><a href='{apply('1')}'></a></div>"
+    row = lens_row("1", "智能机器人公司")
+    row["attr2"] = row["attr2"].replace("浏阳园区", "长沙浏阳园区")
+    result = await Lens(source(Lens), Replay({url: html}, {"obj": [row]}), now).collect()
+    assert result.coverage_issues() == []
+    assert result.jobs[0].unit == "智能机器人公司"
+    assert result.jobs[0].location == "湖南长沙"
+    changed = row | {"attr2": row["attr2"].replace("长沙浏阳园区", "未知园区")}
+    blocked = await Lens(source(Lens), Replay({url: html}, {"obj": [changed]}), now).collect()
+    assert blocked.coverage_issues()
+
+
 def gas_pages(ids: list[str]) -> dict[str, str]:
     home = source(ChinaGas).url
     directory = "https://campus.51job.com/chinagasholdings/page2.html"
@@ -152,6 +166,21 @@ async def test_chinagas_rejects_missing_or_duplicate_ids(now: datetime) -> None:
     ).collect()
     assert duplicate.coverage_issues()
 
+    empty = await ChinaGas(
+        source(ChinaGas), Replay(gas_pages([]), {"jobListData": []}), now
+    ).collect()
+    assert empty.coverage_issues()
+
+
+async def test_chinagas_rejects_apply_link_with_different_tenant(now: datetime) -> None:
+    pages = gas_pages(["1"])
+    target = "https://campus.51job.com/chinagasholdings/page2.html"
+    pages[target] = pages[target].replace("ctmid=1", "ctmid=2")
+    result = await ChinaGas(
+        source(ChinaGas), Replay(pages, {"jobListData": [gas_row("1")]}), now
+    ).collect()
+    assert result.coverage_issues()
+
 
 def bank_pages(*, special: str | None = None) -> dict[str, str]:
     home = source(TianjinBank).url
@@ -194,6 +223,14 @@ async def test_tianjin_bank_does_not_hide_special_branch_failure(now: datetime) 
     assert len(result.jobs) == 3
     assert result.coverage_issues()
     assert not result.scopes[1].terminal
+
+
+async def test_tianjin_bank_rejects_reused_city_apply_id(now: datetime) -> None:
+    pages = bank_pages()
+    hot = "https://campus.51job.com/tjyh_2026/job.html"
+    pages[hot] = pages[hot].replace(apply("3"), apply("2"))
+    result = await TianjinBank(source(TianjinBank), Replay(pages), now).collect()
+    assert result.coverage_issues()
 
 
 def test_split_jobinfo_supports_requirement_first() -> None:

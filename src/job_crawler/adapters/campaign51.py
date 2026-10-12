@@ -96,15 +96,21 @@ class Lens(Adapter):
                 title = text(row["value"])
                 duties = text(row.get("岗位职责"))
                 requirements = text(row.get("岗位要求"))
-                location = text(row.get("attr9"))
+                region = text(row.get("attr9"))
                 detail = text(row.get("attr2"))
                 address_match = re.search(r"工作地点\s*[：:]\s*([^\n]+)", detail)
                 address = address_match.group(1).strip() if address_match else ""
+                # This fourth UI tab is a company, not a geographic region. Its
+                # individual descriptions all locate the work in 长沙浏阳园区.
+                robot_unit = region == "智能机器人公司"
+                if robot_unit:
+                    check("长沙浏阳园区" in address, "蓝思智能机器人岗位的工作地点变化")
+                location = "湖南长沙" if robot_unit else region
                 check(bool(title and duties and requirements and location), "蓝思岗位正文缺失")
                 job = self.job(
                     job_id,
                     title=title,
-                    unit=text(row.get("园区")),
+                    unit=region if robot_unit else text(row.get("园区")),
                     category_raw=text(row.get("一级岗位")),
                     location=location,
                     address=address,
@@ -116,7 +122,11 @@ class Lens(Adapter):
                         "title": "window.obj[].value",
                         "duties": "window.obj[].岗位职责",
                         "requirements": "window.obj[].岗位要求",
-                        "location": "window.obj[].attr9",
+                        "location": (
+                            "window.obj[].attr2:工作地点 + 页面地区选项"
+                            if robot_unit
+                            else "window.obj[].attr9"
+                        ),
                         "address": "window.obj[].attr2:工作地点"
                         if address
                         else "source_missing:详细地址",
