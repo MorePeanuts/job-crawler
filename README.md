@@ -4,7 +4,7 @@
 
 维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，默认自动进行缓存优先的 LLM 分类及必要学历补全，完成校验后直接输出最终表格。
 
-已导入 **500 家企业、228 个招聘链接**，初版已接入并真实验收 **20 家企业**：原四站加 16 家北森平台企业。平台逻辑共享，企业入口和覆盖逐家核验；其他链接待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)，历史四站记录见 [首轮验收](docs/acceptance.md)。
+已导入 **500 家企业、228 个招聘链接**，目前已接入并真实验收 **41 家企业**：原四站、16 家北森平台企业、6 家 Hotjob 平台企业、13 家 Moka 平台企业和 2 家前程无忧静态活动页企业。平台逻辑共享，企业入口和覆盖逐家核验；其余 **187 个有链接来源**待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)、[Hotjob 验收](docs/hotjob-acceptance.md)、[Moka 验收](docs/moka-acceptance.md)、[静态活动页验收](docs/static-campaign-acceptance.md) 和 [首轮验收](docs/acceptance.md)。
 
 **已配置用户提供的真实分类树：20 个一级分类、113 条二级路径。** 分类来源是 `job-position.js`，第三级岗位名称用于模型理解，Excel 仍保留原来的一级、二级两列。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入严格导入表。可以对已保存岗位进行批量分类和重新导出，无须重复爬取。
 
@@ -142,7 +142,9 @@ uv run job-crawler bundle --inputs-file outputs/initial20-inputs.json \
 
 **分类更新版**：`outputs/initial20-taxonomy-20261010/result/岗位信息汇总.xlsx`。原 4,611 条记录中，4,599 条已补充合法分类；其余 12 条涉及未能确定主职能的混合岗位、宽泛职位或校招行程公告，保留为空并列于 `outputs/initial20-taxonomy-20261010/classification-unresolved.json`。原始表保留不覆盖，分类验收与分企业统计见 [分类验收](docs/taxonomy-acceptance.md)。
 
-**最新统一日期版**：`outputs/initial20-deadline-date-20261010/岗位信息汇总.xlsx`。保持上述 4,611 条记录和前十一列不变，最后一列“截止时间”统一为 `YYYY-MM-DD`：1,220 条有值，3,391 条留空。项目模板 `src/job_crawler/assets/job-template.xlsx` 同步更新说明；后续采集、分类与汇总自动使用这一格式。本次离线重导出保留原筛选时刻与企业采集时间，没有重爬或调用模型。
+**最新十三列格式**：`outputs/initial20-publication-20261012/岗位信息汇总.xlsx`。从已保存的 20 家快照离线重导出，共 4,611 条岗位，其中 3,986 条有发布时间；末两列为“截止时间”“发布时间”，均按 `YYYY-MM-DD` 输出。离线导出会按当前配置重新处理分类等字段，因此不是旧表仅追加一列的逐单元格副本；源站没有重新采集。模板与导出验收见 [发布时间记录](docs/publication-acceptance.md)。
+
+**41 家扩展采集检查表**：`outputs/initial41-publication-20261012/岗位信息汇总.xlsx`，由各站点在不同时间保存的快照离线汇总，含 6,768 条待补全岗位信息，6,124 条有发布时间，来源页列明 41 家的采集时刻。本次扩展验证关闭了 LLM，严格导入页为 0 行；该表用于核对采集结果，若需可导入表，请按默认配置重新运行，或对保存快照执行 `classify` 并检查待补全报告。详见 [Moka 验收](docs/moka-acceptance.md)与[静态活动页验收](docs/static-campaign-acceptance.md)。
 
 汇总不会重新访问招聘网站；all 快照按汇总时刻再次筛除已截止记录，day/week/month 保留原窗口和筛选时刻。不同窗口或不同窗口基准时刻的快照拒绝混合，不会把每日预筛选的简略行重新当成全量岗位。保留原始采集时间，不宣称重新验证在线状态。同一来源若指定两轮结果会拒绝合并，需自行选择其中一轮。默认与 run 一样为未满足约束的字段进行缓存优先的模型补全；可能访问模型服务，但不访问招聘网站。设 llm.enabled=false 可关闭。
 
