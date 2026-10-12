@@ -1,12 +1,15 @@
 import json
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
-from job_crawler.adapters.zhiye import Xiangyu, date_text
+from job_crawler.adapters.zhiye import TENANTS, Xiangyu, date_text
+from job_crawler.config import load_bindings
 from job_crawler.models import Source
+from job_crawler.sources import read_sources
 from job_crawler.transport import CrawlError
 
 
@@ -152,3 +155,32 @@ async def test_zhiye_stops_queued_details_after_access_denied(now: datetime) -> 
 )
 def test_zhiye_unset_dates(value: Any, expected: str) -> None:
     assert date_text(value) == expected
+
+
+@pytest.mark.parametrize(
+    "source_id,host",
+    [
+        ("COM0226", "mengniu.zhiye.com"),
+        ("COM0247", "goldwind.zhiye.com"),
+        ("COM0272", "leapmotor.zhiye.com"),
+        ("COM0388", "mywind.zhiye.com"),
+        ("COM0393", "popmart.zhiye.com"),
+        ("COM0452", "szgas.zhiye.com"),
+        ("COM0461", "ovt-omnivision.zhiye.com"),
+        ("COM0484", "juhua.zhiye.com"),
+    ],
+)
+def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> None:
+    root = Path(__file__).resolve().parents[1]
+    sources, _ = read_sources(root / "sites/sources.csv")
+    bindings = load_bindings(root / "sites/bindings.toml")
+    source = next(source for source in sources if source.source_id == source_id)
+    adapter = next(adapter for adapter in TENANTS if adapter.host == host)
+    assert urlsplit(source.url).hostname == host
+    assert bindings[source_id].adapter == adapter.name
+
+
+@pytest.mark.parametrize("source_id", ["COM0468", "COM0471"])
+def test_group_portals_remain_unbound(source_id: str) -> None:
+    root = Path(__file__).resolve().parents[1]
+    assert source_id not in load_bindings(root / "sites/bindings.toml")

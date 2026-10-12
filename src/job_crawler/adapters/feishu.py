@@ -1,0 +1,136 @@
+"""Feishu campus catalog pagination through the site's signed browser requests."""
+
+import asyncio
+import json
+from typing import Any, cast
+from urllib.parse import parse_qs, urlsplit
+
+from job_crawler.adapters.base import Adapter, text
+from job_crawler.adapters.platforms import check
+from job_crawler.models import Scope
+from job_crawler.storage import write_json
+from job_crawler.transport import BrowserSession, CrawlError
+
+LIST_PATH = "/api/v1/search/job/posts"
+
+
+def page_payload(response: dict[str, Any], host: str, offset: int) -> dict[str, Any]:
+    url = urlsplit(response["url"])
+    query = parse_qs(url.query, keep_blank_values=True)
+    check(url.hostname == host and url.path == LIST_PATH, "飞书岗位响应来自未知接口")
+    check(query.get("offset") == [str(offset)], "飞书岗位响应偏移量错误")
+    check(query.get("portal_type") == ["6"], "飞书入口不是校园招聘")
+    check(query.get("_signature", [""])[0] != "", "飞书分页签名缺失")
+    for key in (
+        "keyword",
+        "job_category_id_list",
+        "tag_id_list",
+        "location_code_list",
+        "subject_id_list",
+        "recruitment_id_list",
+        "job_function_id_list",
+        "storefront_id_list",
+    ):
+        check(not query.get(key, [""])[0], f"飞书目录带有筛选 {key}")
+    payload = json.loads(response["body"])
+    check(payload.get("code") == 0, "飞书岗位接口失败")
+    return payload["data"]
+
+
+class Desaysv(Adapter):
+    name = "feishu-desaysv"
+    host = "yesv-desaysv.jobs.feishu.cn"
+    path = "/campus/"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "德赛西威飞书校招门户公开全目录；由站点 UI 签名分页，实习由公共筛选排除"
+
+    async def harvest(self) -> None:
+        session = cast(BrowserSession, self.session)
+        observed = await self.session.observed(f"{LIST_PATH}?")
+        size = int(parse_qs(urlsplit(observed["url"]).query)["limit"][0])
+        check(0 < size <= 50, "飞书分页大小无效")
+        scope = Scope(name="campus-portal-all-projects")
+        self.result.scopes.append(scope)
+        seen: set[str] = set()
+        offset = 0
+        response = observed
+        while True:
+            data = page_payload(response, self.host, offset)
+            expected = int(data["count"])
+            check(expected >= 0, "飞书岗位总数无效")
+            if scope.expected is None:
+                scope.expected = expected
+            check(scope.expected == expected, "飞书分页期间岗位总数变化")
+            evidence = session.output / f"feishu-list-offset-{offset}.json"
+            write_json(evidence, {"url": response["url"], "data": data})
+            session.last_evidence = str(evidence)
+            rows = self.add_page(scope, data["job_post_list"], seen, lambda row: str(row["id"]))
+            for row in rows:
+                key = str(row["id"])
+                subject = row.get("job_subject") or {}
+                subject_name = text((subject.get("name") or {}).get("zh_cn"))
+                title = text(row.get("title"))
+                duties = text(row.get("description"))
+                requirements = text(row.get("requirement"))
+                check(bool(title) and bool(duties), "飞书岗位标题或职责缺失")
+                cities = row.get("city_list") or []
+                check(isinstance(cities, list), "飞书岗位城市结构改变")
+                location = "、".join(
+                    dict.fromkeys(text(city.get("name")) for city in cities if city.get("name"))
+                )
+                function = row.get("job_function") or {}
+                page = f"https://{self.host}/campus/position/{key}/detail"
+                job = self.job(
+                    key,
+                    title=title,
+                    source_url=page,
+                    apply_url=page,
+                    work_type="实习" if "实习" in subject_name or "实习" in title else "校招",
+                    batch=subject_name,
+                    category_raw=text(function.get("name")),
+                    location=location,
+                    duties=duties,
+                    requirements=requirements,
+                    published=text(row.get("publish_time")),
+                    field_sources={
+                        "duties": "search/job/posts.data.job_post_list[].description",
+                        "requirements": "search/job/posts.data.job_post_list[].requirement",
+                        "published": "search/job/posts.data.job_post_list[].publish_time",
+                        "location": "search/job/posts.data.job_post_list[].city_list[].name",
+                        "deadline": "source_missing",
+                    },
+                )
+                job.evidence = [str(evidence)]
+                resolved = self.before_detail(f"job:{key}", row, scope, job, evidence=str(evidence))
+                if resolved is not None:
+                    self.result.jobs.extend(resolved)
+                    continue
+                self.result.jobs.append(job)
+                scope.details += 1
+                self.remember(f"job:{key}", row, [job])
+            if scope.unique >= expected:
+                scope.terminal = True
+                break
+            check(bool(rows) and len(rows) <= size, "飞书分页提前为空或超出页大小")
+            offset += len(rows)
+            check(session.page is not None, "飞书浏览器页面丢失")
+            assert session.page is not None
+            session.consume_request()
+            await session.page.locator('li[title="下一页"]').click(timeout=10000)
+            response = await self._wait_page(session, offset)
+
+    async def _wait_page(self, session: BrowserSession, offset: int) -> dict[str, Any]:
+        for _ in range(40):
+            if session.pending:
+                await asyncio.gather(*list(session.pending), return_exceptions=True)
+            matches = [
+                item
+                for item in session.responses
+                if urlsplit(item["url"]).path == LIST_PATH
+                and parse_qs(urlsplit(item["url"]).query).get("offset") == [str(offset)]
+                and item["status"] == 200
+            ]
+            if matches:
+                return matches[-1]
+            await asyncio.sleep(0.5)
+        raise CrawlError("api_not_observed", f"飞书分页 offset={offset} 的签名响应未出现")

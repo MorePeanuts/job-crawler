@@ -4,7 +4,7 @@
 
 维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，默认自动进行缓存优先的 LLM 分类及必要学历补全，完成校验后直接输出最终表格。
 
-已导入 **500 家企业、228 个招聘链接**，目前已接入并真实验收 **45 家企业**：原四站、16 家北森平台企业、6 家 Hotjob 平台企业、13 家 Moka 平台企业和 6 家前程无忧定制活动页企业。平台逻辑共享，企业入口和覆盖逐家核验；其余 **183 个有链接来源**待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)、[Hotjob 验收](docs/hotjob-acceptance.md)、[Moka 验收](docs/moka-acceptance.md)、[首批静态活动页验收](docs/static-campaign-acceptance.md)、[第二批静态活动页验收](docs/51job-batch2-acceptance.md) 和 [首轮验收](docs/acceptance.md)。
+已导入 **500 家企业、228 个招聘链接**，目前已接入并真实验收 **73 家企业**：原有 53 家，加上第三批新增 20 家。平台逻辑共享，企业入口和覆盖逐家核验；其余 **155 个有链接来源**待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)、[Hotjob 验收](docs/hotjob-acceptance.md)、[Moka 验收](docs/moka-acceptance.md)、[首批静态活动页验收](docs/static-campaign-acceptance.md)、[第二批静态活动页验收](docs/51job-batch2-acceptance.md)、[北森批量验收](docs/zhiye-batch-acceptance.md)、[第三批验收](docs/adapter-batch3-acceptance.md) 和 [首轮验收](docs/acceptance.md)。
 
 **已配置用户提供的真实分类树：20 个一级分类、113 条二级路径。** 分类来源是 `job-position.js`，第三级岗位名称用于模型理解，Excel 仍保留原来的一级、二级两列。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入严格导入表。可以对已保存岗位进行批量分类和重新导出，无须重复爬取。
 
@@ -150,6 +150,10 @@ uv run job-crawler bundle --inputs-file outputs/initial20-inputs.json \
 
 **第二批静态活动页**：蓝思 COM0245、中国燃气 COM0259、天津银行 COM0406 的 Crawl4AI 全量采集已通过覆盖核验，合计 362 条；最终十三列检查表在 `outputs/batch2-final-20261012/岗位信息汇总.xlsx`。蓝思智能机器人分支的地点经复核后使用重新采集的快照，和另两站结果由程序离线合并。分类已完成，严格导入表仍因缺少已核验的地点映射而没有合格行；具体数量与历史专题风险见 [第二批验收](docs/51job-batch2-acceptance.md)。
 
+**北森批量接入**：本轮另有 8 家北森企业的公开校招目录与详情全量验收通过，共 787 条；由程序从八份快照离线合并的十三列检查表在 `outputs/zhiye-bulk-combined-20261012/岗位信息汇总.xlsx`。默认 `deepseek-flash` 离线分类后的结果在 `outputs/zhiye-bulk-classified-20261012/result/`，严格导入表有 3 行，其余 784 行主要等待地点映射。招商局能源运输和申能股份所给入口实际上是集团统一门户，存在跨法人岗位，尚未绑定；详见 [北森批量验收](docs/zhiye-batch-acceptance.md)。
+
+**第三批新增二十家**：京东、腾讯、联想、中粮、交通银行、中国联通、广汽、美团、顺丰、上海建工、牧原、温氏、徐工、正泰、上港、重庆银行、德赛西威、哔哩哔哩、宁波华翔、龙佰集团已完成公开目录全量验收；共采集 6,741 条目录行，按状态和校招范围入选 6,657 条。程序从各自快照生成的十三列检查表和严格导入表在 `outputs/batch3-20-delivered-full-llm-20261012/`：汇总表有 6,657 行，严格导入表有 410 行，其余 6,247 行待补全。缺失后台省市映射等字段的岗位继续列入 `review.json`，不人为填入导入表。逐站数量、范围、证据和复现步骤见 [第三批验收](docs/adapter-batch3-acceptance.md)。吉利仍因采集期间目录总数变化保持待验证，未绑定。
+
 汇总不会重新访问招聘网站；all 快照按汇总时刻再次筛除已截止记录，day/week/month 保留原窗口和筛选时刻。不同窗口或不同窗口基准时刻的快照拒绝混合，不会把每日预筛选的简略行重新当成全量岗位。保留原始采集时间，不宣称重新验证在线状态。同一来源若指定两轮结果会拒绝合并，需自行选择其中一轮。默认与 run 一样为未满足约束的字段进行缓存优先的模型补全；可能访问模型服务，但不访问招聘网站。设 llm.enabled=false 可关闭。
 
 `岗位信息汇总.xlsx` 包含待补全记录，使用更新模板的十三字段，缺失值留空，正文不截断。`jobs.xlsx` 则始终是严格校验的导入表。分类补全后，学历或地点不合要求的记录仍进入 `review.json`，不能把分类成功等同于全部可直接导入。JSON 同时保留全部原始岗位（包括已排除的岗位）及证据。
@@ -244,7 +248,7 @@ enabled = true
 model = "deepseek-flash"
 base_url = "https://api.deepseek.com"
 api_key_env = "DEEPSEEK_API_KEY"
-max_calls = 1000            # 分类、复核、学历及重试共用总上限
+max_calls = 2000            # 分类、复核、学历及重试共用总上限；20 站初次合并需更高预算
 batch_size = 10            # 分类批次
 concurrency = 5            # 分类并发
 refine = true

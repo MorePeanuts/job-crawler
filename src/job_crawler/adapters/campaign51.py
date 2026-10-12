@@ -426,4 +426,87 @@ class TianjinBank(Adapter):
             )
 
 
-TENANTS = (Lens, ChinaGas, TianjinBank)
+def gac_apply_key(url: str) -> str:
+    parsed = urlsplit(url)
+    if parsed.hostname == "xyz.51job.com":
+        return f"51job:{apply_id(url)}"
+    if (parsed.hostname or "").endswith(".jobs.feishu.cn"):
+        match = re.fullmatch(r"/\d+/position/(\d+)/detail", parsed.path)
+        check(match is not None, "广汽飞书申请链接缺少岗位 ID")
+        assert match is not None
+        return f"feishu:{match.group(1)}"
+    raise ValueError("广汽岗位申请链接不是已核验平台")
+
+
+class Gac(Adapter):
+    name = "gac-2027-static"
+    host = "xyzp.51job.com"
+    path = "/gacgroup2027/jobs.html"
+    scope_description = "广汽集团 2027 校招活动页全部静态岗位卡片；不含社招，公开页面无发布时间"
+
+    async def harvest(self) -> None:
+        session = cast(PageSession, self.session)
+        html = await session.page.content()
+        document = BeautifulSoup(html, "html.parser")
+        cards = document.select(".job-item")
+        check(bool(cards), "广汽活动页没有岗位卡片")
+        check(not document.select(".pagination,.pager,.next-page"), "广汽岗位目录出现未适配分页")
+        scope = Scope(name="gac-2027-all-cards", expected=len(cards), listed=len(cards))
+        scope.evidence.append(session.snapshot("gac-2027-directory", html))
+        self.result.scopes.append(scope)
+        seen: set[str] = set()
+        for card in cards:
+            try:
+                title = card.select_one(".job-name")
+                anchor = card.select_one("a.job-apply-btn[href]")
+                check(title is not None and anchor is not None, "广汽岗位缺少标题或申请入口")
+                assert title is not None and anchor is not None
+                name = title.get_text(" ", strip=True)
+                url = str(anchor["href"])
+                key = gac_apply_key(url)
+                check(bool(name) and key not in seen, "广汽岗位名称为空或申请 ID 重复")
+                seen.add(key)
+                sections: dict[str, str] = {}
+                for section in card.select(".job-section"):
+                    heading = section.select_one(".job-section-title")
+                    body = section.select_one(".job-section-text")
+                    check(heading is not None and body is not None, "广汽岗位分段正文缺失")
+                    assert heading is not None and body is not None
+                    sections[heading.get_text(" ", strip=True)] = body.get_text("\n", strip=True)
+                check("招聘要求" in sections and "岗位介绍" in sections, "广汽岗位缺少必备详情分段")
+                job = self.job(
+                    key,
+                    title=name,
+                    source_url=f"https://{self.host}{self.path}",
+                    apply_url=url,
+                    duties=sections["岗位介绍"],
+                    requirements=sections["招聘要求"],
+                    location=sections.get("工作地点", ""),
+                    field_sources={
+                        "duties": ".job-item .job-section:岗位介绍",
+                        "requirements": ".job-item .job-section:招聘要求",
+                        "location": ".job-item .job-section:工作地点",
+                        "published": "source_missing",
+                        "deadline": "source_missing",
+                    },
+                )
+                job.evidence = [scope.evidence[0]]
+                self.result.jobs.append(job)
+                scope.details += 1
+                if not job.duties:
+                    self.result.warnings.append(
+                        Issue(
+                            code="field_missing",
+                            message="源站岗位介绍为空，保留任职要求并待补全",
+                            source_id=self.source.source_id,
+                            job_key=key,
+                            url=url,
+                        )
+                    )
+            except Exception as exc:
+                self.error(exc)
+        scope.unique = len(seen)
+        scope.terminal = True
+
+
+TENANTS = (Lens, ChinaGas, TianjinBank, Gac)

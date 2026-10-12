@@ -374,6 +374,49 @@ class Dasenlin(Moka):
     path = f"/campus-recruitment/{org}/{site_id}#/jobs"
 
 
+class Geely(Moka):
+    name = "moka-geely"
+    host = "campus.geely.com"
+    org = "geely"
+    site_id = 78436
+    path = f"/campus-recruitment/{org}/{site_id}/#/jobs"
+
+    def detail_page(self, job_id: str) -> str:
+        return f"https://{self.host}/campus-recruitment/{self.org}/{self.site_id}/#/job/{job_id}"
+
+
+class Chint(Moka):
+    name = "moka-chint"
+    host = "campus.chint.com"
+    org = "chint"
+    site_id = 40745
+    path = f"/campus-recruitment/{org}/{site_id}/#/jobs"
+
+    def detail_page(self, job_id: str) -> str:
+        return f"https://{self.host}/campus-recruitment/{self.org}/{self.site_id}/#/job/{job_id}"
+
+
+class Muyuan(Moka):
+    name = "moka-muyuan"
+    org = "muyuan"
+    site_id = 70116
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+
+
+class Wens(Moka):
+    name = "moka-wens"
+    org = "wens"
+    site_id = 92366
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+
+
+class XCMG(Moka):
+    name = "moka-xcmg"
+    org = "xcmg"
+    site_id = 148091
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+
+
 TENANTS = (
     CATL,
     Huaqin,
@@ -388,4 +431,9 @@ TENANTS = (
     Yadea,
     Fehorizon,
     Dasenlin,
+    Geely,
+    Chint,
+    Muyuan,
+    Wens,
+    XCMG,
 )

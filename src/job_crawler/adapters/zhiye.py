@@ -231,6 +231,46 @@ class Iflytek(Zhiye):
     host = "iflytek.zhiye.com"
 
 
+class Goldwind(Zhiye):
+    name = "zhiye-goldwind"
+    host = "goldwind.zhiye.com"
+
+
+class Mengniu(Zhiye):
+    name = "zhiye-mengniu"
+    host = "mengniu.zhiye.com"
+
+
+class Leapmotor(Zhiye):
+    name = "zhiye-leapmotor"
+    host = "leapmotor.zhiye.com"
+
+
+class Mywind(Zhiye):
+    name = "zhiye-mywind"
+    host = "mywind.zhiye.com"
+
+
+class Popmart(Zhiye):
+    name = "zhiye-popmart"
+    host = "popmart.zhiye.com"
+
+
+class Szgas(Zhiye):
+    name = "zhiye-szgas"
+    host = "szgas.zhiye.com"
+
+
+class Ovt(Zhiye):
+    name = "zhiye-ovt"
+    host = "ovt-omnivision.zhiye.com"
+
+
+class Juhua(Zhiye):
+    name = "zhiye-juhua"
+    host = "juhua.zhiye.com"
+
+
 TENANTS = (
     Poly,
     Xiangyu,
@@ -248,4 +288,12 @@ TENANTS = (
     Tsingtao,
     Yuhong,
     Iflytek,
+    Goldwind,
+    Mengniu,
+    Leapmotor,
+    Mywind,
+    Popmart,
+    Szgas,
+    Ovt,
+    Juhua,
 )
