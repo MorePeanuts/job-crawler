@@ -74,6 +74,14 @@ version = "1"
 adapter = "moka-sungrow"
 version = "1"
 
+[sources.COM0245]
+adapter = "lens-static"
+version = "1"
+
+[sources.COM0259]
+adapter = "chinagas-static"
+version = "1"
+
 [sources.COM0267]
 adapter = "zhiye-transsion"
 version = "1"
@@ -128,6 +136,10 @@ version = "1"
 
 [sources.COM0404]
 adapter = "moka-hfsp"
+version = "1"
+
+[sources.COM0406]
+adapter = "tjyh-static"
 version = "1"
 
 [sources.COM0413]

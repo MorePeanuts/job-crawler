@@ -1,10 +1,12 @@
 # 来源适配进度与下一批调查
 
-2026-10-12。本文件记录逐站验收进度，不代替 `sites/sources.csv` 的输入清单或 `sites/bindings.toml` 的 ready 状态。清单有 500 家企业、228 条招聘链接；目前 42 条链接有经过真实覆盖验收的绑定，186 条有链接来源仍为 pending，另 272 家尚未提供链接。导出模板已是十三列，最后两列为截止时间、发布时间。
+2026-10-12。本文件记录逐站验收进度，不代替 `sites/sources.csv` 的输入清单或 `sites/bindings.toml` 的 ready 状态。清单有 500 家企业、228 条招聘链接；目前 45 条链接有经过真实覆盖验收的绑定，183 条有链接来源仍为 pending，另 272 家尚未提供链接。导出模板已是十三列，最后两列为截止时间、发布时间。
 
 本轮新增 22 家：Hotjob `pb/school.html` 六家、Moka 单站点十三家、51job 定制静态活动页三家。每家具体源目录数、问题和保存快照见 [Hotjob 验收](hotjob-acceptance.md)、[Moka 验收](moka-acceptance.md)、[静态活动页验收](static-campaign-acceptance.md)。本轮扩展版采集检查表在 `outputs/initial42-publication-20261012/岗位信息汇总.xlsx`，由不同采集时刻的快照离线拼合，不代表所有站在同一时刻的实时数据。
 
 已对该快照运行默认模型分类：351 条通过全部导入校验，6,681 条保留待补全，主要问题是地点路径映射。见 [分类验收](classification-42-acceptance.md)。
+
+第二批新增三家前程无忧定制活动页：COM0245 蓝思科技、COM0259 中国燃气、COM0406 天津银行。Crawl4AI 分别核对 26、308、28 个岗位，共 362 条；这批不属于上述 42 家旧快照。原始验收、分支计数与不能直接导入的字段障碍见 [第二批活动页验收](51job-batch2-acceptance.md)。
 
 已调查但尚不能标 ready 的典型来源：
 
