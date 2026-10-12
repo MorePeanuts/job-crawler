@@ -1,5 +1,6 @@
 """Explicit adapter registration; unknown sites never fall through to guessing."""
 
+from job_crawler.adapters.ansteel import Ansteel
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
@@ -16,6 +17,7 @@ REGISTRY = {
         Alibaba,
         Wtmec,
         Hzsteel,
+        Ansteel,
         *TENANTS,
         *HOTJOB_TENANTS,
         *MOKA_TENANTS,

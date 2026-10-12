@@ -92,6 +92,19 @@ async def test_observed_path_ignores_similarly_named_api(tmp_path: Path) -> None
         store.close()
 
 
+def test_snapshot_preserves_tab_dom(tmp_path: Path) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    session = BrowserSession("A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0))
+    try:
+        saved = session.snapshot("tab-02", "<div>second tab</div>")
+        assert session.last_evidence == saved
+        assert json.loads(Path(saved).read_text())["html"] == "<div>second tab</div>"
+        with pytest.raises(ValueError):
+            session.snapshot("../../outside", "")
+    finally:
+        store.close()
+
+
 class NavigationPage:
     url = "https://example.test/jobs?type=campus"
 

@@ -34,6 +34,10 @@ version = "1"
 adapter = "wtmec-static"
 version = "1"
 
+[sources.COM0121]
+adapter = "ansteel-static"
+version = "1"
+
 [sources.COM0141]
 adapter = "zhiye-changan"
 version = "1"

@@ -3,6 +3,7 @@
 import asyncio
 import json
 import os
+import re
 import time
 from pathlib import Path
 from typing import Any, Protocol, cast
@@ -361,6 +362,15 @@ class BrowserSession:
                 return matches[-1]
             await asyncio.sleep(2)
         raise CrawlError("api_not_observed", f"未观察到精确接口 {path}")
+
+    def snapshot(self, label: str, html: str) -> str:
+        """Retain the current DOM after an in-page state change such as a tab click."""
+        if not re.fullmatch(r"[a-z0-9-]{1,40}", label):
+            raise ValueError("页面证据标签无效")
+        path = self.output / f"page-{self.requests:05}-{label}.json"
+        write_json(path, {"url": self.url, "html": html})
+        self.last_evidence = str(path)
+        return str(path)
 
     async def request(
         self,
