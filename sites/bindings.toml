@@ -74,8 +74,16 @@ version = "1"
 adapter = "moka-sungrow"
 version = "1"
 
+[sources.COM0226]
+adapter = "zhiye-mengniu"
+version = "1"
+
 [sources.COM0245]
 adapter = "lens-static"
+version = "1"
+
+[sources.COM0247]
+adapter = "zhiye-goldwind"
 version = "1"
 
 [sources.COM0259]
@@ -88,6 +96,10 @@ version = "1"
 
 [sources.COM0268]
 adapter = "moka-jinko"
+version = "1"
+
+[sources.COM0272]
+adapter = "zhiye-leapmotor"
 version = "1"
 
 [sources.COM0289]
@@ -118,8 +130,16 @@ version = "1"
 adapter = "zhiye-dsbj"
 version = "1"
 
+[sources.COM0388]
+adapter = "zhiye-mywind"
+version = "1"
+
 [sources.COM0389]
 adapter = "moka-digiloong"
+version = "1"
+
+[sources.COM0393]
+adapter = "zhiye-popmart"
 version = "1"
 
 [sources.COM0398]
@@ -158,8 +178,16 @@ version = "1"
 adapter = "moka-sanhua"
 version = "1"
 
+[sources.COM0452]
+adapter = "zhiye-szgas"
+version = "1"
+
 [sources.COM0460]
 adapter = "hotjob-haitian"
+version = "1"
+
+[sources.COM0461]
+adapter = "zhiye-ovt"
 version = "1"
 
 [sources.COM0476]
@@ -172,6 +200,10 @@ version = "1"
 
 [sources.COM0483]
 adapter = "zhiye-iflytek"
+version = "1"
+
+[sources.COM0484]
+adapter = "zhiye-juhua"
 version = "1"
 
 [sources.COM0496]
