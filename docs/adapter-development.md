@@ -78,7 +78,7 @@ Hotjob `pb/school.html` 租户可参考 `adapters/hotjob.py`。新租户仍须�
 
 Moka `campus-recruitment` 与 `campus_apply` 的已验收单站点租户可参考 `adapters/moka.py` 和 SPEC-013。该平台公开页面在 `window.TurboApply.data.aesIv` 给出本页响应 IV，接口通过响应中的 `necromancer` 解码；不要复用另一轮保存的 IV、密钥或已解码目录。先直接访问该租户的 `#/jobs`，确认 `website/jobs/v2` 是同组织/同 siteId 的无筛选目录，`jobStats.total` 与每页岗位数一致，再核对 `website/job` 详情 ID。观察接口时按完整 URL 路径精确匹配；`/website/jobs/v2/filterFieldsAggregations` 不是职位列表。`publishedAt` 是发布时间，`updatedAt` 只是更新；移动链接仅在核对公开跳转后的同租户目录时复用，跨多个 siteId 的首页门户必须另做范围设计。即使租户同属 Moka，也不能只因域名相同就启用绑定。
 
-前程无忧 `campus.51job.com` 的活动页通常按企业定制。参考 `adapters/wtmec.py` 和 `adapters/hzsteel.py` 处理两类已验收静态页面；新活动页必须重新检查实际导航、岗位卡片与占位元素、分页或弹窗、申请 ID 以及公开日期，不套用同域名的选择器。若页面没有发布/截止日期或某项岗位字段，保留空值和字段来源说明。公开申请链接进入登录页不阻止采集公开岗位正文，也不能据此推断投递状态。
+前程无忧 `campus.51job.com` 的活动页通常按企业定制。参考 `adapters/wtmec.py`、`adapters/hzsteel.py` 和 `adapters/ansteel.py` 处理三类已验收页面；新活动页必须重新检查实际导航、招聘企业选项、岗位卡片与占位元素、分页或弹窗、申请 ID 以及公开日期，不套用同域名的选择器。鞍钢默认只显示一个招聘企业，必须逐选项点击并保存各选项证据才能报告整个集团的覆盖。若页面没有发布/截止日期或某项岗位字段，保留空值和字段来源说明。公开申请链接进入登录页不阻止采集公开岗位正文，也不能据此推断投递状态。
 
 ## 测试与交付
 
