@@ -9,6 +9,13 @@ from job_crawler.models import Scope
 
 API = "https://fe.zhaopin.com/grace/api/dsc/search-job-list"
 FILTERS = {
+    "workExperiences",
+    "minSalary",
+    "maxSalary",
+    "educations",
+    "orgScales",
+    "employmentTypes",
+    "orgNatures",
     "orgDepartmentIds",
     "campusParentDepartmentIds",
     "workRegionIds",
@@ -164,4 +171,11 @@ class ShenzhenEnergy(Zhaopin):
     org_number = "107415"
 
 
-TENANTS = (Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)
+class Hadian(Zhaopin):
+    name = "zhaopin-hadian"
+    host = "hadian.zhaopin.com"
+    path = "/jobslist/index.html?id=10132887"
+    org_number = "105816"
+
+
+TENANTS = (Hadian, Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)

@@ -379,12 +379,17 @@ class BrowserSession:
         payload: dict[str, Any] | None = None,
         form: dict[str, str] | None = None,
         detail: bool = False,
+        credentials: str = "include",
     ) -> dict[str, Any]:
+        if credentials not in {"include", "omit"}:
+            raise ValueError("不支持的凭据模式")
         if payload is not None and form is not None:
             raise ValueError("同一次请求不能同时发送 JSON 和表单")
         identity: dict[str, Any] = {"url": url, "payload": payload}
         if form is not None:
             identity["form"] = form
+        if credentials != "include":
+            identity["credentials"] = credentials
         key = fingerprint(identity)
         path = self.output / f"request-{key[:20]}.json"
         if self.resume and detail:
@@ -395,7 +400,7 @@ class BrowserSession:
         self.store.request(self.run_id, self.source_id, key, "pending")
         options: dict[str, Any] = {
             "method": "POST" if payload is not None or form is not None else "GET",
-            "credentials": "include",
+            "credentials": credentials,
             "headers": {},
         }
         if payload is not None:
@@ -486,10 +491,19 @@ class BrowserSession:
         raise AssertionError("unreachable")
 
     async def request_html(
-        self, url: str, *, form: dict[str, str] | None = None, detail: bool = False
+        self,
+        url: str,
+        *,
+        form: dict[str, str] | None = None,
+        detail: bool = False,
+        encoding: str = "utf-8",
     ) -> str:
         """Read a server-rendered page in the active Crawl4AI browser context."""
         identity = {"url": url, "form": form, "format": "html"}
+        if encoding not in {"utf-8", "gb18030"}:
+            raise ValueError("未支持的HTML编码")
+        if encoding != "utf-8":
+            identity["encoding"] = encoding
         key = fingerprint(identity)
         path = self.output / f"request-{key[:20]}.json"
         if self.resume and detail:
@@ -512,7 +526,9 @@ class BrowserSession:
             + str(int(self.config.timeout * 1000))
             + ");const r=await fetch("
             + json.dumps(url)
-            + ",options);return {status:r.status,url:r.url,body:await r.text()};"
+            + ",options);const body=await r.arrayBuffer();return {status:r.status,url:r.url,body:new TextDecoder("
+            + json.dumps(encoding)
+            + ").decode(body)};"
         )
         for attempt in range(self.config.retries + 1):
             try:
@@ -539,7 +555,7 @@ class BrowserSession:
                         f"HTTP {response['status']}",
                     )
                 html = response["body"]
-                if "<html" not in html[:2000].lower():
+                if "<html" not in html[:50000].lower():
                     write_json(
                         path,
                         {

@@ -321,4 +321,47 @@ class ZhengzhouBank(Hotjob):
     path = f"/{suite}/pb/school.html"
 
 
-TENANTS = (HuaXia, JinTian, GF, LiuGong, HaiTian, Minth, Yutong, ZhengzhouBank)
+class Cmoc(Hotjob):
+    name = "hotjob-cmoc"
+    suite = "SU67e513c01c240e188726a2e9"
+    path = f"/{suite}/pb/school.html"
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        if "实习" in job.title or "实习" in job.batch:
+            job.work_type = "实习"
+        return job
+
+
+class CountryGarden(Hotjob):
+    name = "hotjob-countrygarden"
+    suite = "SU5fe5ad319b0d78e6f422f6f8"
+    path = f"/{suite}/pb/school.html"
+
+
+class Baiyao(Cmoc):
+    name = "hotjob-baiyao"
+    suite = "SU6136b970bef57c3b638162c4"
+    path = f"/{suite}/pb/school.html"
+
+
+TENANTS = (
+    Baiyao,
+    HuaXia,
+    JinTian,
+    GF,
+    LiuGong,
+    HaiTian,
+    Minth,
+    Yutong,
+    ZhengzhouBank,
+    CountryGarden,
+    Cmoc,
+)
