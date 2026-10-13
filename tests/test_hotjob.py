@@ -161,7 +161,6 @@ async def test_hotjob_paginates_and_joins_detail(adapter: type[Hotjob], now: dat
     ("options", "code"),
     [
         ({"repeated": True}, "duplicate_page"),
-        ({"empty": True}, "source_changed"),
     ],
 )
 async def test_hotjob_rejects_unproven_coverage(
@@ -175,6 +174,21 @@ async def test_hotjob_rejects_unproven_coverage(
     )
     result = await HuaXia(source, Replay(**options), now).collect()
     assert code in {issue.code for issue in result.coverage_issues()}
+
+
+async def test_hotjob_accepts_a_counted_empty_campus_catalog(now: datetime) -> None:
+    source = Source(
+        source_id="SITE",
+        company_id="SITE",
+        company="企业",
+        url="https://wecruit.hotjob.cn/SU645b0d18bef57c0907e9fbc8/pb/school.html",
+    )
+    result = await HuaXia(source, Replay(empty=True), now).collect()
+
+    assert result.jobs == []
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == 0
+    assert result.scopes[0].terminal
 
 
 def test_combined_hotjob_body_uses_visible_section_heading() -> None:

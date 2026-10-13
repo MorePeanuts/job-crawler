@@ -435,7 +435,24 @@ class BrowserSession:
                         "access_denied" if response["status"] in {401, 403} else "http_error",
                         f"HTTP {response['status']}",
                     )
-                data = json.loads(response["body"], strict=False)
+                try:
+                    data = json.loads(response["body"], strict=False)
+                except json.JSONDecodeError as exc:
+                    write_json(
+                        path,
+                        {
+                            "url": url,
+                            "payload": payload,
+                            "form": form,
+                            "status": response["status"],
+                            "body": response["body"][:50000],
+                        },
+                    )
+                    self.last_evidence = str(path)
+                    raise CrawlError(
+                        "invalid_json",
+                        f"接口响应不是 JSON（HTTP {response['status']}）：{response['body'][:300]!r}",
+                    ) from exc
                 if not isinstance(data, dict):
                     raise CrawlError("schema_changed", "预期 JSON 对象，接口结构已改变")
                 write_json(

@@ -289,3 +289,35 @@ version = "1"
 [sources.COM0496]
 adapter = "hotjob-minth"
 version = "1"
+
+[sources.COM0128]
+adapter = "zhiye-cnaf"
+version = "1"
+
+[sources.COM0178]
+adapter = "zhiye-bankofbeijing"
+version = "1"
+
+[sources.COM0180]
+adapter = "zhiye-enn"
+version = "1"
+
+[sources.COM0326]
+adapter = "zhiye-vital"
+version = "1"
+
+[sources.COM0449]
+adapter = "zhiye-aux"
+version = "1"
+
+[sources.COM0144]
+adapter = "tcl-campus"
+version = "1"
+
+[sources.COM0210]
+adapter = "zhiye-ke"
+version = "1"
+
+[sources.COM0026]
+adapter = "byd-campus"
+version = "1"

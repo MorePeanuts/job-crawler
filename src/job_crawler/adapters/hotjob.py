@@ -109,7 +109,17 @@ class Hotjob(Adapter):
             page_form = response["data"]["pageForm"]
             expected = int(page_form["dataCount"])
             pages = int(page_form["totalPage"])
-            check(expected > 0 and pages > 0, "Hotjob 校招目录为空或计数无效")
+            if expected == 0:
+                check(
+                    pages == 0
+                    and not page_form["pageData"]
+                    and int(page_form["currentPage"]) in {0, 1},
+                    "Hotjob 空目录计数不一致",
+                )
+                scope.expected = 0
+                scope.terminal = True
+                break
+            check(expected > 0 and pages > 0, "Hotjob 校招目录计数无效")
             check(int(page_form["currentPage"]) == page, "Hotjob 返回了错误页码")
             if scope.expected is None:
                 scope.expected = expected
@@ -298,4 +308,10 @@ class Minth(Hotjob):
     path = f"/{suite}/pb/school.html"
 
 
-TENANTS = (HuaXia, JinTian, GF, LiuGong, HaiTian, Minth)
+class Yutong(Hotjob):
+    name = "hotjob-yutong"
+    suite = "SU64e7157a1eb80519a8e4efcf"
+    path = f"/{suite}/mc/position/campus"
+
+
+TENANTS = (HuaXia, JinTian, GF, LiuGong, HaiTian, Minth, Yutong)

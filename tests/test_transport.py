@@ -68,6 +68,30 @@ async def test_form_post_is_encoded_and_cached_by_fields(tmp_path: Path, now: da
         store.close()
 
 
+async def test_invalid_json_response_is_saved_as_evidence(tmp_path: Path, now: datetime) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    store.begin("run", "hash", now, False, 6)
+    session = BrowserSession(
+        "A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0, retries=0)
+    )
+
+    class EmptyResponsePage(Page):
+        async def evaluate(self, script: str) -> dict[str, Any]:
+            self.calls += 1
+            return {"status": 200, "body": "", "url": "https://example.test/api"}
+
+    session.page = EmptyResponsePage()
+    try:
+        with pytest.raises(CrawlError, match="不是 JSON"):
+            await session.request("https://example.test/api")
+        assert session.last_evidence
+        evidence = json.loads(await asyncio.to_thread(Path(session.last_evidence).read_text))
+        assert evidence["body"] == ""
+        assert evidence["status"] == 200
+    finally:
+        store.close()
+
+
 async def test_observed_path_ignores_similarly_named_api(tmp_path: Path) -> None:
     store = Store(tmp_path / "db.sqlite")
     session = BrowserSession("A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0))
