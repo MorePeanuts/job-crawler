@@ -5,16 +5,21 @@ from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bilibili import Bilibili
 from job_crawler.adapters.byd import BYDCampus
 from job_crawler.adapters.campaign51 import TENANTS as CAMPAIGN51_TENANTS
+from job_crawler.adapters.cdkj import Cdkj
+from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
-from job_crawler.adapters.feishu import Desaysv
+from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
+from job_crawler.adapters.greentown import GreentownCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.jd import JD
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
+from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.sf import SF
+from job_crawler.adapters.smic import SmicCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.wtmec import Wtmec
@@ -32,7 +37,7 @@ REGISTRY = {
         Hzsteel,
         Ansteel,
         Lenovo,
-        Desaysv,
+        *FEISHU_TENANTS,
         JD,
         Tencent,
         SF,
@@ -40,6 +45,11 @@ REGISTRY = {
         Meituan,
         Bilibili,
         BYDCampus,
+        Cdkj,
+        Chnenergy,
+        GreentownCampus,
+        NewHopeCampus,
+        SmicCampus,
         TCLCampus,
         *CAMPAIGN51_TENANTS,
         *COAPI51_TENANTS,

@@ -41,6 +41,7 @@ class Desaysv(Adapter):
     name = "feishu-desaysv"
     host = "yesv-desaysv.jobs.feishu.cn"
     path = "/campus/"
+    detail_prefix = "/campus/position"
     ready_endpoints = (f"https://{host}{LIST_PATH}?",)
     scope_description = "德赛西威飞书校招门户公开全目录；由站点 UI 签名分页，实习由公共筛选排除"
 
@@ -69,6 +70,8 @@ class Desaysv(Adapter):
                 key = str(row["id"])
                 subject = row.get("job_subject") or {}
                 subject_name = text((subject.get("name") or {}).get("zh_cn"))
+                recruit_type = row.get("recruit_type") or {}
+                recruit_name = text(recruit_type.get("name"))
                 title = text(row.get("title"))
                 duties = text(row.get("description"))
                 requirements = text(row.get("requirement"))
@@ -79,15 +82,20 @@ class Desaysv(Adapter):
                     dict.fromkeys(text(city.get("name")) for city in cities if city.get("name"))
                 )
                 function = row.get("job_function") or {}
-                page = f"https://{self.host}/campus/position/{key}/detail"
+                category = row.get("job_category") or {}
+                page = f"https://{self.host}{self.detail_prefix}/{key}/detail"
                 job = self.job(
                     key,
                     title=title,
                     source_url=page,
                     apply_url=page,
-                    work_type="实习" if "实习" in subject_name or "实习" in title else "校招",
+                    work_type=(
+                        "实习"
+                        if any("实习" in value for value in (subject_name, recruit_name, title))
+                        else "校招"
+                    ),
                     batch=subject_name,
-                    category_raw=text(function.get("name")),
+                    category_raw=text(function.get("name") or category.get("name")),
                     location=location,
                     duties=duties,
                     requirements=requirements,
@@ -134,3 +142,28 @@ class Desaysv(Adapter):
                 return matches[-1]
             await asyncio.sleep(0.5)
         raise CrawlError("api_not_observed", f"飞书分页 offset={offset} 的签名响应未出现")
+
+
+class Xpeng(Desaysv):
+    name = "feishu-xpeng"
+    host = "xiaopeng.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+
+
+class Nio(Desaysv):
+    name = "feishu-nio"
+    host = "nio.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+
+
+class Jtexpress(Desaysv):
+    name = "feishu-jtexpress"
+    host = "jtexpress.jobs.feishu.cn"
+    path = "/478610/position/list"
+    detail_prefix = "/478610/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+
+
+TENANTS = (Desaysv, Xpeng, Nio, Jtexpress)

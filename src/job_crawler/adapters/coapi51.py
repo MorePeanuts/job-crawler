@@ -173,6 +173,91 @@ class Nbhx(Coapi):
         scope.terminal = True
 
 
+class Wanxiang(Coapi):
+    name = "coapi-wanxiang-2027"
+    host = "campus.51job.com"
+    path = "/wxxz2027/about2.html"
+    ctmid = "8019567"
+    scope_description = "万向集团 2027 招聘计划 COAPI 无筛选目录、十条分页及岗位详情"
+
+    async def harvest(self) -> None:
+        session = cast(BrowserSession, self.session)
+        check(session.page is not None, "万向招聘计划页不存在")
+        assert session.page is not None
+        document = BeautifulSoup(await session.page.content(), "html.parser")
+        check(f"ctmid: '{self.ctmid}'" in str(document), "万向招聘计划页租户 ID 发生变化")
+        cards = [str(item["jobid"]) for item in document.select(".tel_top[jobid]")]
+        check(bool(cards) and len(cards) == len(set(cards)), "万向首屏岗位卡片缺失或重复")
+        scope = Scope(name="wanxiang-2027-all-jobs")
+        self.result.scopes.append(scope)
+        seen: set[str] = set()
+        page = 1
+        size = 10
+        while True:
+            session.consume_request()
+            await asyncio.sleep(session.config.delay)
+            response = await session.page.evaluate(
+                LIST_JS,
+                {
+                    "ctmid": self.ctmid,
+                    "functype": "",
+                    "jobarea": "",
+                    "poscode": "",
+                    "pagenum": page,
+                    "pagesize": size,
+                },
+            )
+            check(
+                isinstance(response, dict) and isinstance(response.get("resultbody"), dict),
+                "万向岗位目录回调结构改变",
+            )
+            body = response["resultbody"]
+            expected = int(body["totalnum"])
+            check(0 < expected <= 5000, "万向岗位目录总数无效")
+            if scope.expected is None:
+                scope.expected = expected
+            check(scope.expected == expected, "万向翻页期间总数变化")
+            rows = body["joblist"]
+            check(
+                isinstance(rows, list) and len(rows) == min(size, expected - (page - 1) * size),
+                "万向目录分页行数不符",
+            )
+            if page == 1:
+                check([str(row["jobid"]) for row in rows] == cards, "万向首屏与接口岗位不符")
+            evidence = session.output / "coapi-pages" / f"{page:04}.json"
+            write_json(evidence, response)
+            session.last_evidence = str(evidence)
+            fresh = self.add_page(scope, rows, seen, lambda row: str(row["jobid"]))
+            for row in fresh:
+                key = str(row["jobid"])
+                try:
+                    check(str(row["ctmid"]) == self.ctmid, "万向目录租户 ID 不符")
+                    listing = self.listing_job(key, row, deadline=text(row.get("validDate")))
+                    if select(listing, "all", self.as_of).reason == "expired":
+                        listing.detail_mode = "listing_only"
+                        self.result.jobs.append(listing)
+                        scope.skipped_expired += 1
+                        continue
+                    resolved = self.before_detail(
+                        f"job:{key}", row, scope, listing, evidence=str(evidence)
+                    )
+                    if resolved is not None:
+                        self.result.jobs.extend(resolved)
+                        continue
+                    values, detail_evidence = await self.detail(key)
+                    job = self.complete_job(key, row, values, detail_evidence, str(evidence))
+                    self.result.jobs.append(job)
+                    scope.details += 1
+                    self.remember(f"job:{key}", row, [job])
+                except Exception as exc:
+                    self.error(exc, key)
+            if scope.unique == expected:
+                scope.terminal = True
+                break
+            page += 1
+            check(page <= (expected + size - 1) // size, "万向目录超过声明页数")
+
+
 class Cofco(Coapi):
     name = "coapi-cofco"
     host = "campus.51job.com"
@@ -328,4 +413,4 @@ class Scg(Coapi):
         scope.terminal = True
 
 
-TENANTS = (Nbhx, Cofco, Scg)
+TENANTS = (Nbhx, Wanxiang, Cofco, Scg)

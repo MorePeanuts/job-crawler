@@ -314,4 +314,11 @@ class Yutong(Hotjob):
     path = f"/{suite}/mc/position/campus"
 
 
-TENANTS = (HuaXia, JinTian, GF, LiuGong, HaiTian, Minth, Yutong)
+class ZhengzhouBank(Hotjob):
+    name = "hotjob-zzbank"
+    host = "zzbankcampus.hotjob.cn"
+    suite = "SU64f952b41eb8051fabaed066"
+    path = f"/{suite}/pb/school.html"
+
+
+TENANTS = (HuaXia, JinTian, GF, LiuGong, HaiTian, Minth, Yutong, ZhengzhouBank)

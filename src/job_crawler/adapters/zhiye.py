@@ -18,13 +18,23 @@ def date_text(value: Any) -> str:
 
 class Zhiye(Adapter):
     path = "/campus/jobs"
+    mixed_catalog = False
     ready_endpoints = ("/api/Jobad/GetJobAdPageList",)
     scope_description = "北森公开校园招聘 Category=2 全目录；保留实际租户/门户范围，不含社招和实习"
 
     async def harvest(self) -> None:
         observed = await self.session.observed("/api/Jobad/GetJobAdPageList")
         payload = json.loads(observed["post_data"])
-        check([str(v) for v in payload.get("Category", [])] == ["2"], "不是校招 Category=2")
+        if self.mixed_catalog:
+            check(
+                not payload.get("Category")
+                and payload.get("SpecialType") == 0
+                and payload.get("PortalId") == "",
+                "北森混合目录初始筛选异常",
+            )
+            payload["Category"] = ["2"]
+        else:
+            check([str(v) for v in payload.get("Category", [])] == ["2"], "不是校招 Category=2")
         check(not payload.get("KeyWords"), "校招目录仍有关键词筛选")
         for key in (
             "LocId",
@@ -329,6 +339,9 @@ class WuxiApptec(Zhiye):
 class Gotion(Zhiye):
     name = "zhiye-gotion"
     host = "gotion.zhiye.com"
+    path = "/jobs"
+    mixed_catalog = True
+    scope_description = "国轩高科 /jobs 混合目录，经 Category=2 过滤的全部校招岗位"
 
 
 class CALB(Zhiye):
