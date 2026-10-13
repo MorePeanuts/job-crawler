@@ -45,15 +45,30 @@ def apply_id(url: str) -> str:
 def split_jobinfo(raw: str) -> tuple[str, str]:
     """Split only visibly headed sections; leave ambiguous prose for review."""
     body = text(raw)
-    parts = re.split(r"(岗位职责|工作职责|职位职责|任职要求|岗位要求|任职资格)\s*[：:]?", body)
+    parts = re.split(
+        r"(【[^】\n]{0,30}工作内容】|【[^】\n]{0,30}任职要求】|"
+        r"岗位职责|工作职责|职位职责|主要职责|岗位内容|岗位描述|工作内容|"
+        r"任职要求|岗位要求|任职资格)\s*[：:]?",
+        body,
+    )
     duties: list[str] = []
     requirements: list[str] = []
     for label, content in zip(parts[1::2], parts[2::2], strict=True):
         value = content.strip(" \n：:")
-        if label in {"岗位职责", "工作职责", "职位职责"}:
+        if label in {
+            "岗位职责",
+            "工作职责",
+            "职位职责",
+            "主要职责",
+            "岗位内容",
+            "岗位描述",
+            "工作内容",
+        } or label.endswith("工作内容】"):
             duties.append(value)
         else:
             requirements.append(value)
+    if not duties and requirements and re.match(r"\s*\d+[、.]", parts[0]):
+        duties.append(parts[0].strip())
     return "\n".join(filter(None, duties)), "\n".join(filter(None, requirements))
 
 

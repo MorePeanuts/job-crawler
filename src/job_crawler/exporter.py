@@ -131,9 +131,13 @@ def import_errors(job: Job, mapping: MappingConfig, allowed: dict[str, set[str]]
         errors.append("invalid:apply_url")
     for name in FIELDS:
         value = getattr(job, name)
-        if len(value) > 32767 or ILLEGAL_CHARACTERS_RE.search(value):
+        if excel_text_invalid(value):
             errors.append(f"invalid:excel_text:{name}")
     return errors
+
+
+def excel_text_invalid(value: str) -> bool:
+    return len(value) > 32767 or bool(ILLEGAL_CHARACTERS_RE.search(value))
 
 
 def export_workbook(
@@ -230,7 +234,7 @@ def export_workbook(
             sheet.row_dimensions[row_index].height = min(409, max(60, lines * 16 + 8))
         for col_index, field in enumerate(FIELDS, 1):
             value = getattr(job, field)
-            if len(value) > 32767 or ILLEGAL_CHARACTERS_RE.search(value):
+            if excel_text_invalid(value):
                 raise ValueError(f"无法无损导出 {job.key}:{field}")
             if field in {"deadline", "published"}:
                 value = deadline_date(value)

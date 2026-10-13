@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+from openpyxl import load_workbook
 
 from job_crawler.config import MappingConfig, Settings
 from job_crawler.models import Collection, Issue, Job, Scope, Source
@@ -45,6 +46,35 @@ async def test_capture_complete_is_not_import_complete(
     assert not valid and len(review) == 1
     assert reports[0].coverage == "complete"
     assert reports[0].review == 1
+
+
+async def test_excel_limit_preserves_full_text_and_other_rows(
+    tmp_path: Path, now: datetime, job: Job, mapping: MappingConfig
+) -> None:
+    oversized = job.model_copy(deep=True)
+    oversized.source_key = "long"
+    oversized.duties = "岗位职责" * 9000
+    oversized.requirements += "\x1e岗位要求"
+    collections = {"TEST": complete([job, oversized])}
+    source = Source(source_id="TEST", company_id="A", company="公司")
+    settings = Settings(mapping=mapping)
+    settings.llm.enabled = False
+    valid, review, reports = await prepare_export(
+        collections, [source], {}, settings, "all", now, tmp_path
+    )
+    assert len(valid) == len(review) == 1
+    saved = save_results(tmp_path, {}, collections, valid, review, reports)
+    assert saved["information_overflow_fields"] == 2
+    overflow = json.loads((tmp_path / "excel-overflow.json").read_text())
+    assert overflow == [
+        {"job_key": oversized.key, "field": "duties", "value": oversized.duties},
+        {"job_key": oversized.key, "field": "requirements", "value": oversized.requirements},
+    ]
+    workbook = load_workbook(tmp_path / "岗位信息汇总.xlsx", read_only=True)
+    rows = list(workbook.worksheets[0].values)
+    assert len(rows) == 3
+    assert any("excel-overflow.json" in str(row[8]) for row in rows[1:])
+    workbook.close()
 
 
 async def test_recovered_navigation_warning_kept_without_false_coverage_failure(

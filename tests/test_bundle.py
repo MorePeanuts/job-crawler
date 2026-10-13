@@ -111,3 +111,17 @@ async def test_daily_bundle_preserves_window_and_rejects_mixed_windows(
     snapshot(tmp_path / "all", job.model_copy(update={"source_id": "OTHER"}), now)
     with pytest.raises(ValueError, match="不同时间窗口"):
         await bundle([daily, tmp_path / "all"], tmp_path / "mixed", Settings())
+
+
+async def test_bundle_preserves_excel_incompatible_text_in_sidecar(
+    tmp_path: Path, job: Job, now: datetime
+) -> None:
+    original = "岗位职责\x1e完整正文"
+    snapshot(tmp_path / "source", job.model_copy(update={"duties": original}), now)
+    result = await bundle([tmp_path / "source"], tmp_path / "result", Settings())
+    assert result["information_overflow_fields"] == 1
+    overflow = json.loads((tmp_path / "result" / "excel-overflow.json").read_text())
+    assert overflow[0]["value"] == original
+    workbook = load_workbook(tmp_path / "result" / "岗位信息汇总.xlsx")
+    assert "excel-overflow.json" in workbook["岗位信息（待补全）"].cell(2, 9).value
+    workbook.close()

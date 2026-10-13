@@ -13,7 +13,15 @@ from job_crawler import __version__
 from job_crawler.adapters import REGISTRY
 from job_crawler.config import Settings
 from job_crawler.delivery import enrich_delivery
-from job_crawler.exporter import enums, export_workbook, import_errors, normalize, validate_mapping
+from job_crawler.exporter import (
+    FIELDS,
+    enums,
+    excel_text_invalid,
+    export_workbook,
+    import_errors,
+    normalize,
+    validate_mapping,
+)
 from job_crawler.field_extraction import field_audit
 from job_crawler.filtering import SHANGHAI, Window, select, window_start
 from job_crawler.incremental import IncrementalSource
@@ -144,6 +152,29 @@ async def prepare_export(
     return valid, review, reports
 
 
+def information_rows(
+    valid: list[Job], review: list[dict[str, Any]]
+) -> tuple[list[Job], list[dict[str, str]]]:
+    information_jobs: list[Job] = []
+    overflow: list[dict[str, str]] = []
+    for original in sorted(
+        [*valid, *(Job.model_validate(row["job"]) for row in review)],
+        key=lambda job: (job.company, job.title, job.key),
+    ):
+        copy = original.model_copy(deep=True)
+        for field in FIELDS:
+            value = getattr(copy, field)
+            if excel_text_invalid(value):
+                overflow.append({"job_key": copy.key, "field": field, "value": value})
+                setattr(
+                    copy,
+                    field,
+                    f"完整原文见 excel-overflow.json；岗位键 {copy.key}；字段 {field}",
+                )
+        information_jobs.append(copy)
+    return information_jobs, overflow
+
+
 def save_results(
     output: Path,
     manifest: dict[str, Any],
@@ -152,6 +183,7 @@ def save_results(
     review: list[dict[str, Any]],
     reports: list[SourceReport],
 ) -> dict[str, Any]:
+    information_jobs, overflow = information_rows(valid, review)
     complete = all(
         report.coverage == "complete" and report.review == 0 and not report.issues
         for report in reports
@@ -166,6 +198,7 @@ def save_results(
         "collected": sum(len(c.jobs) for c in collections.values()),
         "exported": len(valid),
         "review": len(review),
+        "information_overflow_fields": len(overflow),
         "sources": [r.model_dump(mode="json") for r in reports],
         "finished_at": datetime.now(SHANGHAI).isoformat(),
     }
@@ -178,6 +211,7 @@ def save_results(
         ],
     )
     write_json(output / "review.json", review)
+    write_json(output / "excel-overflow.json", overflow)
     write_json(
         output / "delivered.json",
         [
@@ -199,10 +233,7 @@ def save_results(
     export_workbook(output / "jobs.xlsx", valid)
     export_workbook(
         output / "岗位信息汇总.xlsx",
-        sorted(
-            [*valid, *(Job.model_validate(row["job"]) for row in review)],
-            key=lambda j: (j.company, j.title, j.key),
-        ),
+        information_jobs,
         information=True,
     )
     return report
