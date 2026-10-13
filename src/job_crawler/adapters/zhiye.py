@@ -271,6 +271,96 @@ class Juhua(Zhiye):
     host = "juhua.zhiye.com"
 
 
+class NewHope(Zhiye):
+    name = "zhiye-newhope"
+    host = "newhope.zhiye.com"
+
+
+class CNAF(Zhiye):
+    name = "zhiye-cnaf"
+    host = "cnaf.zhiye.com"
+
+
+class Greentown(Zhiye):
+    name = "zhiye-gtgroup"
+    host = "gtgroup.zhiye.com"
+
+
+class BankOfBeijing(Zhiye):
+    name = "zhiye-bankofbeijing"
+    host = "bankofbeijing.zhiye.com"
+
+
+class ENN(Zhiye):
+    name = "zhiye-enn"
+    host = "enn.zhiye.com"
+
+
+class Beike(Zhiye):
+    name = "zhiye-ke"
+    host = "ke.zhiye.com"
+
+
+class SMIC(Zhiye):
+    name = "zhiye-smics"
+    host = "smics.zhiye.com"
+
+
+class Sunwoda(Zhiye):
+    name = "zhiye-sunwoda"
+    host = "sunwodacampus.zhiye.com"
+
+
+class ZhongyuanBank(Zhiye):
+    name = "zhiye-zybank"
+    host = "zybank.zhiye.com"
+
+
+class Vital(Zhiye):
+    name = "zhiye-vital"
+    host = "vital.zhiye.com"
+
+
+class WuxiApptec(Zhiye):
+    name = "zhiye-wuxiapptec"
+    host = "wuxiappteccampus.zhiye.com"
+
+
+class Gotion(Zhiye):
+    name = "zhiye-gotion"
+    host = "gotion.zhiye.com"
+
+
+class CALB(Zhiye):
+    name = "zhiye-calb"
+    host = "calbjs.zhiye.com"
+
+
+class CICC(Zhiye):
+    name = "zhiye-cicc"
+    host = "cicc.zhiye.com"
+
+
+class Jiangling(Zhiye):
+    name = "zhiye-jmc"
+    host = "jmc.zhiye.com"
+
+
+class Avary(Zhiye):
+    name = "zhiye-avary"
+    host = "avaryholding.zhiye.com"
+
+
+class ChinaStock(Zhiye):
+    name = "zhiye-chinastock"
+    host = "chinastock.zhiye.com"
+
+
+class AUX(Zhiye):
+    name = "zhiye-aux"
+    host = "auxgroup.zhiye.com"
+
+
 TENANTS = (
     Poly,
     Xiangyu,
@@ -296,4 +386,22 @@ TENANTS = (
     Szgas,
     Ovt,
     Juhua,
+    NewHope,
+    CNAF,
+    Greentown,
+    BankOfBeijing,
+    ENN,
+    Beike,
+    SMIC,
+    Sunwoda,
+    ZhongyuanBank,
+    Vital,
+    WuxiApptec,
+    Gotion,
+    CALB,
+    CICC,
+    Jiangling,
+    Avary,
+    ChinaStock,
+    AUX,
 )
