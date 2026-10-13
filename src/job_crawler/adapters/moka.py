@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.padding import PKCS7
 
 from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.platforms import check
+from job_crawler.description import split_sections
 from job_crawler.filtering import select
 from job_crawler.models import Issue, Job, Scope
 from job_crawler.transport import CrawlError
@@ -50,23 +51,8 @@ def decode(response: dict[str, Any], iv: str) -> dict[str, Any]:
 
 
 def sections(html: str) -> tuple[str, str]:
-    lines = [line.strip() for line in text(html).splitlines()]
-    duties: list[str] = []
-    requirements: list[str] = []
-    mode = "duties"
-    for line in lines:
-        heading = re.sub(r"[：:\s【】]", "", line)
-        heading = re.sub(r"^[一二三四五六七八九十0-9]+[、.．]", "", heading)
-        if heading in {"岗位职责", "工作职责", "职位职责", "职位描述"}:
-            mode = "duties"
-            continue
-        if heading in {"任职要求", "岗位要求", "任职资格", "职位要求", "应聘要求", "基本要求"}:
-            mode = "requirements"
-            continue
-        if line in {"：", ":"}:
-            continue
-        (requirements if mode == "requirements" else duties).append(line)
-    return "\n".join(duties), "\n".join(requirements)
+    body = re.sub(r"(?m)^[ \t]*[:：][ \t]*$", "", text(html))
+    return split_sections(body)
 
 
 def location_text(rows: object) -> tuple[str, str]:

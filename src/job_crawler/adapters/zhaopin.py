@@ -5,6 +5,7 @@ from typing import Any
 
 from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.platforms import check
+from job_crawler.description import split_sections
 from job_crawler.models import Scope
 
 API = "https://fe.zhaopin.com/grace/api/dsc/search-job-list"
@@ -20,12 +21,7 @@ ALLOWED = FILTERS | {"orgNumbers", "jobSource", "pageIndex", "pageSize"}
 
 
 def split_detail(value: str) -> tuple[str, str]:
-    for marker in ("任职要求", "任职资格", "岗位要求", "应聘条件", "任职条件"):
-        if marker in value:
-            duties, _, requirements = value.partition(marker)
-            if duties.strip() and requirements.strip():
-                return duties.strip(), requirements.lstrip("：:\n ").strip()
-    return value, ""
+    return split_sections(value)
 
 
 class Zhaopin(Adapter):

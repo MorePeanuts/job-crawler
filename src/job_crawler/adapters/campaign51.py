@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup, Tag
 
 from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.platforms import check
+from job_crawler.description import split_sections
 from job_crawler.models import Issue, Scope
 
 
@@ -43,18 +44,7 @@ def apply_id(url: str) -> str:
 
 
 def split_jobinfo(raw: str) -> tuple[str, str]:
-    """Split only visibly headed sections; leave ambiguous prose for review."""
-    body = text(raw)
-    parts = re.split(r"(岗位职责|工作职责|职位职责|任职要求|岗位要求|任职资格)\s*[：:]?", body)
-    duties: list[str] = []
-    requirements: list[str] = []
-    for label, content in zip(parts[1::2], parts[2::2], strict=True):
-        value = content.strip(" \n：:")
-        if label in {"岗位职责", "工作职责", "职位职责"}:
-            duties.append(value)
-        else:
-            requirements.append(value)
-    return "\n".join(filter(None, duties)), "\n".join(filter(None, requirements))
+    return split_sections(text(raw), unheaded_duties=False, include_preamble=False)
 
 
 class Lens(Adapter):
