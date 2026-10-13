@@ -310,6 +310,24 @@ print(report["status"], report["exported"])
 
 ## 开发
 
+### 岗位正文章节与历史修复
+
+[SPEC-034](specs/034-description-headings.md) 统一识别职责/要求章节，去掉 `【岗位职责】` 等冗余标题和因拆分产生的括号残留。支持标题同行、跨 HTML 段、编号与常见同义词；保留正文中的普通括号及词语。默认采集和导出均使用修复后的清理逻辑。
+
+已被旧逻辑拆坏的快照不能靠普通 `export` 还原标题边界，应从原始证据重放。对 2026-10-12 汇总可运行以下离线工具（`MOKA_PUBLIC_IV` 是当时公开页面的 `TurboApply.data.aesIv` 参数，工具不联网获取，也不将其保存到报告）：
+
+```sh
+uv run python scripts/repair_description_snapshot.py \
+  outputs/today-collected-20261012-combined outputs/description-repair-new \
+  --moka-iv "$MOKA_PUBLIC_IV"
+uv run python scripts/apply_description_workbook.py \
+  outputs/today-collected-20261012-combined/岗位信息汇总.xlsx \
+  outputs/description-repair-new/cell-patches.json \
+  outputs/description-repair-new/岗位信息汇总-正文修复版.xlsx
+```
+
+工具核对岗位身份、旧解析结果与原单元格，只修改职责/要求，不重新分类、筛选或改写其他字段；输出必须为新目录/新文件，原件保留。修复计划、逐岗位依据、修复后的交付快照与工作簿核对结果分开保存。该工具按昨日已知适配器证据格式设计；缺失/冲突证据会报错，不适用于任意历史文件。此次统计和限制见 [验收记录](docs/description-headings-acceptance.md)。
+
 先读 [AGENTS.md](AGENTS.md) 和 [正式版 spec](specs/001-production.md)。从 main 创建功能分支，先写 spec，再实现、测试、更新验收记录，按阶段提交。有远程时通过 PR 评审，没有远程时保留本地分支，不直接合并未验证变更。
 
 ```sh
