@@ -10,13 +10,18 @@ from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bilibili import Bilibili
 from job_crawler.adapters.byd import BYDCampus
 from job_crawler.adapters.campaign51 import TENANTS as CAMPAIGN51_TENANTS
+from job_crawler.adapters.cdkj import Cdkj
+from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
-from job_crawler.adapters.feishu import Desaysv
+from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
+from job_crawler.adapters.greentown import GreentownCampus
 from job_crawler.adapters.jd import JD
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
+from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.sf import SF
+from job_crawler.adapters.smic import SmicCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
@@ -48,7 +53,7 @@ async def main() -> None:
                 *CAMPAIGN51_TENANTS,
                 *COAPI51_TENANTS,
                 Lenovo,
-                Desaysv,
+                *FEISHU_TENANTS,
                 JD,
                 Tencent,
                 SF,
@@ -56,6 +61,11 @@ async def main() -> None:
                 Meituan,
                 Bilibili,
                 BYDCampus,
+                Cdkj,
+                Chnenergy,
+                GreentownCampus,
+                NewHopeCampus,
+                SmicCampus,
                 TCLCampus,
             )
             if a.host == urlsplit(source.url).hostname

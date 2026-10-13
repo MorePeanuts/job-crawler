@@ -68,6 +68,66 @@ async def test_form_post_is_encoded_and_cached_by_fields(tmp_path: Path, now: da
         store.close()
 
 
+async def test_server_rendered_form_keeps_html_evidence_and_detail_cache(
+    tmp_path: Path, now: datetime
+) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    store.begin("run", "hash", now, False, 6)
+    session = BrowserSession(
+        "A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0), resume=True
+    )
+
+    class HtmlPage(Page):
+        async def evaluate(self, script: str) -> dict[str, Any]:
+            self.calls += 1
+            self.scripts.append(script)
+            return {
+                "status": 200,
+                "body": "<html><body>岗位</body></html>",
+                "url": "https://example.test/jobs",
+            }
+
+    page = HtmlPage()
+    session.page = page
+    try:
+        first = await session.request_html(
+            "https://example.test/jobs", form={"pagenum": "2&3"}, detail=True
+        )
+        again = await session.request_html(
+            "https://example.test/jobs", form={"pagenum": "2&3"}, detail=True
+        )
+        assert first == again == "<html><body>岗位</body></html>"
+        assert page.calls == 1
+        assert "pagenum=2%263" in page.scripts[0]
+        evidence = json.loads(await asyncio.to_thread(Path(session.last_evidence).read_text))
+        assert evidence["html"] == first
+    finally:
+        store.close()
+
+
+async def test_server_rendered_http_error_keeps_response_evidence(
+    tmp_path: Path, now: datetime
+) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    store.begin("run", "hash", now, False, 6)
+    session = BrowserSession(
+        "A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0, retries=0)
+    )
+
+    class DeniedPage(Page):
+        async def evaluate(self, script: str) -> dict[str, Any]:
+            return {"status": 403, "body": "访问受限", "url": "https://example.test/jobs"}
+
+    session.page = DeniedPage()
+    try:
+        with pytest.raises(CrawlError, match="HTTP 403"):
+            await session.request_html("https://example.test/jobs")
+        evidence = json.loads(await asyncio.to_thread(Path(session.last_evidence).read_text))
+        assert evidence["status"] == 403 and evidence["body"] == "访问受限"
+    finally:
+        store.close()
+
+
 async def test_invalid_json_response_is_saved_as_evidence(tmp_path: Path, now: datetime) -> None:
     store = Store(tmp_path / "db.sqlite")
     store.begin("run", "hash", now, False, 6)

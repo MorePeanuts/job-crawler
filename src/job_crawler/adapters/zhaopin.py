@@ -150,4 +150,18 @@ class Lbjt(Zhaopin):
     org_number = "107163"
 
 
-TENANTS = (Unicom, Sipg, Cqbank, Lbjt)
+class Zndl(Zhaopin):
+    name = "zhaopin-zndl"
+    host = "zndl2027.zhaopin.com"
+    path = "/post/index.html"
+    org_number = "106942"
+
+
+class ShenzhenEnergy(Zhaopin):
+    name = "zhaopin-szny2027"
+    host = "szny2027.zhaopin.com"
+    path = "/jobs/index.html"
+    org_number = "107415"
+
+
+TENANTS = (Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)

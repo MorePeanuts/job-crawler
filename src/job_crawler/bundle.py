@@ -9,8 +9,8 @@ from typing import Any
 from job_crawler.config import Settings
 from job_crawler.exporter import export_workbook
 from job_crawler.filtering import SHANGHAI, Window
-from job_crawler.models import Binding, Collection, Job, Source
-from job_crawler.runner import prepare_export, save_results
+from job_crawler.models import Binding, Collection, Source
+from job_crawler.runner import information_rows, prepare_export, save_results
 from job_crawler.storage import fingerprint, write_json
 
 
@@ -104,10 +104,7 @@ async def bundle(
             },
         )
     report = save_results(output, manifest, collections, valid, review, reports)
-    information = sorted(
-        [*valid, *(Job.model_validate(item["job"]) for item in review)],
-        key=lambda job: (job.company, job.title, job.key),
-    )
+    information, _ = information_rows(valid, review)
     source_lookup = {source.source_id: source for source in sources}
     source_rows: list[list[str | int]] = [
         [

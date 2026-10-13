@@ -484,3 +484,98 @@ class BrowserSession:
             finally:
                 self.capture = True
         raise AssertionError("unreachable")
+
+    async def request_html(
+        self, url: str, *, form: dict[str, str] | None = None, detail: bool = False
+    ) -> str:
+        """Read a server-rendered page in the active Crawl4AI browser context."""
+        identity = {"url": url, "form": form, "format": "html"}
+        key = fingerprint(identity)
+        path = self.output / f"request-{key[:20]}.json"
+        if self.resume and detail:
+            cached = self.store.cached(self.run_id, self.source_id, key)
+            if cached and await asyncio.to_thread(Path(cached).exists):
+                self.last_evidence = cached
+                return json.loads(await asyncio.to_thread(Path(cached).read_text))["html"]
+        self.store.request(self.run_id, self.source_id, key, "pending")
+        options: dict[str, Any] = {
+            "method": "POST" if form is not None else "GET",
+            "credentials": "include",
+        }
+        if form is not None:
+            options["headers"] = {"Content-Type": "application/x-www-form-urlencoded"}
+            options["body"] = urlencode(form)
+        script = (
+            "const options="
+            + json.dumps(options)
+            + ";options.signal=AbortSignal.timeout("
+            + str(int(self.config.timeout * 1000))
+            + ");const r=await fetch("
+            + json.dumps(url)
+            + ",options);return {status:r.status,url:r.url,body:await r.text()};"
+        )
+        for attempt in range(self.config.retries + 1):
+            try:
+                self.capture = False
+                self.consume_request()
+                await asyncio.sleep(self.config.delay)
+                async with asyncio.timeout(self.config.timeout + 5):
+                    response = await self.page.evaluate("async () => {" + script + "}")
+                if not isinstance(response, dict) or not isinstance(response.get("body"), str):
+                    raise CrawlError("api_execution", "浏览器没有返回 HTML 页面")
+                if response["status"] >= 400:
+                    write_json(
+                        path,
+                        {
+                            "url": response["url"],
+                            "form": form,
+                            "status": response["status"],
+                            "body": response["body"][:50000],
+                        },
+                    )
+                    self.last_evidence = str(path)
+                    raise CrawlError(
+                        "access_denied" if response["status"] in {401, 403} else "http_error",
+                        f"HTTP {response['status']}",
+                    )
+                html = response["body"]
+                if "<html" not in html[:2000].lower():
+                    write_json(
+                        path,
+                        {
+                            "url": response["url"],
+                            "form": form,
+                            "status": response["status"],
+                            "body": html[:50000],
+                        },
+                    )
+                    self.last_evidence = str(path)
+                    raise CrawlError("invalid_html", "响应不是完整 HTML 页面")
+                write_json(
+                    path,
+                    {
+                        "url": response["url"],
+                        "form": form,
+                        "status": response["status"],
+                        "html": html,
+                    },
+                )
+                self.store.request(self.run_id, self.source_id, key, "done", str(path))
+                self.last_evidence = str(path)
+                return html
+            except Exception as exc:
+                self.store.request(
+                    self.run_id, self.source_id, key, "failed", str(path), error=str(exc)[:1000]
+                )
+                if isinstance(exc, CrawlError) and exc.code in {
+                    "access_denied",
+                    "request_budget",
+                    "time_budget",
+                }:
+                    raise
+                if attempt == self.config.retries:
+                    raise
+                await asyncio.sleep(min(2**attempt, 4))
+            finally:
+                self.capture = True
+        raise AssertionError("unreachable")

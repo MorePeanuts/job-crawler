@@ -235,3 +235,15 @@ async def test_tianjin_bank_rejects_reused_city_apply_id(now: datetime) -> None:
 
 def test_split_jobinfo_supports_requirement_first() -> None:
     assert split_jobinfo("岗位要求\n本科及以上\n岗位职责：负责研发") == ("负责研发", "本科及以上")
+
+
+def test_split_jobinfo_supports_wanxiang_section_headings() -> None:
+    assert split_jobinfo("主要职责：<br>负责质量管理<br>任职要求<br>本科及以上") == (
+        "负责质量管理",
+        "本科及以上",
+    )
+    assert split_jobinfo("【财务专员工作内容】<br>负责核算<br>【任职要求】<br>本科") == (
+        "负责核算",
+        "本科",
+    )
+    assert split_jobinfo("1、维护系统<br>任职要求：本科") == ("1、维护系统", "本科")

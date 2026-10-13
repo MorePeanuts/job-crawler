@@ -321,3 +321,67 @@ version = "1"
 [sources.COM0026]
 adapter = "byd-campus"
 version = "1"
+
+[sources.COM0216]
+adapter = "feishu-nio"
+version = "1"
+
+[sources.COM0232]
+adapter = "zhaopin-zndl"
+version = "1"
+
+[sources.COM0238]
+adapter = "feishu-xpeng"
+version = "1"
+
+[sources.COM0346]
+adapter = "zhiye-calb"
+version = "1"
+
+[sources.COM0352]
+adapter = "zhaopin-szny2027"
+version = "1"
+
+[sources.COM0378]
+adapter = "zhiye-jmc"
+version = "1"
+
+[sources.COM0381]
+adapter = "cdkj-2027-static"
+version = "1"
+
+[sources.COM0493]
+adapter = "hotjob-zzbank"
+version = "1"
+
+[sources.COM0031]
+adapter = "chnenergy-campus"
+version = "1"
+
+[sources.COM0217]
+adapter = "feishu-jtexpress"
+version = "1"
+
+[sources.COM0166]
+adapter = "greentown-2027-html"
+version = "1"
+
+[sources.COM0118]
+adapter = "newhope-inline-campus"
+version = "1"
+
+[sources.COM0261]
+adapter = "smic-campus-html"
+version = "1"
+
+[sources.COM0039]
+adapter = "moka-geely"
+version = "1"
+
+[sources.COM0133]
+adapter = "coapi-wanxiang-2027"
+version = "1"
+
+[sources.COM0342]
+adapter = "zhiye-gotion"
+version = "1"

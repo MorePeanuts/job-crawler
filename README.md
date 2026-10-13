@@ -4,7 +4,7 @@
 
 维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，默认自动进行缓存优先的 LLM 分类及必要学历补全，完成校验后直接输出最终表格。
 
-已导入 **500 家企业、228 个招聘链接**，目前已接入并真实验收 **81 家企业**：原有 53 家、第三批新增 20 家和第四批新增 8 家。平台逻辑共享，企业入口和覆盖逐家核验；其余 **147 个有链接来源**待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)、[Hotjob 验收](docs/hotjob-acceptance.md)、[Moka 验收](docs/moka-acceptance.md)、[首批静态活动页验收](docs/static-campaign-acceptance.md)、[第二批静态活动页验收](docs/51job-batch2-acceptance.md)、[北森批量验收](docs/zhiye-batch-acceptance.md)、[第三批验收](docs/adapter-batch3-acceptance.md)、[第四批验收](docs/adapter-batch4-acceptance.md) 和 [首轮验收](docs/acceptance.md)。
+已导入 **500 家企业、228 个招聘链接**，目前已接入并真实验收 **97 家企业**：原有 53 家、第三批新增 20 家和第四批累计 24 家。平台逻辑共享，企业入口和覆盖逐家核验；其余 **131 个有链接来源**待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)、[Hotjob 验收](docs/hotjob-acceptance.md)、[Moka 验收](docs/moka-acceptance.md)、[首批静态活动页验收](docs/static-campaign-acceptance.md)、[第二批静态活动页验收](docs/51job-batch2-acceptance.md)、[北森批量验收](docs/zhiye-batch-acceptance.md)、[第三批验收](docs/adapter-batch3-acceptance.md)、[第四批验收](docs/adapter-batch4-acceptance.md)、[剩余 42 家复查](docs/adapter-batch5-triage.md) 和 [首轮验收](docs/acceptance.md)。
 
 **已配置用户提供的真实分类树：20 个一级分类、113 条二级路径。** 分类来源是 `job-position.js`，第三级岗位名称用于模型理解，Excel 仍保留原来的一级、二级两列。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入严格导入表。可以对已保存岗位进行批量分类和重新导出，无须重复爬取。
 
@@ -154,7 +154,7 @@ uv run job-crawler bundle --inputs-file outputs/initial20-inputs.json \
 
 **第三批新增二十家**：京东、腾讯、联想、中粮、交通银行、中国联通、广汽、美团、顺丰、上海建工、牧原、温氏、徐工、正泰、上港、重庆银行、德赛西威、哔哩哔哩、宁波华翔、龙佰集团已完成公开目录全量验收；共采集 6,741 条目录行，按状态和校招范围入选 6,657 条。程序从各自快照生成的十三列检查表和严格导入表在 `outputs/batch3-20-delivered-full-llm-20261012/`：汇总表有 6,657 行，严格导入表有 410 行，其余 6,247 行待补全。缺失后台省市映射等字段的岗位继续列入 `review.json`，不人为填入导入表。逐站数量、范围、证据和复现步骤见 [第三批验收](docs/adapter-batch3-acceptance.md)。吉利仍因采集期间目录总数变化保持待验证，未绑定。
 
-**第四批五十家扩展**：本轮对 50 个候选来源进行了页面探测，新增比亚迪、TCL 和十八个北森租户适配器；截至 2026-10-13 有 8 家来源通过真实全量覆盖核验，其中 7 家有岗位，共采集 2,268 条岗位记录。程序按默认模型配置汇总出的十三列岗位表在 `outputs/batch4-20261013-final/岗位信息汇总.xlsx`，包含 2,268 条岗位信息，其中 2,262 条待补全；严格导入表 `jobs.xlsx` 当前有 6 行。另有 42 个候选来源尚未通过完整性验收；逐站范围、数量与障碍见 [第四批验收](docs/adapter-batch4-acceptance.md)、[50 家来源状态](outputs/batch4-20261013-source-status.json) 和 [SPEC-033](specs/033-fifty-source-expansion.md)。
+**第四批五十家扩展**：首次验收通过 8 家；对剩余 42 家复查后又修复并实采通过 16 家，累计 **24/50 家来源覆盖完整**。程序生成的 `outputs/batch5-20261013-final/岗位信息汇总.xlsx` 含 6,645 条有效岗位信息和 24 家来源的采集情况；其中 1,944 条满足严格导入格式，4,701 条在待补全报告中。其余 26 家仍未通过完整性验收，不进入汇总。逐站原因、证据与修复范围见 [剩余 42 家复查](docs/adapter-batch5-triage.md) 和 [SPEC-033](specs/033-fifty-source-expansion.md)。
 
 汇总不会重新访问招聘网站；all 快照按汇总时刻再次筛除已截止记录，day/week/month 保留原窗口和筛选时刻。不同窗口或不同窗口基准时刻的快照拒绝混合，不会把每日预筛选的简略行重新当成全量岗位。保留原始采集时间，不宣称重新验证在线状态。同一来源若指定两轮结果会拒绝合并，需自行选择其中一轮。默认与 run 一样为未满足约束的字段进行缓存优先的模型补全；可能访问模型服务，但不访问招聘网站。设 llm.enabled=false 可关闭。
 
