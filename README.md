@@ -4,7 +4,7 @@
 
 维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，默认自动进行缓存优先的 LLM 分类及必要学历补全，完成校验后直接输出最终表格。
 
-已导入 **500 家企业、228 个招聘链接**，目前已接入并真实验收 **97 家企业**：原有 53 家、第三批新增 20 家和第四批累计 24 家。平台逻辑共享，企业入口和覆盖逐家核验；其余 **131 个有链接来源**待适配，空链接待补充。名单与结果见 [20 家企业验收](docs/initial20-acceptance.md)、[Hotjob 验收](docs/hotjob-acceptance.md)、[Moka 验收](docs/moka-acceptance.md)、[首批静态活动页验收](docs/static-campaign-acceptance.md)、[第二批静态活动页验收](docs/51job-batch2-acceptance.md)、[北森批量验收](docs/zhiye-batch-acceptance.md)、[第三批验收](docs/adapter-batch3-acceptance.md)、[第四批验收](docs/adapter-batch4-acceptance.md)、[剩余 42 家复查](docs/adapter-batch5-triage.md) 和 [首轮验收](docs/acceptance.md)。
+已导入 **500 家企业、228 个招聘链接**，目前已接入并真实验收 **128 家企业**；其余 **100 个有链接来源**待适配，空链接待补充。平台逻辑共享，企业入口和覆盖逐家核验。最新一次交付为 **50 家有实际岗位的企业、11,176 条校招岗位**，见 [50 家交付验收及剩余障碍](docs/adapter-batch6-acceptance.md)。历史记录见 [首轮验收](docs/acceptance.md)、[第三批](docs/adapter-batch3-acceptance.md)、[第四批](docs/adapter-batch4-acceptance.md) 和 [42 家复查](docs/adapter-batch5-triage.md)。
 
 **已配置用户提供的真实分类树：20 个一级分类、113 条二级路径。** 分类来源是 `job-position.js`，第三级岗位名称用于模型理解，Excel 仍保留原来的一级、二级两列。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入严格导入表。可以对已保存岗位进行批量分类和重新导出，无须重复爬取。
 
@@ -127,6 +127,8 @@ include_undated_new = true   # day 包含基线建立后新发现的无发布日
 退出码：`0` 全部完成；`2` 部分结果或阻塞；`1` 输入/配置错误；`130` 用户中断。调用方应同时查看报告，不能只按 Excel 行数判断成功。运行产物和 SQLite 不提交 Git。
 
 ## 合并开发期间已经采集的结果
+
+**2026-10-13 最新交付**：`outputs/batch6-20261013-final/岗位信息汇总.xlsx` 含 **50 家企业、11,176 条岗位信息**，每家都实际有岗位。原 26 家继续修复 4 家，另补充 27 家，复用当天已完成的 19 家快照。严格导入表 `jobs.xlsx` 有 2,160 行，其余 9,016 行主要等待后台地点映射及缺失字段补全；主表不等同全部可直接导入。按 `outputs/batch6-fifty-inputs.json` 执行下述 `bundle` 命令可从快照重导出，无需重爬。范围、原始运行目录与仍受阻的 22 家见 [验收记录](docs/adapter-batch6-acceptance.md)。
 
 不必为了得到一份总表再次采集。`bundle` 接受一个或多个采集目录，也接受目录内单独的 `collections/*.json` 文件，用于从多来源任务中只选择已完成的企业：
 

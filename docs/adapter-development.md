@@ -99,3 +99,15 @@ Moka `campus-recruitment` 与 `campus_apply` 的已验收单站点租户可参�
 执行 `uv run ruff format --check .`、`uv run ruff check .`、`uv run ty check`、`uv run pytest`。若需要改变公共契约，先更新 spec、版本与受影响回放。
 
 交付包含平台 spec、代码/版本、来源绑定、回放/测试、验收记录、程序生成的结果路径与尚未解决障碍。访问受限或业务配置缺失时明确标记，不能宣称整站完整交付。
+
+## 本批新增协议参考（SPEC-042～046）
+
+完整实例见 [50 家交付验收](adapter-batch6-acceptance.md) 与 `tests/test_batch6_contracts.py`。不能仅按域名后缀批量绑定：同一个 HCM 的字段标签可以不同，Moka 列表 deptId 不一定等于公开法人 department.id，校招项目也可能夹杂社招或实习。
+
+- `inline_catalogs.py` / `sinopharm.py`：先验证项目集合、无局部筛选、招聘类型和明确分页终态；列表已有完整正文就不另请求详情。
+- `chinatower.py`：公开虚拟表格需读取整页模型，并等待模型页码、分页控件、记录数同步；只保留公开岗位字段。字段元数据决定日期和学历语义。
+- `nci.py` / `static_campus.py` / `bank_catalogs.py`：DOM内嵌正文、动态滚动分页、旧GBK网页；不能把CSS省略标题、不可见“没有更多”文本或乱码当完整结果。
+- `anker.py` / `haier.py`：列表身份关联公开详情，调用公共增量钩子；多法人门户按明确的源主体字段过滤。
+- `BrowserSession.request(..., credentials="omit")` 只用于已观察的公开无登录跨域API；默认仍为include。`request_html(..., encoding="gb18030")` 仅用于源页面明确声明GBK的站点。请求模式和编码参与缓存键，不能跨模式复用证据。跨域ready_endpoints必须为完整HTTPS URL。
+
+采集验收为complete且有效岗位大于零，才能计入“有岗位企业”交付数量。无日期、无职责或地点未映射的岗位可保留信息表，但必须同时保留待补全原因和严格导入表，不为达成数量填造字段。

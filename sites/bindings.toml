@@ -385,3 +385,127 @@ version = "1"
 [sources.COM0342]
 adapter = "zhiye-gotion"
 version = "1"
+
+[sources.COM0032]
+adapter = "cnd-campus"
+version = "1"
+
+[sources.COM0037]
+adapter = "sinopharm-campus"
+version = "1"
+
+[sources.COM0041]
+adapter = "moka-wzgroup"
+version = "1"
+
+[sources.COM0057]
+adapter = "midea-campus"
+version = "1"
+
+[sources.COM0078]
+adapter = "moka-zijin"
+version = "1"
+
+[sources.COM0086]
+adapter = "haier-campus"
+version = "1"
+
+[sources.COM0097]
+adapter = "zhiye-baic"
+version = "1"
+
+[sources.COM0098]
+adapter = "nci-campus-html"
+version = "1"
+
+[sources.COM0135]
+adapter = "hotjob-cmoc"
+version = "1"
+
+[sources.COM0167]
+adapter = "hotjob-countrygarden"
+version = "1"
+
+[sources.COM0174]
+adapter = "kuaishou-campus"
+version = "1"
+
+[sources.COM0179]
+adapter = "moka-zte"
+version = "1"
+
+[sources.COM0187]
+adapter = "czbank-campus"
+version = "1"
+
+[sources.COM0196]
+adapter = "moka-vipshop"
+version = "1"
+
+[sources.COM0203]
+adapter = "chinatower-campus"
+version = "1"
+
+[sources.COM0269]
+adapter = "kingfa-campus"
+version = "1"
+
+[sources.COM0274]
+adapter = "sunwoda-campus"
+version = "1"
+
+[sources.COM0279]
+adapter = "moka-joyson"
+version = "1"
+
+[sources.COM0294]
+adapter = "tianneng-campus"
+version = "1"
+
+[sources.COM0302]
+adapter = "moka-nongfu"
+version = "1"
+
+[sources.COM0331]
+adapter = "jac-campus"
+version = "1"
+
+[sources.COM0336]
+adapter = "zhaopin-hadian"
+version = "1"
+
+[sources.COM0351]
+adapter = "zhink-campus"
+version = "1"
+
+[sources.COM0366]
+adapter = "hotjob-baiyao"
+version = "1"
+
+[sources.COM0367]
+adapter = "zhiye-cicc"
+version = "1"
+
+[sources.COM0375]
+adapter = "zhiye-naura"
+version = "1"
+
+[sources.COM0385]
+adapter = "zhiye-chinastock"
+version = "1"
+
+[sources.COM0424]
+adapter = "hrbb-campus"
+version = "1"
+
+[sources.COM0428]
+adapter = "zhiye-dahua"
+version = "1"
+
+[sources.COM0445]
+adapter = "anker-campus"
+version = "1"
+
+[sources.COM0464]
+adapter = "syst-campus"
+version = "1"
