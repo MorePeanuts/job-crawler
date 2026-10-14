@@ -77,3 +77,28 @@ uv run job-crawler run --source COM0045 --bindings .runtime/batches/2026-10-14-b
 新增 COM0045 后，从已归档九家阶段快照恢复并连同本次江铜全量快照离线汇总，输入记录 `.runtime/batches/2026-10-14-stage10-inputs.json`。`audit_delivery.py --expected-companies 10` 在 `.runtime/batches/2026-10-14-stage10-audit.json` 通过：10 家有岗位企业、源采 1,761 条（含理想汽车 3 条实习）、有效 1,758 条、信息表 1,758 行、严格导入 1 行、待补全 1,757 行。汇总 as_of 为 2026-10-14 11:57:22（上海）。已发布 `outputs/2026-10-14/新增10家-阶段汇总-岗位信息汇总.xlsx` 和 `新增10家-阶段汇总-严格导入.xlsx`，并按项目规则压缩归档后台快照。这是当前最新阶段表格，离 50 家目标仍差 40 家。
 
 本阶段完成 `uv sync --locked`、`uv run ruff format --check .`、`uv run ruff check .`、`uv run ty check` 与 `uv run pytest -q`，均通过；测试为 429 项。站点验收与离线测试分开记录，上述阻塞来源没有被计入 10 家。
+
+## 继续接入的六家与十六家阶段汇总
+
+用户要求继续完成剩余 40 家后，候选范围扩展到名录内原未填写 URL 的企业；仍遵守 SPEC-050 的逐主体核验。下表六家均为本批起点未绑定的新企业，`coverage=complete`，已通过全目录实采。时间为 2026-10-14 上海时间；原始运行目录已按 SPEC-047 归档，可用 `job-crawler restore` 恢复。
+
+| 来源 | 名录主体与入口 | 采集时刻 | 目录/详情/跳过过期 | 有效校招 | 严格导入 | 待补全 |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| COM0283 | 华峰集团；`huafeng.zhiye.com/campus` | 12:24 | 66/66/0 | 66 | 0 | 66 |
+| COM0409 | 盈峰集团；`recruit.infore.com/campus/jobs` | 12:25 | 46/46/0 | 45 | 1 | 44 |
+| COM0230 | 华友钴业；`wecruit.hotjob.cn/.../pb/school.html` | 12:27 | 197/196/1 | 194 | 118 | 76 |
+| COM0156 | 赛力斯集团；`sokon.zhiye.com/campus/jobs` | 12:32 | 174/174/0 | 174 | 0 | 174 |
+| COM0325 | 上海农商银行；`shrcb.zhiye.com/campus/jobs` | 12:35 | 15/15/0 | 15 | 1 | 14 |
+| COM0183 | 海大集团；`haid1.zhiye.com/campus/jobs` | 12:38 | 171/171/0 | 152 | 1 | 151 |
+
+华峰集团首页 2027 届校招接口带 Category=2，城市卡片是交叉统计，正式目录按稳定 `Count=66` 核对，日期哨兵留空。盈峰集团旧入口限于盈峰环境，现改为页脚明确标注“盈峰集团招聘门户”的全校园目录；46 条中实习 1 条不计。华友钴业的官方 `campus.huayou.com` 跳转至本次 Hotjob 租户，197 条源记录覆盖 17 页，实习和校园大使各 1 条、过期 1 条被排除。其余 194 条的实际单位和项目在快照中保留。
+
+赛力斯站点将校招和实习分为不同导航，校招标题“可实习”表示正式校招可提前实习，没有将该词误当实习项目；174 条仍为 Category=2。上海农商银行站点将本行和长江金租分入口，15 条本行岗位单位仅“总行”及“分支行”；不把子公司计入。海大集团旧前程无忧入口失效，新公开北森入口列出集团校园 171 条，其中 19 条标题为实习已排除，152 条正式岗位有效。北森站点列表包含完整正文，未重复读取无必要详情。对应平台回放在 `tests/test_zhiye.py`、`tests/test_hotjob.py`。
+
+六家均按 `job-crawler run --window all --source <ID> --bindings .runtime/batches/2026-10-14-remaining-bindings.toml --output outputs/dev-20261014-<ID> --state .runtime/development-state/20261014-<ID>.sqlite` 实采，报告原路径在归档索引可查。`report.status=partial` 是导入字段待补全，六家来源 `coverage=complete`，总数和唯一数一致。
+
+十家阶段快照从归档恢复后与六家新快照离线汇总，输入 `.runtime/batches/2026-10-14-stage16-inputs.json`。只读审计 `.runtime/batches/2026-10-14-stage16-audit.json` 通过：16 家、源采 2,430 条、有效 2,404 条、信息表 2,404 行、严格导入 122 行、待补全 2,282 行；汇总 as_of 为 2026-10-14 12:39:46（上海）。已发布 `outputs/2026-10-14/新增16家-阶段汇总-岗位信息汇总.xlsx` 和 `新增16家-阶段汇总-严格导入.xlsx`，后台快照及证据压缩归档。距离 50 家目标仍差 34 家，这份是阶段表格。
+
+新调查的 COM0360 龙旗新北森入口仍显示 2026 届且全目录 0；COM0137 京东方官方 2027 定制门户目录跨招聘类型与多业务板块，尚未完成逐分支详情、法人范围和全目录验收；COM0341 汇川技术新门户有公开岗位，但 `segment` 仅标“集团业务/分子公司”，未给逐岗位法人，不能归入名录上市主体；COM0285 超聚变新门户存在多个岗位方向，尚需展开详情。它们都未计入 16 家。
+
+十六家阶段完成 `uv sync --locked`、`uv run ruff format --check .`、`uv run ruff check .`、`uv run ty check` 与 `uv run pytest -q`，均通过；离线测试 435 项。阶段实采与离线测试结论分开记录，目标 50 家仍在进行中。
