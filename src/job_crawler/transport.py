@@ -11,6 +11,7 @@ from urllib.parse import urlencode, urlsplit
 
 from job_crawler.config import CrawlConfig
 from job_crawler.models import Issue
+from job_crawler.retention import evidence_exists, read_evidence
 from job_crawler.storage import Store, fingerprint, write_json
 
 
@@ -394,9 +395,9 @@ class BrowserSession:
         path = self.output / f"request-{key[:20]}.json"
         if self.resume and detail:
             cached = self.store.cached(self.run_id, self.source_id, key)
-            if cached and await asyncio.to_thread(Path(cached).exists):
+            if cached and await asyncio.to_thread(evidence_exists, cached):
                 self.last_evidence = cached
-                return json.loads(await asyncio.to_thread(Path(cached).read_text))["data"]
+                return json.loads(await asyncio.to_thread(read_evidence, cached))["data"]
         self.store.request(self.run_id, self.source_id, key, "pending")
         options: dict[str, Any] = {
             "method": "POST" if payload is not None or form is not None else "GET",
@@ -508,9 +509,9 @@ class BrowserSession:
         path = self.output / f"request-{key[:20]}.json"
         if self.resume and detail:
             cached = self.store.cached(self.run_id, self.source_id, key)
-            if cached and await asyncio.to_thread(Path(cached).exists):
+            if cached and await asyncio.to_thread(evidence_exists, cached):
                 self.last_evidence = cached
-                return json.loads(await asyncio.to_thread(Path(cached).read_text))["html"]
+                return json.loads(await asyncio.to_thread(read_evidence, cached))["html"]
         self.store.request(self.run_id, self.source_id, key, "pending")
         options: dict[str, Any] = {
             "method": "POST" if form is not None else "GET",
