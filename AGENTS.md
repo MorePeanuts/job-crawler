@@ -6,7 +6,7 @@
 
 - 开发前阅读 `docs/recruitment-crawler-plan.md` 和 `specs/` 下相关规范；新需求先修改 spec，再实现、测试、更新验收记录。用户最新需求优先于历史方案。
 - spec 必须包含目标、非目标、输入输出、失败行为和可验证验收条件。维护需求到测试的对应关系，不把计划标为已实现。
-- 新适配器遵循 `docs/adapter-development.md`；未知网站保留待适配状态，不自动猜测接口或将空结果算作成功。
+- 新增、批量接入或修复招聘适配器时，先读取项目 skill `.agents/skills/add-recruitment-adapters/SKILL.md`，按其中的开发、验收、汇总及归档流程执行；契约细节以 `docs/adapter-development.md` 为准。未知网站保留待适配状态，不自动猜测接口或将空结果算作成功。
 - 首轮由公共框架与已验证平台适配器组成，来源清单与接入状态分开维护。禁止用历史结果冒充实时采集。
 
 ## Python 工程

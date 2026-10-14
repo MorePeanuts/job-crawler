@@ -2,6 +2,8 @@
 
 将新增招聘链接交给 Codex 时使用本规范，确保新站复用现有采集、筛选、验证和模板导出流程。
 
+执行入口为项目 skill [add-recruitment-adapters](../.agents/skills/add-recruitment-adapters/SKILL.md)，包含批次计数、临时绑定实采、只读交付核验和快照归档命令。本文件维护底层适配器契约。
+
 ## 可直接使用的任务说明
 
 > 阅读 AGENTS.md、specs/001-production.md、specs/011-publication-and-adapter-rollout.md 和 docs/adapter-development.md，为以下来源接入适配器：企业 ID、主体名称、招聘 URL（填入）。先编写该站 spec，确认平台、校招范围、目录/单位树/分页/详情与终止依据。探测和采集全部由程序执行，不手工补录岗位。优先复用现有适配器；新增逻辑须有回放测试和真实验收。使用 uv、Ruff、ty，走功能分支与分阶段提交。按当前十三列模板导出，不改变字段。遇到登录、验证码、403、附件或分类障碍如实报告。更新来源绑定、支持范围和验收记录。
@@ -16,7 +18,7 @@
 4. 检查是否可以复用平台。相同域名或第三方平台不保证版本相同；租户参数与平台流程分开。
 5. 实现、注册适配器，增加首/次/末页、空目录、其他分支、详情关联和失败回放。
 6. 真实试运行，核对源计数、唯一键、目录覆盖、过期筛选、必填字段和输出。单个分公司成功不等于整站完成。
-7. 更新绑定版本、README 和验收记录，通过质量门禁后提交；有远程时创建 PR，不自动合并 main。
+7. 更新绑定版本、README 和验收记录，通过质量门禁后提交；按 AGENTS.md 的本地分支流程合回本地 main，不要求每次创建 PR，推送远端按用户要求执行。
 
 ## 代码契约
 
@@ -72,7 +74,7 @@ Job 附带 `evidence` 与关键字段 `field_sources`。仅提交最小脱敏回
 
 每日优化使用公共 `IncrementalSource`，由 runner 注入。详情请求前调用 `before_detail`，返回 None 才需要读详情；成功核对后 `remember` 保存列表指纹与完整岗位，公告允许一对多。详情入口页面应延迟到确实需要请求时打开；并发时保存本页列表证据，不能把其他岗位详情当成列表依据。只有确认源字段是发布时间才传入预筛选记录。列表直接包含全文的适配器不需要额外读详情，由 runner 记录首次发现。失败不推进历史、身份隔离和全量强制刷新均须回放测试，不能只测缓存命中。
 
-北森新版可复用 `adapters/zhiye.py`，但必须逐租户确认 Category=2、无局部筛选的入口、GetJobAdInfo 详情与 GUID 关联。只有真实全量验收后才启用绑定；不能把该平台的旧版站点或仅有静态首页的入口直接登记为已支持。`scripts/probe_sites.py` 用于有限探测，`scripts/collect_batch.py` 可将每家企业结果独立保存；使用 `job-crawler bundle` 合并已保存结果，不要为了输出一份总表重复采集。
+北森新版可复用 `adapters/zhiye.py`，但必须逐租户确认 Category=2、无局部筛选的入口、GetJobAdInfo 详情与 GUID 关联。只有真实全量验收后才启用绑定；不能把该平台的旧版站点或仅有静态首页的入口直接登记为已支持。`scripts/probe_sites.py` 用于有限探测，`scripts/collect_batch.py` 是历史开发脚本，其内置平台候选和输出目录内状态库设计不宜直接套用到新批次归档；优先使用 skill 中将输出与状态库分开的 CLI/SDK 调用。使用 `job-crawler bundle` 合并已保存结果，不要为了输出一份总表重复采集。
 
 Hotjob `pb/school.html` 租户可参考 `adapters/hotjob.py`。新租户仍须先观察 `listPosition` 的原始表单，确认 `recruitType=1`、第一页无局部筛选、`dataCount` 与末页，再核对 `listPositionDetail` 的 `postId`。表单请求走同一 Crawl4AI 浏览器会话，不能把 JSON POST 直接套用。`publishFirstDate` 是首次发布时间；页面的“更新日期”对应 `publishDate`，不能拿来做每日新发布筛选。部分租户将职责和资格放在同一正文，只有明确小标题时拆分；源站未给资格则留空并报告。`mc/position/campus` 移动入口不能未经验证复用 `pb` 的路径和表单。
 

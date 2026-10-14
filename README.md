@@ -97,6 +97,16 @@ uv run job-crawler archive .runtime/runs/remapped --publish
 
 本地历史整理记录见 [目录清理验收](docs/output-retention-acceptance.md)。10 月 10 日的 20 家、12 日新增 53 家、13 日新增 50 家分别保留最终表格，属于当时离线汇总结果，不代表重新确认了今天的在招状态。
 
+## 项目内适配器接入 Skill
+
+新增链接或批量接入时可以直接告诉 Codex：
+
+> 使用 $add-recruitment-adapters，从名录中新增 50 家企业的招聘适配器，复用调试阶段采集结果，完成验收后汇总并按日期归档。受阻企业按本次允许的范围处理，明确报告缺口。
+
+也可以指定企业和 URL 列表。skill 位于 [.agents/skills/add-recruitment-adapters/SKILL.md](.agents/skills/add-recruitment-adapters/SKILL.md)，随仓库保存；AGENTS.md 提供发现入口。若当前客户端未列出该 skill，或使用 Claude Code 等其他代理，可直接要求读取该文件并执行，不依赖全局安装或专属工具。
+
+skill 包含实现定位、分页/详情/增量契约、真实验收标准、批次企业去重计数、快照复用、两份表格核对与归档步骤，并提供只读交付核验脚本。零岗位、部分覆盖和同公司多个入口不能凑足目标家数；不会仅因创建适配器文件就报告交付完成。日常运行已有站点的 day/all 命令无需调用此 skill。
+
 ## 每天新增一批适配器后的交付
 
 开发时显式指定独立工作目录，保留调试时已采到的每家公司快照。确认这批 50 家均有有效岗位、覆盖范围明确后，选择每家最新通过验收的快照路径（同来源不能重复），写入 JSON 数组，例如 `.runtime/batches/2026-10-14-inputs.json`。已压缩的输入先 restore，再选择恢复后的目录或 collections 文件。
@@ -105,7 +115,7 @@ uv run job-crawler archive .runtime/runs/remapped --publish
 uv run job-crawler bundle --inputs-file .runtime/batches/2026-10-14-inputs.json \
   --output .runtime/runs/new50-20261014
 uv run job-crawler archive .runtime/runs/new50-20261014 \
-  --publish --label 新增50家 --pin
+  --publish --label 新增50家
 ```
 
 得到 `outputs/2026-10-14/新增50家-岗位信息汇总.xlsx` 和 `新增50家-严格导入.xlsx`。bundle 不重新请求招聘网站，会复用模型缓存并在必要时调用模型补全；保留每家真实采集时刻。这里的“新增50家”是当天新接入的公司，其表中可包含仍在展示的存量岗位，与 day 的最近一天新增岗位不同。

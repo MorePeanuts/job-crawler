@@ -1,0 +1,4 @@
+interface:
+  display_name: "招聘站点适配器接入"
+  short_description: "接入和修复招聘站点适配器，完成真实验收、岗位汇总与日期归档"
+  default_prompt: "使用 $add-recruitment-adapters 为本项目接入指定招聘来源，复用采集快照完成验收、汇总和归档。"
