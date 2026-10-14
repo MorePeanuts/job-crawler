@@ -42,6 +42,10 @@ version = "1"
 adapter = "zhiye-xiangyu"
 version = "1"
 
+[sources.COM0065]
+adapter = "pdd-campus"
+version = "1"
+
 [sources.COM0066]
 adapter = "moka-catl"
 version = "1"
@@ -498,8 +502,16 @@ version = "1"
 adapter = "hrbb-campus"
 version = "1"
 
+[sources.COM0425]
+adapter = "zhiye-mindray"
+version = "1"
+
 [sources.COM0428]
 adapter = "zhiye-dahua"
+version = "1"
+
+[sources.COM0440]
+adapter = "zhiye-shenzhou"
 version = "1"
 
 [sources.COM0445]
@@ -508,4 +520,8 @@ version = "1"
 
 [sources.COM0464]
 adapter = "syst-campus"
+version = "1"
+
+[sources.COM0497]
+adapter = "zhiye-luzhou-laojiao"
 version = "1"
