@@ -22,6 +22,7 @@ from job_crawler.adapters.hotjob import (
     Skyworth,
     Tbea,
     TclIndustries,
+    Wanhua2027,
     Zoomlion2027,
     detail_body,
     location_paths,
@@ -267,6 +268,58 @@ async def test_zoomlion_rejects_detail_legal_entity_conflict(now: datetime) -> N
     assert result.coverage_issues()
     assert result.scopes[0].details == 6
     assert any(issue.job_key == "1" for issue in result.issues)
+
+
+class WanhuaReplay(Replay):
+    def __init__(self, *, wrong_detail: bool = False):
+        super().__init__()
+        self.wrong_detail = wrong_detail
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row.update(
+            {
+                "postName": f"研发工程师-{post_id}",
+                "company": "万华化学集团股份有限公司",
+                "orgCode": "0",
+                "projectName": "本硕博招聘",
+                "projectId": 100001,
+            }
+        )
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        row = self._listing(post_id)
+        row.update(
+            {
+                "orgName": "另一法人"
+                if self.wrong_detail and post_id == "a"
+                else "万华化学集团股份有限公司",
+                "education": "本科及以上",
+                "workContent": "负责化工研发",
+                "serviceCondition": "2027届本科毕业生",
+            }
+        )
+        return {"state": "200", "data": row}
+
+
+async def test_wanhua_2027_pagination_and_legal_identity(now: datetime) -> None:
+    source = Source(
+        source_id="COM0139",
+        company_id="COM0139",
+        company="万华化学集团股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{Wanhua2027.suite}/pb/school.html",
+    )
+    result = await Wanhua2027(source, WanhuaReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert len(result.jobs) == 3
+    assert all(job.unit == "万华化学集团股份有限公司" for job in result.jobs)
+
+    wrong = await Wanhua2027(source, WanhuaReplay(wrong_detail=True), now).collect()
+    assert wrong.coverage_issues()
+    assert len(wrong.jobs) == 2
+    assert any(issue.job_key == "a" for issue in wrong.issues)
 
 
 async def test_hotjob_uses_returned_page_size_before_advancing(now: datetime) -> None:

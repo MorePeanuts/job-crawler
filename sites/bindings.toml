@@ -666,3 +666,7 @@ version = "1"
 [sources.COM0402]
 adapter = "cdrcb-2027"
 version = "1"
+
+[sources.COM0139]
+adapter = "hotjob-wanhua-2027"
+version = "1"

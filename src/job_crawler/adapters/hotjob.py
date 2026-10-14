@@ -656,7 +656,46 @@ class Zoomlion2027(Hotjob):
         return super()._job(row, listing, evidence, locations, location_evidence)
 
 
+class Wanhua2027(Hotjob):
+    name = "hotjob-wanhua-2027"
+    suite = "SU6a7ad69c43154813049755d7"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "万华化学2027校招全目录；逐条验证本级法人和招聘项目"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(
+            text(row.get("company")) == "万华化学集团股份有限公司"
+            and text(row.get("orgCode")) == "0"
+            and text(row.get("projectName")) == "本硕博招聘"
+            and str(row.get("projectId")) == "100001",
+            "万华化学列表法人或招聘项目变化",
+        )
+        return True
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                str(row.get("postId")) == str(listing.get("postId"))
+                and text(row.get("postName")) == text(listing.get("postName"))
+                and text(row.get("company")) == "万华化学集团股份有限公司"
+                and text(row.get("orgName")) == "万华化学集团股份有限公司"
+                and text(row.get("orgCode")) == "0"
+                and text(row.get("projectName")) == "本硕博招聘"
+                and str(row.get("projectId")) == "100001",
+                "万华化学详情与列表或本级主体不符",
+            )
+        return super()._job(row, listing, evidence, locations, location_evidence)
+
+
 TENANTS = (
+    Wanhua2027,
     Zoomlion2027,
     EveEnergy,
     Luxshare,
