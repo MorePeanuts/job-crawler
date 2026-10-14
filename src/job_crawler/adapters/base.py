@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from bs4 import BeautifulSoup
 
+from job_crawler.description import clean_field_headings
 from job_crawler.incremental import IncrementalSource
 from job_crawler.models import Collection, Issue, Job, Scope, Source
 from job_crawler.transport import CrawlError, Session
@@ -101,7 +102,7 @@ class Adapter:
         )
 
     def job(self, key: str, **fields: Any) -> Job:
-        return Job(
+        job = Job(
             source_id=self.source.source_id,
             source_key=key,
             company=self.source.company,
@@ -109,6 +110,9 @@ class Adapter:
             evidence=[self.session.last_evidence],
             **fields,
         )
+        job.duties = clean_field_headings(job.duties)
+        job.requirements = clean_field_headings(job.requirements)
+        return job
 
     def add_page(
         self,

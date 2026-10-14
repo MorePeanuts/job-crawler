@@ -14,6 +14,7 @@ from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from openpyxl.utils import get_column_letter
 
 from job_crawler.config import MappingConfig
+from job_crawler.description import clean_field_headings
 from job_crawler.field_extraction import enrich_fields
 from job_crawler.filtering import SHANGHAI, parse_date
 from job_crawler.models import Job
@@ -89,6 +90,8 @@ def validate_mapping(mapping: MappingConfig) -> None:
 
 def normalize(job: Job, mapping: MappingConfig) -> Job:
     result = job.model_copy(deep=True)
+    result.duties = clean_field_headings(result.duties)
+    result.requirements = clean_field_headings(result.requirements)
     pair = mapping.categories.get(job.category_raw)
     if pair:
         result.category_primary, result.category_secondary = pair

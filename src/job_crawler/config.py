@@ -52,11 +52,18 @@ class IncrementalConfig(Model):
     include_undated_new: bool = True
 
 
+class RetentionConfig(Model):
+    archive_days: int = Field(default=30, ge=1)
+    cache_days: int = Field(default=90, ge=1)
+    cache_mb: int = Field(default=2048, ge=1)
+
+
 class Settings(Model):
     crawl: CrawlConfig = Field(default_factory=CrawlConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     mapping: MappingConfig = Field(default_factory=MappingConfig)
     incremental: IncrementalConfig = Field(default_factory=IncrementalConfig)
+    retention: RetentionConfig = Field(default_factory=RetentionConfig)
 
 
 def load_settings(path: Path | None = None) -> Settings:

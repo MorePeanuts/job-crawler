@@ -43,10 +43,10 @@ uv run job-crawler sources add --id COM0002-campus-new \
 
 ```sh
 # 默认运行全部已启用适配器，采集当前未截止的校招岗位
-uv run job-crawler run --output outputs/current
+uv run job-crawler run
 
 # 选择单个/多个来源
-uv run job-crawler run --source COM0012 --window day --output outputs/pingan-day
+uv run job-crawler run --source COM0012 --window day
 uv run job-crawler run --source COM0002 --source COM0008 --window week
 uv run job-crawler run --window month
 
@@ -54,7 +54,7 @@ uv run job-crawler run --window month
 uv run job-crawler run --all-sources
 ```
 
-省略 `--output` 会在 `outputs/` 创建带时间戳的目录，程序拒绝覆盖非空目录。初始来源 ID：中石油 `COM0002`、建行 `COM0008`、平安 `COM0012`、阿里 `COM0015`。
+省略 `--output` 会在 `.runtime/runs/` 创建独立工作目录，导出后压缩归档，并将最终表格发布到 `outputs/YYYY-MM-DD/`。文件名区分 all/day/week/month 和运行编号，同日不同窗口或多轮运行不覆盖、不混淆。显式 `--output` 保留开发模式（完整未压缩目录），程序仍拒绝覆盖非空目录。初始来源 ID：中石油 `COM0002`、建行 `COM0008`、平安 `COM0012`、阿里 `COM0015`。
 
 | 模式 | 规则 |
 | --- | --- |
@@ -67,20 +67,67 @@ uv run job-crawler run --all-sources
 
 可用 `--as-of '2026-10-10T12:00:00+08:00'` 固定筛选基准。它只筛选当前可访问目录，不还原历史网页。建行列表已经证明过期的岗位不再读取详情，计入 `skipped_expired` 并保留列表证据。
 
+## 结果目录与自动清理
+
+日常只需运行 `uv run job-crawler run` 或 `uv run job-crawler run --window day`。在 `outputs/2026-10-14/` 这样的日期目录中查看 `all-运行编号-岗位信息汇总.xlsx` 和 `all-运行编号-严格导入.xlsx`；前者包含待补全信息，后者只包含通过导入校验的岗位。日期取本轮 manifest 中的 `as_of`（上海时区）；指定历史 `--as-of` 不等于历史网页回溯。来源状态及原始快照保存在后台，不额外加入模板列。
+
+不同筛选时刻的 day 不能直接混合，因此同一天多次运行保留独立表格。若分批采集后需要一份汇总，仍使用 `bundle` 明确选择来源快照；同一来源只选一轮、窗口及 day 筛选时刻必须一致。
+
+后台 `.runtime/archives/` 保存经 SHA-256 逐文件校验的压缩包，`.runtime/archive-index.json` 记录原目录、日期发布文件、哈希及状态库路径。旧证据引用通过索引读取压缩内容，单纯归档不会迫使每日重读详情。代码升级仍遵循原有“代码身份变化则重建基线”的规则，本次没有绕过身份校验或把旧代码历史强制迁移成新代码基线。不要手动删除索引、状态库或仍受引用保护的归档。LLM 分类/学历缓存继续共用，不因按日期输出而重置。
+
+```sh
+# 显式输出适合开发；完成后按历史日期发布并压缩
+uv run job-crawler archive outputs/my-run --publish
+# 重要交付可加 --pin，长期保留其后台快照
+
+# 预览；加 --apply 才删除到期数据。默认 run 成功导出后会自动应用
+uv run job-crawler maintenance
+uv run job-crawler maintenance --apply
+
+# 从索引中的原运行路径恢复到不存在的新目录，不访问网站
+uv run job-crawler restore outputs/my-run --output .runtime/restored/my-run
+# 重新补全并导出（按默认模型配置可能调用 LLM）
+uv run job-crawler export .runtime/restored/my-run --output .runtime/runs/remapped
+uv run job-crawler archive .runtime/runs/remapped --publish
+```
+
+默认非固定归档至少保留 30 天，从归档时刻开始计时；每个来源/窗口的最新快照及仍被增量状态引用的归档额外保留，最终 Excel 永不自动删除。LLM 缓存保留 90 天，合计上限 2 GiB，超限淘汰最旧文件；淘汰后该内容再次出现可能需要模型调用。可在 `config.toml` 的 `[retention]` 修改 `archive_days`、`cache_days`、`cache_mb`。这些是清理阈值，并非对受保护数据的硬容量上限。
+
+`archive` 仅用于已停止写入的目录，默认只压缩；`--publish` 要求存在 manifest 和两份最终表格。归档失败保留原数据；采集中断时，CLI 显示的 `.runtime/runs/<运行编号>` 仍保留，可用 `--output 该目录 --resume` 恢复。已完成并归档的快照用 `restore/export`，不作为过期断点继续采集。历史文档中的旧 `outputs/...` 路径可作为 `restore` 的输入；如果是某个归档目录下的子目录，先恢复其顶层目录。
+
+本地历史整理记录见 [目录清理验收](docs/output-retention-acceptance.md)。10 月 10 日的 20 家、12 日新增 53 家、13 日新增 50 家分别保留最终表格，属于当时离线汇总结果，不代表重新确认了今天的在招状态。
+
+## 每天新增一批适配器后的交付
+
+开发时显式指定独立工作目录，保留调试时已采到的每家公司快照。确认这批 50 家均有有效岗位、覆盖范围明确后，选择每家最新通过验收的快照路径（同来源不能重复），写入 JSON 数组，例如 `.runtime/batches/2026-10-14-inputs.json`。已压缩的输入先 restore，再选择恢复后的目录或 collections 文件。
+
+```sh
+uv run job-crawler bundle --inputs-file .runtime/batches/2026-10-14-inputs.json \
+  --output .runtime/runs/new50-20261014
+uv run job-crawler archive .runtime/runs/new50-20261014 \
+  --publish --label 新增50家 --pin
+```
+
+得到 `outputs/2026-10-14/新增50家-岗位信息汇总.xlsx` 和 `新增50家-严格导入.xlsx`。bundle 不重新请求招聘网站，会复用模型缓存并在必要时调用模型补全；保留每家真实采集时刻。这里的“新增50家”是当天新接入的公司，其表中可包含仍在展示的存量岗位，与 day 的最近一天新增岗位不同。
+
+调试目录不会因执行 bundle 自动消失。完成交付后，开发代理对已停止写入的调试目录逐一执行 `job-crawler archive 目录`（不加 --publish），只发布最终汇总；快照进入同一保留策略。一天多批用不同 label，例如 `新增50家-第二批`，已有同名交付不会被覆盖。
+
 ## 每日减少详情请求
 
-建议升级 alpha.2 后先执行一次全量建立基线，之后每天运行 day，每 15 天再次运行 all。输出目录每轮必须不同；**所有轮次共用同一 `--state` 和保留下来的证据文件**。默认状态库是 `.runtime/state.sqlite`，不应按天删除或换路径。
+建议升级 alpha.2 后先执行一次全量建立基线，之后每天运行 day，每 15 天再次运行 all。输出目录每轮必须不同；**所有轮次共用同一 `--state`，保留证据文件或完整的归档及索引**。默认状态库是 `.runtime/state.sqlite`，不应按天删除或换路径。
 
 ```sh
 # 首次基线，以及之后每 15 天的全量刷新；每次使用新的输出目录
-uv run job-crawler run --window all --output outputs/baseline-alpha2
+uv run job-crawler run --window all
 
-# 每日：更换日期/目录；省略 --output 则自动使用时间戳目录
-uv run job-crawler run --window day --output outputs/daily-20261011
+# 每日：默认自动按日期发布并归档，无需手工指定输出目录
+uv run job-crawler run --window day
 
-# 无需另跑 classify；最终表格直接位于 outputs/daily-20261011/
+# 无需另跑 classify；最终表格位于 outputs/YYYY-MM-DD/
 # 如模型失败或缺 key，修复配置后只重试补全/导出，不重新访问招聘网站
-uv run job-crawler export outputs/daily-20261011 --output outputs/daily-20261011-retried
+uv run job-crawler restore .runtime/runs/原运行编号 --output .runtime/restored/retry
+uv run job-crawler export .runtime/restored/retry --output .runtime/runs/retried
+uv run job-crawler archive .runtime/runs/retried --publish
 ```
 
 上面是手动命令，本版本不自动安排定时。一次 run 已包含分类与必要学历辅助；退出码 2 表示采集不完整或字段仍待补全，先检查 report.json/review.json，修复后可用 export 重试，不代表没有输出产物。
@@ -311,6 +358,24 @@ print(report["status"], report["exported"])
 ```
 
 ## 开发
+
+### 岗位正文章节与历史修复
+
+[SPEC-034](specs/034-description-headings.md) 统一识别职责/要求章节，去掉 `【岗位职责】` 等冗余标题和因拆分产生的括号残留。支持标题同行、跨 HTML 段、编号与常见同义词；保留正文中的普通括号及词语。默认采集和导出均使用修复后的清理逻辑。
+
+已被旧逻辑拆坏的快照不能靠普通 `export` 还原标题边界，应从原始证据重放。对 2026-10-12 汇总可运行以下离线工具（`MOKA_PUBLIC_IV` 是当时公开页面的 `TurboApply.data.aesIv` 参数，工具不联网获取，也不将其保存到报告）：
+
+```sh
+uv run python scripts/repair_description_snapshot.py \
+  outputs/today-collected-20261012-combined outputs/description-repair-new \
+  --moka-iv "$MOKA_PUBLIC_IV"
+uv run python scripts/apply_description_workbook.py \
+  outputs/today-collected-20261012-combined/岗位信息汇总.xlsx \
+  outputs/description-repair-new/cell-patches.json \
+  outputs/description-repair-new/岗位信息汇总-正文修复版.xlsx
+```
+
+工具核对岗位身份、旧解析结果与原单元格，只修改职责/要求，不重新分类、筛选或改写其他字段；输出必须为新目录/新文件，原件保留。修复计划、逐岗位依据、修复后的交付快照与工作簿核对结果分开保存。该工具按昨日已知适配器证据格式设计；缺失/冲突证据会报错，不适用于任意历史文件。此次统计和限制见 [验收记录](docs/description-headings-acceptance.md)。
 
 先读 [AGENTS.md](AGENTS.md) 和 [正式版 spec](specs/001-production.md)。从 main 创建功能分支，先写 spec，再实现、测试、更新验收记录，按阶段提交。有远程时通过 PR 评审，没有远程时保留本地分支，不直接合并未验证变更。
 

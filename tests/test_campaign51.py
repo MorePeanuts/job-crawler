@@ -247,3 +247,11 @@ def test_split_jobinfo_supports_wanxiang_section_headings() -> None:
         "本科",
     )
     assert split_jobinfo("1、维护系统<br>任职要求：本科") == ("1、维护系统", "本科")
+
+
+def test_split_jobinfo_keeps_ordinary_duties_words() -> None:
+    assert split_jobinfo("岗位职责：负责说明工作内容，核对岗位要求并执行。\n任职要求：本科") == (
+        "负责说明工作内容，核对岗位要求并执行。",
+        "本科",
+    )
+    assert split_jobinfo("按照【财务专员工作内容】开展业务") == ("", "")
