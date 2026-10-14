@@ -19,6 +19,7 @@ from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
 from job_crawler.adapters.jd import JD
+from job_crawler.adapters.jxcc import JxccCampus
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.meituan import Meituan
@@ -59,6 +60,7 @@ REGISTRY = {
         *INLINE_TENANTS,
         *EXTRA_TENANTS,
         JD,
+        JxccCampus,
         Tencent,
         SF,
         BankComm,
