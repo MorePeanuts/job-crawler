@@ -531,7 +531,81 @@ class Goertek(Hotjob):
         return company == "歌尔股份"
 
 
+class Luxshare(Hotjob):
+    name = "hotjob-luxshare"
+    suite = "SU601778b25d83dc072073230a"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "立讯共享校招目录全量；仅机构 0/36 立讯精密工业股份归本主体"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        roots = {str(item["code"]): item for item in data.get("orgList", [])}
+        self._names = {
+            "0/36": "立讯精密工业股份",
+            "0/45": "华南园区",
+            "0/44": "华东园区",
+            "0/210201": "京西国际",
+        }
+        check(
+            {code: text(item.get("nameCh")) for code, item in roots.items()} == self._names,
+            "立讯校招机构树分支变化",
+        )
+        self._total = sum(int(item["positionsNum"]) for item in roots.values())
+        self._other_total = sum(
+            int(item["positionsNum"]) for code, item in roots.items() if code != "0/36"
+        )
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        code = text(row.get("orgCode"))
+        check(code in self._names, "立讯岗位机构编码超出已核对分支")
+        check(text(row.get("company")) == self._names[code], "立讯岗位机构名称不一致")
+        return code == "0/36"
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        scope = self.result.scopes[0]
+        check(scope.expected == self._total, "立讯机构树与目录总数不符")
+        check(scope.skipped_out_of_scope == self._other_total, "立讯其他机构计数不符")
+
+
+class EveEnergy(Hotjob):
+    name = "hotjob-eve-energy"
+    suite = "SU630487ca0dcad45aa7768a79"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "亿纬锂能校招全目录；仅 0/108547 惠州本部岗位归上市主体"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        code = text(row.get("orgCode"))
+        check(code in {"0", "0/108547", "0/108528/106673"}, "亿纬机构编码变化")
+        if code != "0/108547":
+            return False
+        check(
+            text(row.get("company")) == "亿纬锂能" and text(row.get("workPlaceStr")) == "惠州市",
+            "亿纬本部岗位主体或地点变化",
+        )
+        return True
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                text(row.get("orgCode")) == "0/108547"
+                and text(row.get("company")) == "亿纬锂能"
+                and text(row.get("orgName")) == "亿纬锂能"
+                and text(row.get("workPlaceStr")) == "惠州市",
+                "亿纬详情机构或地点与本部不符",
+            )
+        return super()._job(row, listing, evidence, locations, location_evidence)
+
+
 TENANTS = (
+    EveEnergy,
+    Luxshare,
     Goertek,
     TclIndustries,
     Tbea,

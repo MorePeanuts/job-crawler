@@ -8,6 +8,7 @@ import pytest
 
 from job_crawler.adapters.hotjob import (
     GF,
+    EveEnergy,
     Goertek,
     HaiTian,
     Hotjob,
@@ -16,6 +17,7 @@ from job_crawler.adapters.hotjob import (
     Huayou,
     JinTian,
     LiuGong,
+    Luxshare,
     Minth,
     Skyworth,
     Tbea,
@@ -467,6 +469,102 @@ async def test_tcl_industries_only_collects_verified_group_branch(now: datetime)
     unknown = GroupReplay()
     unknown.unknown_code = True
     assert (await TclIndustries(src, unknown, now).collect()).coverage_issues()
+
+
+async def test_luxshare_only_collects_explicit_listed_company_branch(now: datetime) -> None:
+    class OrganizationReplay(Replay):
+        unknown_code = False
+
+        async def observed(self, needle: str) -> dict[str, Any]:
+            if "listSearchTerm" in needle:
+                return {
+                    "url": self._url("listSearchTerm"),
+                    "body": json.dumps(
+                        {
+                            "state": "200",
+                            "data": {
+                                "orgList": [
+                                    {
+                                        "code": "0/36",
+                                        "nameCh": "立讯精密工业股份",
+                                        "positionsNum": 1,
+                                    },
+                                    {"code": "0/45", "nameCh": "华南园区", "positionsNum": 1},
+                                    {"code": "0/44", "nameCh": "华东园区", "positionsNum": 1},
+                                    {"code": "0/210201", "nameCh": "京西国际", "positionsNum": 0},
+                                ]
+                            },
+                        },
+                        ensure_ascii=False,
+                    ),
+                }
+            return await super().observed(needle)
+
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            code, company = {
+                "a": ("0/36", "立讯精密工业股份"),
+                "b": ("0/45", "华南园区"),
+                "c": ("0/44", "华东园区"),
+            }[post_id]
+            row["orgCode"] = "0/999" if self.unknown_code and post_id == "c" else code
+            row["company"] = company
+            return row
+
+    source = Source(
+        source_id="COM0079",
+        company_id="COM0079",
+        company="立讯精密工业股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{Luxshare.suite}/pb/school.html",
+    )
+    result = await Luxshare(source, OrganizationReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert [job.source_key for job in result.jobs] == ["a"]
+    assert result.scopes[0].skipped_out_of_scope == 2
+    unknown = OrganizationReplay()
+    unknown.unknown_code = True
+    assert (await Luxshare(source, unknown, now).collect()).coverage_issues()
+
+
+async def test_eve_energy_only_collects_verified_headquarters_code(now: datetime) -> None:
+    class CompanyReplay(Replay):
+        bad_detail = False
+        unknown_code = False
+
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            row["orgCode"] = {
+                "a": "0/108547",
+                "b": "0",
+                "c": "0/108528/106673",
+            }[post_id]
+            if self.unknown_code and post_id == "c":
+                row["orgCode"] = "0/999"
+            row["company"] = "亿纬锂能"
+            row["workPlaceStr"] = "惠州市" if post_id == "a" else "荆门市"
+            return row
+
+        def _detail(self, post_id: str) -> dict[str, Any]:
+            result = super()._detail(post_id)
+            result["data"]["orgName"] = "其他公司" if self.bad_detail else "亿纬锂能"
+            return result
+
+    source = Source(
+        source_id="COM0278",
+        company_id="COM0278",
+        company="惠州亿纬锂能股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{EveEnergy.suite}/pb/school.html",
+    )
+    result = await EveEnergy(source, CompanyReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert [job.source_key for job in result.jobs] == ["a"]
+    assert result.scopes[0].skipped_out_of_scope == 2
+    bad_detail = CompanyReplay()
+    bad_detail.bad_detail = True
+    assert (await EveEnergy(source, bad_detail, now).collect()).coverage_issues()
+    unknown = CompanyReplay()
+    unknown.unknown_code = True
+    assert (await EveEnergy(source, unknown, now).collect()).coverage_issues()
 
 
 async def test_missing_requirement_is_visible_warning(now: datetime) -> None:

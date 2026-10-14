@@ -601,3 +601,11 @@ version = "1"
 [sources.COM0208]
 adapter = "hotjob-goertek"
 version = "1"
+
+[sources.COM0079]
+adapter = "hotjob-luxshare"
+version = "1"
+
+[sources.COM0278]
+adapter = "hotjob-eve-energy"
+version = "1"
