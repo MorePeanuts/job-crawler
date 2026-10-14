@@ -9,6 +9,7 @@ from job_crawler.description import split_sections
 from job_crawler.models import Scope
 
 API = "https://fe.zhaopin.com/grace/api/dsc/search-job-list"
+TREE_API = "https://fe.zhaopin.com/grace/api/dsc/get-sub-company-and-department-list"
 FILTERS = {
     "workExperiences",
     "minSalary",
@@ -33,10 +34,20 @@ def split_detail(value: str) -> tuple[str, str]:
 
 class Zhaopin(Adapter):
     org_number = ""
+    page_size = 50
     scope_description = (
         "智联招聘公开校园招聘 jobSource=2 无部门/地区/标签筛选全目录；列表包含完整岗位正文"
     )
     ready_endpoints = (API,)
+
+    def parse_detail(self, value: str) -> tuple[str, str]:
+        return split_detail(value)
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        pass
+
+    def unit_name(self, company_data: dict[str, Any]) -> str:
+        return text(company_data.get("campusOrgName"))
 
     async def harvest(self) -> None:
         observed = await self.session.observed(API)
@@ -54,7 +65,10 @@ class Zhaopin(Adapter):
         check(payload.get("pageIndex") == 1, "智联目录不是第一页")
         for key in FILTERS:
             payload[key] = [] if key == "orgDepartmentIds" else ""
-        size = 50
+        await self.collect_catalog(payload)
+
+    async def collect_catalog(self, payload: dict[str, Any]) -> None:
+        size = self.page_size
         payload["pageSize"] = size
         scope = Scope(name="campus-job-source-2")
         self.result.scopes.append(scope)
@@ -82,24 +96,29 @@ class Zhaopin(Adapter):
                 job_data: dict[str, Any] = row["job"]
                 company_data: dict[str, Any] = row["company"]
                 check(str(company_data["companyId"]) == self.org_number, "岗位混入其他组织")
+                self.validate_company(company_data)
                 check(job_data.get("positionSourceType") == 2, "岗位混入非校招来源")
                 key = str(job_data["jobNumber"])
                 detail = text(job_data.get("detail"))
                 check(bool(text(job_data.get("title"))) and bool(detail), "岗位标题或正文缺失")
-                duties, requirements = split_detail(detail)
+                duties, requirements = self.parse_detail(detail)
                 job = self.job(
                     key,
                     title=text(job_data["title"]),
                     source_url=str(job_data.get("url") or job_data.get("deliveryPath") or ""),
                     apply_url=str(job_data.get("deliveryPath") or ""),
-                    unit=text(company_data.get("campusOrgName")),
+                    unit=self.unit_name(company_data),
                     location=text(job_data.get("address") or job_data.get("cityName")),
                     education=text(job_data.get("minEducationName")),
                     category_raw=text(job_data.get("jobTypeName")),
                     duties=duties,
                     requirements=requirements,
                     field_sources={
-                        "duties": "search-job-list.data.jobList[].job.detail",
+                        "duties": (
+                            "search-job-list.data.jobList[].job.detail"
+                            if duties
+                            else "source_missing:无独立岗位职责"
+                        ),
                         "requirements": (
                             "search-job-list.data.jobList[].job.detail:任职要求等标题"
                             if requirements
@@ -174,4 +193,76 @@ class Hadian(Zhaopin):
     org_number = "105816"
 
 
-TENANTS = (Hadian, Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)
+class ChinaPost2027(Zhaopin):
+    name = "zhaopin-chinapost-2027"
+    host = "chinapost2027.zhaopin.com"
+    path = "/job/index.html?comid=1013109"
+    org_number = "105582"
+    page_size = 100
+    ready_endpoints = (TREE_API,)
+    scope_description = (
+        "中国邮政2027联合校招组织树中集团总部及30个省级分公司及下辖分支；排除独立子公司"
+    )
+    root_names: frozenset[str] = frozenset()
+
+    def parse_detail(self, value: str) -> tuple[str, str]:
+        return "", text(value)
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            company_data.get("slaveDisplayOrgName") == "中国邮政集团有限公司"
+            and company_data.get("campusOrgName") in self.root_names,
+            "中国邮政岗位所属主体或省级根机构越界",
+        )
+        department = company_data.get("campusDepartment")
+        check(
+            isinstance(department, dict) and bool(text(department.get("name"))),
+            "中国邮政岗位缺少下辖招聘机构",
+        )
+
+    def unit_name(self, company_data: dict[str, Any]) -> str:
+        return text(company_data["campusDepartment"]["name"])
+
+    async def harvest(self) -> None:
+        observed = await self.session.observed(TREE_API)
+        tree_evidence = self.session.last_evidence
+        check(observed["url"] == TREE_API, "中国邮政组织树接口变化")
+        query = json.loads(observed["post_data"])
+        check(
+            query == {"rootCompanyId": self.org_number, "format": "tree"},
+            "中国邮政组织树根 ID 或格式变化",
+        )
+        tree = json.loads(observed["body"])
+        check(tree.get("code") == 200, "中国邮政组织树业务失败")
+        items = tree["data"]["list"]
+        check(isinstance(items, list) and bool(items), "中国邮政组织树为空")
+        roots = [
+            row
+            for row in items
+            if row.get("parentId") == int(self.org_number)
+            and (
+                row.get("companyName") == "中国邮政集团有限公司总部"
+                or str(row.get("companyName", "")).endswith("分公司")
+            )
+        ]
+        check(
+            len(roots) == 31
+            and sum(row.get("companyName") == "中国邮政集团有限公司总部" for row in roots) == 1,
+            "中国邮政总部及30个省级分公司根节点不完整",
+        )
+        root_ids = [int(row["id"]) for row in roots]
+        check(len(set(root_ids)) == len(root_ids), "中国邮政组织根 ID 重复")
+        self.root_names = frozenset(str(row["companyName"]) for row in roots)
+        await self.collect_catalog(
+            {
+                "orgNumbers": self.org_number,
+                "jobSource": 2,
+                "pageIndex": 1,
+                "pageSize": self.page_size,
+                "campusParentDepartmentIds": root_ids,
+            }
+        )
+        self.result.scopes[0].evidence.append(tree_evidence)
+
+
+TENANTS = (ChinaPost2027, Hadian, Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)

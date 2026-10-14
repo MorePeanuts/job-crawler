@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Any
 
-from job_crawler.adapters.zhaopin import Unicom, split_detail
+from job_crawler.adapters.zhaopin import ChinaPost2027, Unicom, split_detail
 from job_crawler.models import Source
 
 
@@ -112,3 +112,100 @@ async def test_zhaopin_total_change_is_incomplete(now: datetime) -> None:
 
 def test_zhaopin_detail_without_requirements() -> None:
     assert split_detail("负责开发软件") == ("负责开发软件", "")
+
+
+class PostReplay:
+    last_evidence = "post-tree.json"
+
+    def __init__(self, *, foreign: bool = False, repeated: bool = False):
+        self.foreign = foreign
+        self.repeated = repeated
+        self.pages: list[int] = []
+        self.roots = [
+            {"id": 100 + i, "parentId": 105582, "companyName": f"第{i}省分公司"} for i in range(30)
+        ] + [
+            {"id": 200, "parentId": 105582, "companyName": "中国邮政集团有限公司总部"},
+            {"id": 201, "parentId": 105582, "companyName": "中邮人寿保险股份有限公司"},
+        ]
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://chinapost2027.zhaopin.com/job/index.html?comid=1013109"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        assert needle.endswith("/get-sub-company-and-department-list")
+        return {
+            "url": needle,
+            "post_data": json.dumps({"rootCompanyId": "105582", "format": "tree"}),
+            "body": json.dumps({"code": 200, "data": {"list": self.roots}}),
+        }
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        assert payload is not None and not detail
+        assert len(payload["campusParentDepartmentIds"]) == 31
+        assert 201 not in payload["campusParentDepartmentIds"]
+        page = int(payload["pageIndex"])
+        self.pages.append(page)
+        start = 0 if self.repeated else (page - 1) * 100
+        rows = []
+        for i in range(start, min(start + 100, 101)):
+            rows.append(
+                {
+                    "company": {
+                        "companyId": 105582,
+                        "slaveDisplayOrgName": "其他法人"
+                        if self.foreign and i == 100
+                        else "中国邮政集团有限公司",
+                        "campusOrgName": "第0省分公司",
+                        "campusDepartment": {"name": "市分公司本部"},
+                    },
+                    "job": {
+                        "jobNumber": f"POST{i}",
+                        "positionSourceType": 2,
+                        "title": f"岗位{i}",
+                        "detail": "招聘专业要求：计算机专业",
+                        "url": f"https://xiaoyuan.zhaopin.com/job/POST{i}",
+                        "address": "北京",
+                        "minEducationName": "硕士",
+                    },
+                }
+            )
+        return {
+            "code": 200,
+            "data": {
+                "jobList": rows,
+                "pageInfo": {
+                    "pageIndex": page,
+                    "pageSize": 100,
+                    "totalNum": 101,
+                    "totalPage": 2,
+                },
+            },
+        }
+
+
+def post_source() -> Source:
+    return Source(
+        source_id="COM0034",
+        company_id="COM0034",
+        company="中国邮政集团有限公司",
+        url="https://chinapost2027.zhaopin.com/job/index.html?comid=1013109",
+    )
+
+
+async def test_chinapost_all_parent_branches_and_ends_at_count(now: datetime) -> None:
+    replay = PostReplay()
+    result = await ChinaPost2027(post_source(), replay, now).collect()
+    assert result.coverage_issues() == []
+    assert replay.pages == [1, 2]
+    assert len(result.jobs) == 101
+    assert result.jobs[0].unit == "市分公司本部"
+    assert result.jobs[0].requirements == "招聘专业要求：计算机专业"
+    assert result.jobs[0].duties == result.jobs[0].published == ""
+
+
+async def test_chinapost_rejects_foreign_or_repeated_rows(now: datetime) -> None:
+    for replay in (PostReplay(foreign=True), PostReplay(repeated=True)):
+        result = await ChinaPost2027(post_source(), replay, now).collect()
+        assert result.coverage_issues()
