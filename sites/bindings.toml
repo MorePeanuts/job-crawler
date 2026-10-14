@@ -629,3 +629,6 @@ version = "1"
 [sources.COM0010]
 adapter = "zhiye-chinalife-group"
 version = "1"
+[sources.COM0189]
+adapter = "yili-headquarters"
+version = "1"

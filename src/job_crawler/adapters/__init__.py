@@ -38,6 +38,7 @@ from job_crawler.adapters.sunwoda import SunwodaCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.wtmec import Wtmec
+from job_crawler.adapters.yili import YiliHeadquarters
 from job_crawler.adapters.yingte import YingteCampus
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhiye import TENANTS
@@ -84,6 +85,7 @@ REGISTRY = {
         NewHopeCampus,
         PddCampus,
         YingteCampus,
+        YiliHeadquarters,
         SmicCampus,
         TCLCampus,
         *CAMPAIGN51_TENANTS,
