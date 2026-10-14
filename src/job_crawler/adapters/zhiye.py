@@ -23,11 +23,15 @@ class Zhiye(Adapter):
     regular_only = False
     listing_complete = False
     expected_org = ""
+    page_size = 20
     ready_endpoints = ("/api/Jobad/GetJobAdPageList",)
     scope_description = "北森公开校园招聘 Category=2 全目录；保留实际租户/门户范围，不含社招和实习"
 
     def detail_page(self, job_id: str) -> str:
         return f"https://{self.host}{self.detail_path}?{urlencode({'jobAdId': job_id})}"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        return True
 
     async def harvest(self) -> None:
         observed = await self.session.observed("/api/Jobad/GetJobAdPageList")
@@ -57,7 +61,7 @@ class Zhiye(Adapter):
         self.result.scopes.append(scope)
         seen: set[str] = set()
         page = 0
-        size = max(20, int(payload["PageSize"]))
+        size = max(self.page_size, int(payload["PageSize"]))
         detail_url = ""
         limit = asyncio.Semaphore(3)
         detail_lock = asyncio.Lock()
@@ -203,7 +207,13 @@ class Zhiye(Adapter):
             check(expected == scope.expected, "北森目录总数变化")
             rows = self.add_page(scope, result["Data"], seen, lambda row: str(row["Id"]))
             list_evidence = self.session.last_evidence
-            jobs = await asyncio.gather(*(read_job(row) for row in rows))
+            included = []
+            for row in rows:
+                if self.in_scope(row):
+                    included.append(row)
+                else:
+                    scope.skipped_out_of_scope += 1
+            jobs = await asyncio.gather(*(read_job(row) for row in included))
             self.result.jobs.extend(job for job in jobs if job is not None)
             if abort is not None:
                 raise abort
@@ -522,7 +532,30 @@ class Haid(Zhiye):
     scope_description = "海大集团 2027 Category=2 校园全目录；保留业务板块和实际来源字段"
 
 
+class Chery(Zhiye):
+    name = "zhiye-chery"
+    host = "chery.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    page_size = 200
+    scope_description = "奇瑞汽车北森 Category=2 无筛选目录；仅 OrgId=886961 的奇瑞汽车股份校招"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        name = text(row.get("Org"))
+        org_id = str(row.get("OrgId"))
+        if name == "奇瑞汽车股份（校招）" or org_id == "886961":
+            check(
+                name == "奇瑞汽车股份（校招）" and org_id == "886961",
+                "奇瑞汽车本部组织名称和编码不匹配",
+            )
+            check(str(row.get("CategoryId")) == "2", "奇瑞本部岗位混入非校招类别")
+            check(text(row.get("Kind")) == "全职", "奇瑞本部岗位混入非全职")
+            return True
+        return False
+
+
 TENANTS = (
+    Chery,
     Mindray,
     Shenzhou,
     LuzhouLaojiao,

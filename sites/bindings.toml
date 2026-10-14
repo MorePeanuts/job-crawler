@@ -609,3 +609,15 @@ version = "1"
 [sources.COM0278]
 adapter = "hotjob-eve-energy"
 version = "1"
+
+[sources.COM0108]
+adapter = "cmbc-campus"
+version = "1"
+
+[sources.COM0400]
+adapter = "moka-zhongan"
+version = "1"
+
+[sources.COM0087]
+adapter = "zhiye-chery"
+version = "1"

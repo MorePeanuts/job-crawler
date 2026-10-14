@@ -24,6 +24,7 @@ from job_crawler.adapters.moka import (
     Sanhua,
     Sungrow,
     Yadea,
+    ZhongAn,
     decode,
     sections,
 )
@@ -219,3 +220,34 @@ def test_explicit_intern_title_overrides_fulltime_commitment(now: datetime) -> N
     assert adapter._job(row, row, "evidence.json").work_type == "实习"
     row = {"id": "graduate", "title": "研发管培生"}
     assert adapter._job(row, row, "evidence.json").work_type == "校招"
+
+
+class ZhongAnReplay(Replay):
+    def __init__(self, *, unknown: bool = False):
+        super().__init__("zhongan", 71908)
+        self.unknown = unknown
+
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        row["title"] = {
+            "a": "[2027届秋招-上海]数据开发工程师",
+            "b": "[实习可留用-杭州]保险产品实习生",
+            "c": "未知正式项目" if self.unknown else "众安校园大使",
+        }[job_id]
+        return row
+
+
+async def test_zhongan_excludes_non_jobs_and_detects_unknown_project(now: datetime) -> None:
+    source = Source(
+        source_id="COM0400",
+        company_id="COM0400",
+        company="众安在线财产保险股份有限公司",
+        url="https://app.mokahr.com/campus-recruitment/zhongan/71908#/jobs",
+    )
+    result = await ZhongAn(source, ZhongAnReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert [job.source_key for job in result.jobs] == ["a"]
+    assert result.scopes[0].skipped_out_of_scope == 2
+
+    unknown = await ZhongAn(source, ZhongAnReplay(unknown=True), now).collect()
+    assert unknown.coverage_issues()

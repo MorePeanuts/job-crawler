@@ -8,6 +8,7 @@ import pytest
 
 from job_crawler.adapters.zhiye import (
     TENANTS,
+    Chery,
     Haid,
     Huafeng,
     Infore,
@@ -351,3 +352,79 @@ async def test_seres_optional_internship_remains_formal_campus(now: datetime) ->
     assert len(result.jobs) == 1
     assert result.jobs[0].work_type == "校招"
     assert result.jobs[0].published == ""
+
+
+class CheryReplay:
+    last_evidence = "chery-list.json"
+
+    def __init__(self, fault: str = ""):
+        self.fault = fault
+        self.pages: list[int] = []
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://chery.zhiye.com/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        return {
+            "url": "https://chery.zhiye.com/api/Jobad/GetJobAdPageList",
+            "post_data": json.dumps(
+                {"PageIndex": 0, "PageSize": 20, "Category": ["2"], "KeyWords": "", "PortalId": ""}
+            ),
+        }
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        assert payload is not None and payload["PageSize"] == 200 and not detail
+        page = payload["PageIndex"]
+        self.pages.append(page)
+        rows = []
+        for i in range(page * 200, min((page + 1) * 200, 201)):
+            own = i in {0, 200}
+            rows.append(
+                {
+                    "Id": str(199 if self.fault == "duplicate" and i == 200 else i),
+                    "Org": "奇瑞汽车股份（校招）" if own else "捷途品牌事业部",
+                    "OrgId": 1
+                    if self.fault == "org_mismatch" and i == 200
+                    else 886961
+                    if own
+                    else 2,
+                    "CategoryId": "2",
+                    "Kind": "全职",
+                    "JobAdName": f"工程师{i}",
+                    "Duty": "开发产品",
+                    "Require": "本科及以上",
+                    "PostDate": "2026-09-14T13:09:54",
+                    "EndTime": "0001-01-01T00:00:00",
+                }
+            )
+        return {"Code": 200, "Count": 201, "Data": rows}
+
+
+async def test_chery_full_pages_and_explicit_corporate_branch(now: datetime) -> None:
+    src = Source(
+        source_id="COM0087",
+        company_id="COM0087",
+        company="奇瑞汽车股份有限公司",
+        url="https://chery.zhiye.com/campus/jobs",
+    )
+    replay = CheryReplay()
+    result = await Chery(src, replay, now).collect()
+    assert not result.coverage_issues()
+    assert replay.pages == [0, 1]
+    assert [job.source_key for job in result.jobs] == ["0", "200"]
+    assert result.scopes[0].skipped_out_of_scope == 199
+    assert result.jobs[0].deadline == ""
+
+
+async def test_chery_rejects_duplicate_or_changed_corporate_code(now: datetime) -> None:
+    src = Source(
+        source_id="COM0087",
+        company_id="COM0087",
+        company="奇瑞汽车股份有限公司",
+        url="https://chery.zhiye.com/campus/jobs",
+    )
+    for fault in ("duplicate", "org_mismatch"):
+        result = await Chery(src, CheryReplay(fault), now).collect()
+        assert result.coverage_issues(), fault

@@ -88,6 +88,12 @@ class Moka(Adapter):
     def detail_page(self, job_id: str) -> str:
         return f"https://{self.host}/{self.route}/{self.org}/{self.site_id}#/job/{job_id}"
 
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        return True
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        return None
+
     async def harvest(self) -> None:
         page = cast(PageSession, self.session).page
         iv = await page.evaluate("() => window.TurboApply?.data?.aesIv")
@@ -127,6 +133,9 @@ class Moka(Adapter):
                 job_id = str(row["id"])
                 try:
                     check(row.get("orgId") == self.org, "Moka 列表混入其他组织")
+                    if not self.in_scope(row):
+                        scope.skipped_out_of_scope += 1
+                        continue
                     listing = self._job(row, row, list_evidence)
                     if select(listing, "all", self.as_of).reason == "expired":
                         listing.detail_mode = "listing_only"
@@ -173,6 +182,7 @@ class Moka(Adapter):
                     detail = wrapped_detail["data"]
                     check(str(detail["id"]) == job_id, "Moka 详情与列表 ID 不一致")
                     check(detail.get("orgId") == self.org, "Moka 详情组织不一致")
+                    self.verify_detail(row, detail)
                     job = self._job(
                         detail, row, detail_evidence or self.session.last_evidence, is_detail=True
                     )
@@ -509,7 +519,34 @@ class ZTE(Moka):
     path = f"/campus-recruitment/{org}/{site_id}#/jobs"
 
 
+class ZhongAn(Moka):
+    name = "moka-zhongan"
+    org = "zhongan"
+    site_id = 71908
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "众安在线 71908 公开校招；仅 2027 届秋招，排除实习、赛事和校园大使"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        if title.startswith("[2027届秋招-"):
+            return True
+        if title.startswith("[实习可留用-") or title in {
+            "众安 1024 人人节 · AI Coding 大赛参赛报名",
+            "众安校园大使",
+        }:
+            return False
+        check(False, "众安 71908 出现未知校招项目标题")
+        return False
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(
+            text(detail.get("title")) == text(listing.get("title")),
+            "众安详情与列表标题不一致",
+        )
+
+
 TENANTS = (
+    ZhongAn,
     Zijin,
     ZTE,
     Wzgroup,

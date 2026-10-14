@@ -10,6 +10,7 @@ from job_crawler.adapters.campaign51 import TENANTS as CAMPAIGN51_TENANTS
 from job_crawler.adapters.cdkj import Cdkj
 from job_crawler.adapters.chinatower import ChinaTowerCampus, JacCampus
 from job_crawler.adapters.chnenergy import Chnenergy
+from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
@@ -56,6 +57,7 @@ REGISTRY = {
         Wtmec,
         ZttCampus,
         HzbankCampus,
+        CmbcCampus,
         Hzsteel,
         Ansteel,
         Lenovo,
