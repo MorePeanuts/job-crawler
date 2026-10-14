@@ -4,7 +4,7 @@
 
 维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，默认自动进行缓存优先的 LLM 分类及必要学历补全，完成校验后直接输出最终表格。
 
-已导入 **500 家企业、251 个招聘链接**，目前已接入并真实验收 **174 家企业**；其余 **77 个有链接来源**待适配，空链接待补充。平台逻辑共享，企业入口和覆盖逐家核验。最新一次完整交付为 **50 家有实际岗位的企业、11,176 条校招岗位**，见 [50 家交付验收及剩余障碍](docs/adapter-batch6-acceptance.md)。2026-10-14 的下一批 50 家任务正在进行，已验收 46 家、6,270 条有效岗位，见[阶段验收](docs/adapter-batch7-acceptance.md)；它们尚未构成下一批 50 家汇总。历史记录见 [首轮验收](docs/acceptance.md)、[第三批](docs/adapter-batch3-acceptance.md)、[第四批](docs/adapter-batch4-acceptance.md) 和 [42 家复查](docs/adapter-batch5-triage.md)。
+已导入 **500 家企业、251 个招聘链接**，目前已接入并真实验收 **178 家企业**；其余 **73 个有链接来源**待适配，空链接待补充。平台逻辑共享，企业入口和覆盖逐家核验。2026-10-14 新批次 **50 家有实际岗位的企业、6,287 条有效岗位**已交付，见[本批验收](docs/adapter-batch7-acceptance.md)；历史批次见 [前一批 50 家交付](docs/adapter-batch6-acceptance.md)、[首轮验收](docs/acceptance.md)、[第三批](docs/adapter-batch3-acceptance.md)、[第四批](docs/adapter-batch4-acceptance.md) 和 [42 家复查](docs/adapter-batch5-triage.md)。
 
 **已配置用户提供的真实分类树：20 个一级分类、113 条二级路径。** 分类来源是 `job-position.js`，第三级岗位名称用于模型理解，Excel 仍保留原来的一级、二级两列。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入严格导入表。可以对已保存岗位进行批量分类和重新导出，无须重复爬取。
 
@@ -122,6 +122,8 @@ skill 包含实现定位、分页/详情/增量契约、真实验收标准、批
 客户端未列出 skill 时，直接要求读取上述 SKILL.md 执行即可，无需全局安装。该 skill 是研究与交付指南，不是新增自动爬取 CLI，也不重新采集岗位。结果保存在 `outputs/YYYY-MM-DD/`（公司 XLSX 与 PNG ZIP），过程与逐字段依据保存在 `.runtime/company-enrichment/`；未查证资料明确标记，不承诺未知字段可以直接通过系统导入。设计与离线验收见 [SPEC-049](specs/049-company-profile-skill.md)。
 
 ## 每天新增一批适配器后的交付
+
+2026-10-14 本批实际交付文件：[50 家岗位信息汇总](outputs/2026-10-14/新增50家-批次汇总-岗位信息汇总.xlsx)、[50 家严格导入](outputs/2026-10-14/新增50家-批次汇总-严格导入.xlsx)。信息表 6,287 行，严格导入 459 行，其余 5,828 行保留待补全；汇总审计及每家实采限制见[本批验收](docs/adapter-batch7-acceptance.md)。
 
 开发时显式指定独立工作目录，保留调试时已采到的每家公司快照。确认这批 50 家均有有效岗位、覆盖范围明确后，选择每家最新通过验收的快照路径（同来源不能重复），写入 JSON 数组，例如 `.runtime/batches/2026-10-14-inputs.json`。已压缩的输入先 restore，再选择恢复后的目录或 collections 文件。
 
