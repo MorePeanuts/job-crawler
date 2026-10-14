@@ -573,3 +573,19 @@ version = "1"
 [sources.COM0183]
 adapter = "zhiye-haid"
 version = "1"
+
+[sources.COM0252]
+adapter = "hotjob-skyworth"
+version = "1"
+
+[sources.COM0192]
+adapter = "ztt-campus"
+version = "1"
+
+[sources.COM0327]
+adapter = "hotjob-huatai"
+version = "1"
+
+[sources.COM0205]
+adapter = "hotjob-tbea"
+version = "1"

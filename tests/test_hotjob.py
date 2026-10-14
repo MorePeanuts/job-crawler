@@ -10,11 +10,14 @@ from job_crawler.adapters.hotjob import (
     GF,
     HaiTian,
     Hotjob,
+    Huatai,
     HuaXia,
     Huayou,
     JinTian,
     LiuGong,
     Minth,
+    Skyworth,
+    Tbea,
     detail_body,
     location_paths,
 )
@@ -231,6 +234,111 @@ async def test_huayou_excludes_intern_and_ambassador_projects(now: datetime) -> 
     assert not result.coverage_issues()
     assert result.scopes[0].expected == result.scopes[0].details == 3
     assert [job.work_type for job in result.jobs] == ["校招", "实习", "校园大使"]
+
+
+async def test_skyworth_rejects_other_listing_company(now: datetime) -> None:
+    class CompanyReplay(Replay):
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            row["company"] = "其他法人" if post_id == "c" else "创维集团有限公司"
+            return row
+
+    src = Source(
+        source_id="COM0252",
+        company_id="COM0252",
+        company="创维集团有限公司",
+        url=f"https://skyworth.hotjob.cn/{Skyworth.suite}/pb/school.html",
+    )
+    result = await Skyworth(src, CompanyReplay(), now).collect()
+    assert len(result.jobs) == 2
+    assert result.coverage_issues()
+    assert any("所属公司" in issue.message for issue in result.issues)
+
+
+async def test_huatai_accounts_for_other_legal_entity_without_collecting_it(
+    now: datetime,
+) -> None:
+    class OrganizationReplay(Replay):
+        async def observed(self, needle: str) -> dict[str, Any]:
+            if "listSearchTerm" in needle:
+                return {
+                    "url": self._url("listSearchTerm"),
+                    "body": json.dumps(
+                        {
+                            "state": "200",
+                            "data": {
+                                "orgList": [
+                                    {"code": "0/80", "nameCh": "总部部门", "positionsNum": 1},
+                                    {"code": "0/100102", "nameCh": "子公司", "positionsNum": 1},
+                                    {"code": "0/100103", "nameCh": "分公司", "positionsNum": 1},
+                                ]
+                            },
+                        },
+                        ensure_ascii=False,
+                    ),
+                }
+            return await super().observed(needle)
+
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            row["orgCode"] = {"a": "0/80/124", "b": "0/100102/81", "c": "0/100103"}[post_id]
+            return row
+
+    src = Source(
+        source_id="COM0327",
+        company_id="COM0327",
+        company="华泰证券股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{Huatai.suite}/pb/school.html",
+    )
+    result = await Huatai(src, OrganizationReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
+    assert result.scopes[0].skipped_out_of_scope == 1
+
+
+async def test_tbea_requires_explicit_company_for_unlisted_institution(now: datetime) -> None:
+    class InstitutionReplay(Replay):
+        other_company = "特变电工股份有限公司"
+
+        async def observed(self, needle: str) -> dict[str, Any]:
+            if "listSearchTerm" in needle:
+                return {
+                    "url": self._url("listSearchTerm"),
+                    "body": json.dumps(
+                        {
+                            "state": "200",
+                            "data": {
+                                "orgList": [
+                                    {"code": "0/3", "nameCh": "特变总部", "positionsNum": 1},
+                                    {"code": "0/7", "nameCh": "天池能源", "positionsNum": 1},
+                                ]
+                            },
+                        },
+                        ensure_ascii=False,
+                    ),
+                }
+            return await super().observed(needle)
+
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            row["orgCode"] = {"a": "0/3/25", "b": "0/7/2", "c": "0/1727/1"}[post_id]
+            row["company"] = self.other_company if post_id == "c" else "业务公司"
+            return row
+
+    src = Source(
+        source_id="COM0205",
+        company_id="COM0205",
+        company="特变电工股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{Tbea.suite}/pb/school.html",
+    )
+    accepted = await Tbea(src, InstitutionReplay(), now).collect()
+    assert not accepted.coverage_issues()
+    assert [job.source_key for job in accepted.jobs] == ["a", "c"]
+    assert accepted.scopes[0].skipped_out_of_scope == 1
+    uncertain = InstitutionReplay()
+    uncertain.other_company = "其他法人"
+    rejected = await Tbea(src, uncertain, now).collect()
+    assert rejected.coverage_issues()
 
 
 async def test_missing_requirement_is_visible_warning(now: datetime) -> None:

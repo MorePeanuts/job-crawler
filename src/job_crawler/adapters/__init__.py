@@ -39,6 +39,7 @@ from job_crawler.adapters.wtmec import Wtmec
 from job_crawler.adapters.yingte import YingteCampus
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhiye import TENANTS
+from job_crawler.adapters.ztt import ZttCampus
 
 REGISTRY = {
     adapter.name: adapter
@@ -52,6 +53,7 @@ REGISTRY = {
         CNPC,
         Alibaba,
         Wtmec,
+        ZttCampus,
         Hzsteel,
         Ansteel,
         Lenovo,

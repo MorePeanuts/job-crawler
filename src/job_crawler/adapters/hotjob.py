@@ -71,6 +71,7 @@ class Hotjob(Adapter):
         check(f"/{self.suite}?" in terms_observed["url"], "Hotjob 租户与地点树接口不一致")
         terms = json.loads(terms_observed["body"])
         check(terms.get("state") == "200", "Hotjob 地点树业务失败")
+        self.validate_terms(terms["data"])
         provinces = terms["data"].get("provinceList", [])
         check(isinstance(provinces, list), "Hotjob 地点树结构改变")
         locations = location_paths(provinces)
@@ -126,6 +127,9 @@ class Hotjob(Adapter):
                 post_id = str(row["postId"])
                 try:
                     check(str(row["recruitType"]) == "1", "Hotjob 混入非校招岗位")
+                    if not self.include_listing(row):
+                        scope.skipped_out_of_scope += 1
+                        continue
                     listing = self._job(row, row, list_evidence, locations, location_evidence)
                     if select(listing, "all", self.as_of).reason == "expired":
                         listing.detail_mode = "listing_only"
@@ -194,6 +198,13 @@ class Hotjob(Adapter):
                 break
             check(bool(rows), "Hotjob 分页提前为空")
             page += 1
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        """Tenant-specific institution tree checks, if required."""
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        """Return false only for a proven, explicitly counted other legal entity."""
+        return True
 
     def _job(
         self,
@@ -368,7 +379,107 @@ class Huayou(Cmoc):
         return job
 
 
+class Skyworth(Hotjob):
+    name = "hotjob-skyworth"
+    host = "skyworth.hotjob.cn"
+    suite = "SU668b8b251c240e2e76ea71d8"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "创维集团 2027 校招 recruitType=1 全目录；核对列表公司字段"
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        check(text(listing.get("company")) == "创维集团有限公司", "创维列表所属公司变化")
+        return super()._job(row, listing, evidence, locations, location_evidence)
+
+
+class Huatai(Hotjob):
+    name = "hotjob-huatai"
+    suite = "SU6419745cbef57c635fe10142"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "华泰证券校园目录全量；机构树划分总部与分公司，明确排除子公司"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        roots = {str(item["code"]): item for item in data.get("orgList", [])}
+        check(
+            {code: text(item.get("nameCh")) for code, item in roots.items()}
+            == {"0/80": "总部部门", "0/100102": "子公司", "0/100103": "分公司"},
+            "华泰机构树法人分支变化",
+        )
+        self._org_total = sum(int(item["positionsNum"]) for item in roots.values())
+        self._other_legal_total = int(roots["0/100102"]["positionsNum"])
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        code = text(row.get("orgCode"))
+        check(
+            code in {"0/80", "0/100102", "0/100103"}
+            or code.startswith(("0/80/", "0/100102/", "0/100103/")),
+            "华泰岗位机构编码超出已核对法人分支",
+        )
+        return not code.startswith("0/100102/")
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        scope = self.result.scopes[0]
+        check(scope.expected == self._org_total, "华泰机构树与目录总数不符")
+        check(
+            scope.skipped_out_of_scope == self._other_legal_total,
+            "华泰子公司目录计数不符",
+        )
+
+
+class Tbea(Hotjob):
+    name = "hotjob-tbea"
+    suite = "SU612f55eebef57c0616450aa2"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "特变电工集团校招目录全量；仅特变总部与明确的股份公司直属岗位归本主体"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        roots = {str(item["code"]): item for item in data.get("orgList", [])}
+        check(
+            "0/3" in roots and text(roots["0/3"].get("nameCh")) == "特变总部",
+            "特变机构树缺少上市公司总部",
+        )
+        self._root_codes = set(roots)
+        self._tree_total = sum(int(item["positionsNum"]) for item in roots.values())
+        self._other_total = sum(
+            int(item["positionsNum"]) for code, item in roots.items() if code != "0/3"
+        )
+        self._direct_company_count = 0
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        code = text(row.get("orgCode"))
+        root = "/".join(code.split("/")[:2])
+        if root == "0/3":
+            return True
+        if root in self._root_codes:
+            return False
+        check(
+            text(row.get("company")) == "特变电工股份有限公司",
+            "特变未知机构岗位未注明上市法人",
+        )
+        self._direct_company_count += 1
+        return True
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        scope = self.result.scopes[0]
+        check(
+            scope.expected == self._tree_total + self._direct_company_count,
+            "特变机构树与直属上市公司岗位不闭合",
+        )
+        check(scope.skipped_out_of_scope == self._other_total, "特变其他机构计数不符")
+
+
 TENANTS = (
+    Tbea,
+    Huatai,
+    Skyworth,
     Huayou,
     Baiyao,
     HuaXia,

@@ -101,6 +101,7 @@ class Scope(Model):
     details: int = 0
     skipped_expired: int = 0
     skipped_closed: int = 0
+    skipped_out_of_scope: int = 0
     skipped_window: int = 0
     reused_details: int = 0
     unit: str = "岗位"
@@ -126,6 +127,7 @@ class Collection(Model):
                 or scope.details
                 + scope.skipped_expired
                 + scope.skipped_closed
+                + scope.skipped_out_of_scope
                 + scope.skipped_window
                 + scope.reused_details
                 != scope.unique
