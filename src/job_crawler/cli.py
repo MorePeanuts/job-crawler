@@ -15,6 +15,7 @@ from job_crawler.classification import classify_snapshot
 from job_crawler.config import load_bindings, load_settings
 from job_crawler.filtering import SHANGHAI
 from job_crawler.models import Source
+from job_crawler.retention import archive_run, maintenance, restore
 from job_crawler.runner import preflight, reexport, run
 from job_crawler.sources import read_sources, write_sources
 from job_crawler.taxonomy import load_taxonomy
@@ -82,12 +83,31 @@ def parser() -> argparse.ArgumentParser:
     action.add_argument(
         "--refine", action="store_true", help="用紧凑分类树复核未分类及与精确三级名称不一致的条目"
     )
+    action = commands.add_parser("archive", help="压缩已停止使用的运行目录，校验后删除原目录")
+    action.add_argument("input", type=Path)
+    action.add_argument("--publish", action="store_true", help="按历史日期发布两份最终表格")
+    action.add_argument("--label", help="表格名称前缀")
+    action.add_argument("--pin", action="store_true", help="长期保留此归档")
+    action = commands.add_parser("restore", help="将已归档的原路径恢复到新的目录")
+    action.add_argument("input", type=Path, help="原运行路径（归档索引中的 root）")
+    action.add_argument("--output", type=Path, required=True)
+    action = commands.add_parser("maintenance", help="预览到期归档与 LLM 缓存清理")
+    action.add_argument("--apply", action="store_true")
+    action.add_argument("--config", type=Path, default=Path("config.toml"))
     return result
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
+        if args.command == "archive":
+            archived = archive_run(args.input, publish=args.publish, label=args.label, pin=args.pin)
+            print(archived.model_dump_json(indent=2))
+            return 0
+        if args.command == "restore":
+            restore(args.input, args.output)
+            print(f"已恢复至 {args.output}")
+            return 0
         if args.command == "sources":
             if args.action == "import":
                 if args.file.exists() and not args.replace:
@@ -138,6 +158,23 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"{source.source_id}\t{status}\t{source.company}\t{source.url}")
             return 0
         settings = load_settings(args.config)
+        if args.command == "maintenance":
+            print(
+                json.dumps(
+                    maintenance(
+                        apply=args.apply,
+                        days=settings.retention.archive_days,
+                        cache_days=settings.retention.cache_days,
+                        cache_mb=settings.retention.cache_mb,
+                        cache_dirs=[
+                            Path(settings.llm.cache_dir),
+                            Path(settings.llm.education_cache_dir),
+                        ],
+                    ),
+                    ensure_ascii=False,
+                )
+            )
+            return 0
         if args.command == "classify":
             report = asyncio.run(
                 classify_snapshot(
@@ -184,8 +221,11 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             if args.resume and not args.output:
                 raise ValueError("--resume 需要 --output 指定原运行目录")
-            output = args.output or Path("outputs") / datetime.now(SHANGHAI).strftime(
+            output = args.output or Path(".runtime/runs") / datetime.now(SHANGHAI).strftime(
                 "%Y%m%d-%H%M%S-%f"
+            )
+            print(
+                f"运行目录: {output}；中断后可用 --output 指向此目录并 --resume。", file=sys.stderr
             )
             report = asyncio.run(
                 run(
@@ -199,6 +239,19 @@ def main(argv: list[str] | None = None) -> int:
                     state=args.state,
                 )
             )
+            if not args.output or output.resolve().is_relative_to(Path(".runtime/runs").resolve()):
+                archived = archive_run(output, publish=True)
+                print("交付表格: " + ", ".join(archived.published), file=sys.stderr)
+                maintenance(
+                    apply=True,
+                    days=settings.retention.archive_days,
+                    cache_days=settings.retention.cache_days,
+                    cache_mb=settings.retention.cache_mb,
+                    cache_dirs=[
+                        Path(settings.llm.cache_dir),
+                        Path(settings.llm.education_cache_dir),
+                    ],
+                )
         print(
             json.dumps(
                 {key: report[key] for key in ("status", "collected", "exported", "review")},

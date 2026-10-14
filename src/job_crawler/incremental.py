@@ -1,13 +1,13 @@
 """Source-scoped daily detail reuse; a complete current list is always required."""
 
 from datetime import datetime, timedelta
-from pathlib import Path
 
 from pydantic import Field, ValidationError
 
 from job_crawler.config import IncrementalConfig
 from job_crawler.filtering import Window, select
 from job_crawler.models import Collection, Issue, Job, Model, Scope
+from job_crawler.retention import evidence_exists
 from job_crawler.storage import Store, fingerprint
 
 
@@ -132,7 +132,7 @@ class IncrementalSource:
                 )
             )
             or len({j.key for j in previous.jobs}) != len(previous.jobs)
-            or any(not Path(p).is_file() for j in previous.jobs for p in j.evidence)
+            or any(not evidence_exists(p) for j in previous.jobs for p in j.evidence)
         ):
             return None
         jobs = [job.model_copy(deep=True) for job in previous.jobs]

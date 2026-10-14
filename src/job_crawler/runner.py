@@ -26,6 +26,8 @@ from job_crawler.field_extraction import field_audit
 from job_crawler.filtering import SHANGHAI, Window, select, window_start
 from job_crawler.incremental import IncrementalSource
 from job_crawler.models import Binding, Collection, Issue, Job, Source, SourceReport
+from job_crawler.retention import index as archive_index
+from job_crawler.retention import register_state
 from job_crawler.storage import Store, fingerprint, write_json
 from job_crawler.transport import BrowserSession
 
@@ -254,6 +256,8 @@ async def run(
     preflight(sources, bindings, settings)
     output = await asyncio.to_thread(output.absolute)
     now = datetime.now(SHANGHAI)
+    if str(output) in archive_index().archives:
+        raise ValueError("该运行目录已归档，请使用新目录；重导出请先 restore")
     if resume:
         old = json.loads(await asyncio.to_thread((output / "manifest.json").read_text))
         saved_as_of = datetime.fromisoformat(old["as_of"])
@@ -283,6 +287,7 @@ async def run(
         },
     }
     digest = fingerprint({**manifest, "sources": [s.model_dump() for s in sources]})
+    register_state(state)
     store = Store(state)
     collections: dict[str, Collection] = {}
     try:

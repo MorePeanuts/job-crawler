@@ -27,6 +27,11 @@ enabled = true
 refresh_days = 15
 include_undated_new = true
 
+[retention]
+archive_days = 30
+cache_days = 90
+cache_mb = 2048
+
 [mapping]
 use_source_url_as_apply_url = true
 education_policy = "minimum_eligible"
