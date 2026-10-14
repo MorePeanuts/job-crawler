@@ -13,7 +13,7 @@ from job_crawler.transport import CrawlError
 
 def date_text(value: Any) -> str:
     value = text(value)
-    return "" if value.startswith("0001-01-01") else value
+    return "" if value.startswith(("0001-01-01", "2222-02-02")) else value
 
 
 class Zhiye(Adapter):
@@ -554,7 +554,33 @@ class Chery(Zhiye):
         return False
 
 
+class PICCGroup(Zhiye):
+    name = "zhiye-picc-group"
+    host = "picc.zhiye.com"
+    path = "/custom/campus?hideAll=true"
+    listing_complete = True
+    regular_only = True
+    page_size = 200
+    expected_org = "中国人民保险集团股份有限公司"
+    scope_description = "中国人保 Category=2 共享目录；仅 OrgId=45182 的集团股份公司本级"
+
+    def detail_page(self, job_id: str) -> str:
+        return f"https://{self.host}{self.path}"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        name = text(row.get("Org"))
+        org_id = str(row.get("OrgId"))
+        if name == self.expected_org or org_id == "45182":
+            check(name == self.expected_org and org_id == "45182", "人保集团本级机构编码不匹配")
+            check(str(row.get("CategoryId")) == "2", "人保集团本级混入非校招类别")
+            check(text(row.get("Kind")) == "全职", "人保集团本级混入非全职岗位")
+            check("2027届校招" in text(row.get("JobAdName")), "人保集团本级出现未知项目")
+            return True
+        return False
+
+
 TENANTS = (
+    PICCGroup,
     Chery,
     Mindray,
     Shenzhou,

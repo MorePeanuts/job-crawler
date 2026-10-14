@@ -14,6 +14,7 @@ from job_crawler.adapters.zhiye import (
     Infore,
     LuzhouLaojiao,
     Mindray,
+    PICCGroup,
     Seres,
     Shenzhou,
     Shrcb,
@@ -164,7 +165,13 @@ async def test_zhiye_stops_queued_details_after_access_denied(now: datetime) -> 
 
 
 @pytest.mark.parametrize(
-    "value,expected", [(None, ""), ("0001-01-01T00:00:00", ""), ("2026-12-01", "2026-12-01")]
+    "value,expected",
+    [
+        (None, ""),
+        ("0001-01-01T00:00:00", ""),
+        ("2222-02-02T00:00:00", ""),
+        ("2026-12-01", "2026-12-01"),
+    ],
 )
 def test_zhiye_unset_dates(value: Any, expected: str) -> None:
     assert date_text(value) == expected
@@ -427,4 +434,60 @@ async def test_chery_rejects_duplicate_or_changed_corporate_code(now: datetime) 
     )
     for fault in ("duplicate", "org_mismatch"):
         result = await Chery(src, CheryReplay(fault), now).collect()
+        assert result.coverage_issues(), fault
+
+
+class PICCReplay(CheryReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://picc.zhiye.com/custom/campus?hideAll=true"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        value = await super().observed(needle)
+        value["url"] = "https://picc.zhiye.com/api/Jobad/GetJobAdPageList"
+        return value
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        response = await super().request(url, payload=payload, detail=detail)
+        for row in response["Data"]:
+            own = row["Org"] == "奇瑞汽车股份（校招）"
+            row["Org"] = "中国人民保险集团股份有限公司" if own else "中国人民财产保险股份有限公司"
+            row["OrgId"] = (
+                row["OrgId"]
+                if self.fault == "org_mismatch" and row["Id"] == "200"
+                else 45182
+                if own
+                else 999
+            )
+            row["JobAdName"] = f"集团公司-科技运营岗-2027届校招({row['Id']})"
+            if self.fault == "project" and own and row["Id"] == "200":
+                row["JobAdName"] = "集团公司-未知项目岗位"
+            row["EndTime"] = "2222-02-02T00:00:00"
+        return response
+
+
+def picc_source() -> Source:
+    return Source(
+        source_id="COM0035",
+        company_id="COM0035",
+        company="中国人民保险集团股份有限公司",
+        url="https://picc.zhiye.com/custom/campus?hideAll=true",
+    )
+
+
+async def test_picc_group_only_includes_parent_company(now: datetime) -> None:
+    replay = PICCReplay()
+    result = await PICCGroup(picc_source(), replay, now).collect()
+    assert not result.coverage_issues()
+    assert replay.pages == [0, 1]
+    assert [job.source_key for job in result.jobs] == ["0", "200"]
+    assert result.scopes[0].skipped_out_of_scope == 199
+    assert result.jobs[0].deadline == ""
+    assert result.jobs[0].source_url == picc_source().url
+
+
+async def test_picc_group_rejects_changed_parent_code_or_duplicate(now: datetime) -> None:
+    for fault in ("org_mismatch", "duplicate", "project"):
+        result = await PICCGroup(picc_source(), PICCReplay(fault), now).collect()
         assert result.coverage_issues(), fault

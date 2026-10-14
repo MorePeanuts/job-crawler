@@ -621,3 +621,7 @@ version = "1"
 [sources.COM0087]
 adapter = "zhiye-chery"
 version = "1"
+
+[sources.COM0035]
+adapter = "zhiye-picc-group"
+version = "1"
