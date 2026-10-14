@@ -545,3 +545,7 @@ version = "1"
 [sources.COM0386]
 adapter = "feishu-innolight"
 version = "1"
+
+[sources.COM0045]
+adapter = "jxcc-campus"
+version = "1"
