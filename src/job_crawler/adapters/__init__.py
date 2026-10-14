@@ -31,6 +31,7 @@ from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
+from job_crawler.adapters.nbcb import NingboBank2027
 from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.pdd import PddCampus
@@ -92,6 +93,7 @@ REGISTRY = {
         JacCampus,
         HaierCampus,
         NciCampus,
+        NingboBank2027,
         SunwodaCampus,
         GreentownCampus,
         NewHopeCampus,
