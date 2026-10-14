@@ -678,3 +678,7 @@ version = "1"
 [sources.COM0111]
 adapter = "datang-2027"
 version = "1"
+
+[sources.COM0334]
+adapter = "xmwy-2027"
+version = "1"
