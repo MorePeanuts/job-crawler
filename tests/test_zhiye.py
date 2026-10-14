@@ -9,6 +9,7 @@ import pytest
 from job_crawler.adapters.zhiye import (
     TENANTS,
     Chery,
+    ChinaLifeGroup,
     Haid,
     Huafeng,
     Infore,
@@ -490,4 +491,58 @@ async def test_picc_group_only_includes_parent_company(now: datetime) -> None:
 async def test_picc_group_rejects_changed_parent_code_or_duplicate(now: datetime) -> None:
     for fault in ("org_mismatch", "duplicate", "project"):
         result = await PICCGroup(picc_source(), PICCReplay(fault), now).collect()
+        assert result.coverage_issues(), fault
+
+
+class ChinaLifeReplay(PICCReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://chinalife.zhiye.com/custom/campus?hideMenu=1"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        value = await super().observed(needle)
+        value["url"] = "https://chinalife.zhiye.com/api/Jobad/GetJobAdPageList"
+        return value
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        response = await super().request(url, payload=payload, detail=detail)
+        for row in response["Data"]:
+            own = row["Org"] == "中国人民保险集团股份有限公司"
+            row["Org"] = "中国人寿保险（集团）公司" if own else "寿险上海分公司"
+            row["OrgId"] = (
+                row["OrgId"]
+                if self.fault == "org_mismatch" and row["Id"] == "200"
+                else 3389294
+                if own
+                else 999
+            )
+            row["JobAdName"] = "管培生（集团本级）"
+            if self.fault == "date" and own and row["Id"] == "200":
+                row["PostDate"] = "2025-09-14T13:09:54"
+        return response
+
+
+def chinalife_source() -> Source:
+    return Source(
+        source_id="COM0010",
+        company_id="COM0010",
+        company="中国人寿保险（集团）公司",
+        url="https://chinalife.zhiye.com/custom/campus?hideMenu=1",
+    )
+
+
+async def test_chinalife_group_only_includes_parent_company(now: datetime) -> None:
+    replay = ChinaLifeReplay()
+    result = await ChinaLifeGroup(chinalife_source(), replay, now).collect()
+    assert not result.coverage_issues()
+    assert replay.pages == [0, 1]
+    assert [job.source_key for job in result.jobs] == ["0", "200"]
+    assert result.scopes[0].skipped_out_of_scope == 199
+    assert result.jobs[0].deadline == ""
+
+
+async def test_chinalife_group_rejects_changed_parent_or_batch(now: datetime) -> None:
+    for fault in ("org_mismatch", "duplicate", "date"):
+        result = await ChinaLifeGroup(chinalife_source(), ChinaLifeReplay(fault), now).collect()
         assert result.coverage_issues(), fault

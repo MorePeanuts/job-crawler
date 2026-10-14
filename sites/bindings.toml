@@ -625,3 +625,7 @@ version = "1"
 [sources.COM0035]
 adapter = "zhiye-picc-group"
 version = "1"
+
+[sources.COM0010]
+adapter = "zhiye-chinalife-group"
+version = "1"

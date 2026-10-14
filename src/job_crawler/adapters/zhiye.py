@@ -579,7 +579,36 @@ class PICCGroup(Zhiye):
         return False
 
 
+class ChinaLifeGroup(Zhiye):
+    name = "zhiye-chinalife-group"
+    host = "chinalife.zhiye.com"
+    path = "/custom/campus?hideMenu=1"
+    listing_complete = True
+    regular_only = True
+    page_size = 200
+    expected_org = "中国人寿保险（集团）公司"
+    scope_description = "中国人寿 Category=2 共享目录；仅 OrgId=3389294 的集团公司本级"
+
+    def detail_page(self, job_id: str) -> str:
+        return f"https://{self.host}{self.path}"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        name = text(row.get("Org"))
+        org_id = str(row.get("OrgId"))
+        if name == self.expected_org or org_id == "3389294":
+            check(name == self.expected_org and org_id == "3389294", "国寿集团本级机构编码不匹配")
+            check(str(row.get("CategoryId")) == "2", "国寿集团本级混入非校招类别")
+            check(text(row.get("Kind")) == "全职", "国寿集团本级混入非全职岗位")
+            check(
+                text(row.get("PostDate")).startswith("2026-09-"),
+                "国寿集团本级岗位不属于已验证的 2027 秋招发布时间范围",
+            )
+            return True
+        return False
+
+
 TENANTS = (
+    ChinaLifeGroup,
     PICCGroup,
     Chery,
     Mindray,
