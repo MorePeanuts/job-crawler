@@ -166,4 +166,29 @@ class Jtexpress(Desaysv):
     ready_endpoints = (f"https://{host}{LIST_PATH}?",)
 
 
-TENANTS = (Desaysv, Xpeng, Nio, Jtexpress)
+class Xiaomi(Desaysv):
+    name = "feishu-xiaomi"
+    host = "xiaomi.jobs.f.mioffice.cn"
+    path = "/campus/"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "小米集团官方 2027 校园门户公开全目录；实习由公共筛选排除"
+
+
+class Aac(Desaysv):
+    name = "feishu-aac"
+    host = "talent.aactechnologies.com"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "瑞声科技官方 2027 校园门户公开全目录；实习由公共筛选排除"
+
+
+class Innolight(Desaysv):
+    name = "feishu-innolight"
+    host = "zj-innolight.jobs.feishu.cn"
+    path = "/300308/position/list"
+    detail_prefix = "/300308/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "中际旭创官方 2027 校园门户公开全目录；实习由公共筛选排除"
+
+
+TENANTS = (Desaysv, Xpeng, Nio, Jtexpress, Xiaomi, Aac, Innolight)

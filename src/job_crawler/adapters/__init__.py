@@ -20,6 +20,7 @@ from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
 from job_crawler.adapters.jd import JD
 from job_crawler.adapters.lenovo import Lenovo
+from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
 from job_crawler.adapters.nci import NciCampus
@@ -34,6 +35,7 @@ from job_crawler.adapters.sunwoda import SunwodaCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.wtmec import Wtmec
+from job_crawler.adapters.yingte import YingteCampus
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhiye import TENANTS
 
@@ -52,6 +54,7 @@ REGISTRY = {
         Hzsteel,
         Ansteel,
         Lenovo,
+        LiAutoCampus,
         *FEISHU_TENANTS,
         *INLINE_TENANTS,
         *EXTRA_TENANTS,
@@ -72,6 +75,7 @@ REGISTRY = {
         GreentownCampus,
         NewHopeCampus,
         PddCampus,
+        YingteCampus,
         SmicCampus,
         TCLCampus,
         *CAMPAIGN51_TENANTS,

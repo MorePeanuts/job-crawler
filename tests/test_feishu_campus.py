@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from job_crawler.adapters.feishu import Jtexpress
+from job_crawler.adapters.feishu import Innolight, Jtexpress, Xiaomi
 from job_crawler.models import Source
 
 
@@ -69,4 +69,64 @@ async def test_custom_feishu_portal_uses_recruit_type_and_detail_route(
     assert result.jobs[0].category_raw == "研发"
     assert (
         result.jobs[0].source_url == "https://jtexpress.jobs.feishu.cn/478610/position/123/detail"
+    )
+
+
+class XiaomiSession(Session):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://xiaomi.jobs.f.mioffice.cn/campus/"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "jtexpress.jobs.feishu.cn", "xiaomi.jobs.f.mioffice.cn"
+        )
+        payload = json.loads(response["body"])
+        row = payload["data"]["job_post_list"][0]
+        row["recruit_type"]["name"] = "正式"
+        row["job_subject"] = {"name": {"zh_cn": "2027届校园招聘计划"}}
+        response["body"] = json.dumps(payload)
+        return response
+
+
+async def test_xiaomi_official_linked_campus_tenant(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0058",
+        company_id="COM0058",
+        company="小米集团",
+        url="https://xiaomi.jobs.f.mioffice.cn/campus/",
+    )
+    result = await Xiaomi(source, XiaomiSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].batch == "2027届校园招聘计划"
+    assert (
+        result.jobs[0].source_url == "https://xiaomi.jobs.f.mioffice.cn/campus/position/123/detail"
+    )
+
+
+class InnolightSession(XiaomiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://zj-innolight.jobs.feishu.cn/300308/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "xiaomi.jobs.f.mioffice.cn", "zj-innolight.jobs.feishu.cn"
+        )
+        return response
+
+
+async def test_innolight_group_portal_detail_route(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0386",
+        company_id="COM0386",
+        company="中际旭创股份有限公司",
+        url="https://zj-innolight.jobs.feishu.cn/300308/position/list",
+    )
+    result = await Innolight(source, InnolightSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert (
+        result.jobs[0].source_url
+        == "https://zj-innolight.jobs.feishu.cn/300308/position/123/detail"
     )
