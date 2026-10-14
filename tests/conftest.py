@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 
@@ -41,3 +42,10 @@ def job(now: datetime) -> Job:
 @pytest.fixture
 def mapping() -> MappingConfig:
     return MappingConfig(category_paths={"互联网/AI": ["软件研发", "前端开发"]})
+
+
+@pytest.fixture(autouse=True)
+def isolate_archive_index(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from job_crawler import retention
+
+    monkeypatch.setattr(retention, "INDEX", tmp_path / ".runtime/archive-index.json")
