@@ -670,3 +670,7 @@ version = "1"
 [sources.COM0139]
 adapter = "hotjob-wanhua-2027"
 version = "1"
+
+[sources.COM0170]
+adapter = "ceair-2027"
+version = "1"
