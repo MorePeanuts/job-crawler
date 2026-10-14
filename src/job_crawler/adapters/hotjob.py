@@ -6,6 +6,7 @@ from urllib.parse import parse_qs, urlencode
 
 from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.platforms import check
+from job_crawler.description import split_sections, strip_heading
 from job_crawler.filtering import select
 from job_crawler.models import Issue, Job, Scope
 from job_crawler.transport import CrawlError
@@ -15,13 +16,8 @@ def detail_body(row: dict[str, Any]) -> tuple[str, str]:
     duties = text(row.get("workContent"))
     requirements = text(row.get("serviceCondition"))
     if requirements:
-        return duties, requirements
-    # A few tenants combine the two sections into one labelled source field.
-    for heading in ("【任职资格】", "【任职要求】"):
-        if heading in duties:
-            before, _, after = duties.partition(heading)
-            return before.removeprefix("【岗位职责】").strip(), after.strip()
-    return duties, ""
+        return strip_heading(duties, "duties"), strip_heading(requirements, "requirements")
+    return split_sections(duties)
 
 
 def location_paths(provinces: list[dict[str, Any]]) -> dict[str, str]:

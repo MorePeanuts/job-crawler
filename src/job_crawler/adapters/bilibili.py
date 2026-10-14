@@ -1,25 +1,18 @@
 """Bilibili's public full-time graduate position list."""
 
 import json
-import re
 from typing import Any, cast
 
 from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.platforms import check
+from job_crawler.description import split_sections
 from job_crawler.models import Scope
 from job_crawler.storage import write_json
 from job_crawler.transport import BrowserSession
 
 
 def sections(raw: str) -> tuple[str, str]:
-    body = text(raw)
-    match = re.search(r"(?:工作要求|岗位要求|任职要求|任职资格)\s*[:：]", body)
-    if not match:
-        return body, ""
-    duties = re.sub(
-        r"^(?:工作职责|岗位职责|职位描述)\s*[:：]\s*", "", body[: match.start()]
-    ).strip()
-    return duties, body[match.end() :].strip()
+    return split_sections(text(raw))
 
 
 class Bilibili(Adapter):

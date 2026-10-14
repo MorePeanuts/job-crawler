@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup, Tag
 
 from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.platforms import check
+from job_crawler.description import split_sections
 from job_crawler.models import Issue, Scope
 
 
@@ -43,33 +44,17 @@ def apply_id(url: str) -> str:
 
 
 def split_jobinfo(raw: str) -> tuple[str, str]:
-    """Split only visibly headed sections; leave ambiguous prose for review."""
     body = text(raw)
-    parts = re.split(
-        r"(【[^】\n]{0,30}工作内容】|【[^】\n]{0,30}任职要求】|"
-        r"岗位职责|工作职责|职位职责|主要职责|岗位内容|岗位描述|工作内容|"
-        r"任职要求|岗位要求|任职资格)\s*[：:]?",
+    # Verified 51job headings can prefix the section with the position title.
+    body = re.sub(r"【[^【】\n]{0,30}(工作内容|任职要求)】", r"【\1】", body)
+    # Some 51job records flatten the two colon-headed sections onto one line.
+    if re.match(r"^(?:岗位职责|工作职责|主要职责|工作内容)[：:]", body):
+        body = re.sub(r"[ \t]+(?=(?:任职要求|任职资格|岗位要求)[：:])", "\n", body, count=1)
+    return split_sections(
         body,
+        unheaded_duties=False,
+        include_preamble=bool(re.match(r"\s*\d+[、.]", body)),
     )
-    duties: list[str] = []
-    requirements: list[str] = []
-    for label, content in zip(parts[1::2], parts[2::2], strict=True):
-        value = content.strip(" \n：:")
-        if label in {
-            "岗位职责",
-            "工作职责",
-            "职位职责",
-            "主要职责",
-            "岗位内容",
-            "岗位描述",
-            "工作内容",
-        } or label.endswith("工作内容】"):
-            duties.append(value)
-        else:
-            requirements.append(value)
-    if not duties and requirements and re.match(r"\s*\d+[、.]", parts[0]):
-        duties.append(parts[0].strip())
-    return "\n".join(filter(None, duties)), "\n".join(filter(None, requirements))
 
 
 class Lens(Adapter):
