@@ -690,3 +690,19 @@ version = "1"
 [sources.COM0251]
 adapter = "longi-legacy-campus"
 version = "1"
+
+[sources.COM0062]
+adapter = "shccig-headquarters-trainees"
+version = "1"
+
+[sources.COM0134]
+adapter = "shougang-campus-parent"
+version = "1"
+
+[sources.COM0295]
+adapter = "ctg-dutyfree-campus"
+version = "1"
+
+[sources.COM0390]
+adapter = "grcbank-campus"
+version = "1"
