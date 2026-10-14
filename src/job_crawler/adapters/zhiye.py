@@ -22,6 +22,7 @@ class Zhiye(Adapter):
     detail_path = "/campus/detail"
     regular_only = False
     listing_complete = False
+    listing_unit_field = "Org"
     expected_org = ""
     page_size = 20
     ready_endpoints = ("/api/Jobad/GetJobAdPageList",)
@@ -103,7 +104,7 @@ class Zhiye(Adapter):
                                 else "校招"
                             ),
                             source_url=self.detail_page(str(listed["Id"])),
-                            unit=text(listed.get("Org")),
+                            unit=text(listed.get(self.listing_unit_field)),
                             location=text(listed.get("LocNames")),
                             education=text(listed.get("Degree")),
                             address=text(listed.get("DetailAddress")),
@@ -659,7 +660,30 @@ class CmhkParent(Zhiye):
         return False
 
 
+class Cinda2027(Zhiye):
+    name = "zhiye-cinda-2027"
+    host = "cinda.zhiye.com"
+    listing_complete = True
+    listing_unit_field = "ClassificationTwo"
+    scope_description = (
+        "中国信达2027年度校招 Category=2 全目录；官方公告及附件列出总部、后援中心和分公司"
+    )
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "中国信达目录混入非校招类别")
+        unit = text(row.get("ClassificationTwo"))
+        check(
+            bool(row.get("OrgId"))
+            and (unit in {"信达总部", "总部", "后援中心"} or unit.endswith("分公司")),
+            "中国信达招聘机构超出公告总部、后援中心及分公司范围",
+        )
+        published = date_text(row.get("PostDate"))
+        check(bool(published), "中国信达岗位缺少源发布日期")
+        return published[:10] >= "2026-10-09"
+
+
 TENANTS = (
+    Cinda2027,
     CmhkParent,
     YuntianhuaParent,
     ChinaLifeGroup,

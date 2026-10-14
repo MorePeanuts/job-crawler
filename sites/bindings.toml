@@ -654,3 +654,7 @@ version = "1"
 [sources.COM0280]
 adapter = "bohai-2027"
 version = "1"
+
+[sources.COM0248]
+adapter = "zhiye-cinda-2027"
+version = "1"

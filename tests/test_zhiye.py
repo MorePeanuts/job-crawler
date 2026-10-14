@@ -10,6 +10,7 @@ from job_crawler.adapters.zhiye import (
     TENANTS,
     Chery,
     ChinaLifeGroup,
+    Cinda2027,
     CmhkParent,
     Haid,
     Huafeng,
@@ -673,3 +674,74 @@ async def test_cmhk_rejects_detail_mismatch_code_and_duplicate(now: datetime) ->
     for fault in ("detail_org", "code", "duplicate"):
         result = await CmhkParent(cmhk_source(), CmhkReplay(fault), now).collect()
         assert result.coverage_issues(), fault
+
+
+class CindaReplay:
+    last_evidence = "cinda-list.json"
+
+    def __init__(self, *, foreign_unit: bool = False):
+        self.foreign_unit = foreign_unit
+        self.pages: list[int] = []
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://cinda.zhiye.com/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        return {
+            "url": "https://cinda.zhiye.com/api/Jobad/GetJobAdPageList",
+            "post_data": json.dumps(
+                {"PageIndex": 0, "PageSize": 20, "Category": ["2"], "KeyWords": ""}
+            ),
+        }
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        assert payload is not None and not detail
+        page = payload["PageIndex"]
+        self.pages.append(page)
+        rows = []
+        for index in range(page * 20, min((page + 1) * 20, 21)):
+            unit = "信达总部" if index < 19 else "河北分公司"
+            if self.foreign_unit and index == 20:
+                unit = "其他法人"
+            rows.append(
+                {
+                    "Id": str(index),
+                    "CategoryId": "2",
+                    "OrgId": 100 + index,
+                    "ClassificationTwo": unit,
+                    "JobAdName": f"业务拓展岗{index}",
+                    "Duty": "从事不良资产业务",
+                    "Require": "硕士研究生及以上",
+                    "LocNames": ["北京市"],
+                    "PostDate": "2026-10-08T00:00:00" if index == 19 else "2026-10-09T00:00:00",
+                    "EndTime": "0001-01-01T00:00:00",
+                }
+            )
+        return {"Code": 200, "Count": 21, "Data": rows}
+
+
+def cinda_source() -> Source:
+    return Source(
+        source_id="COM0248",
+        company_id="COM0248",
+        company="中国信达资产管理股份有限公司",
+        url="https://cinda.zhiye.com/campus/jobs",
+    )
+
+
+async def test_cinda_2027_all_pages_uses_institution_and_excludes_old(now: datetime) -> None:
+    replay = CindaReplay()
+    result = await Cinda2027(cinda_source(), replay, now).collect()
+    assert result.coverage_issues() == []
+    assert replay.pages == [0, 1]
+    assert len(result.jobs) == 20
+    assert result.scopes[0].skipped_out_of_scope == 1
+    assert result.jobs[-1].unit == "河北分公司"
+    assert result.jobs[0].published == "2026-10-09T00:00:00"
+
+
+async def test_cinda_2027_rejects_foreign_institution(now: datetime) -> None:
+    result = await Cinda2027(cinda_source(), CindaReplay(foreign_unit=True), now).collect()
+    assert result.coverage_issues()
