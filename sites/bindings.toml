@@ -650,3 +650,7 @@ version = "1"
 [sources.COM0304]
 adapter = "hotjob-zoomlion-2027"
 version = "1"
+
+[sources.COM0280]
+adapter = "bohai-2027"
+version = "1"

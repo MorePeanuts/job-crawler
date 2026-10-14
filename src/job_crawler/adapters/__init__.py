@@ -5,6 +5,7 @@ from job_crawler.adapters.ansteel import Ansteel
 from job_crawler.adapters.bank_catalogs import TENANTS as BANK_TENANTS
 from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bilibili import Bilibili
+from job_crawler.adapters.bohai import Bohai2027
 from job_crawler.adapters.byd import BYDCampus
 from job_crawler.adapters.campaign51 import TENANTS as CAMPAIGN51_TENANTS
 from job_crawler.adapters.cdkj import Cdkj
@@ -75,6 +76,7 @@ REGISTRY = {
         BankComm,
         Meituan,
         Bilibili,
+        Bohai2027,
         BYDCampus,
         Cdkj,
         Chnenergy,
