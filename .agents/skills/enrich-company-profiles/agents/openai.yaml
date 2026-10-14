@@ -1,0 +1,4 @@
+interface:
+  display_name: "公司信息整理与导入"
+  short_description: "从岗位汇总表查证公司资料、总部地址和透明头像，生成公司导入表"
+  default_prompt: "使用 $enrich-company-profiles，从我指定的岗位信息汇总表整理本批企业资料，查证总部详细地址，准备透明 PNG 头像并交付公司导入表；仅在我明确要求时与历史表合并。"

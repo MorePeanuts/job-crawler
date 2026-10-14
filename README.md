@@ -107,6 +107,20 @@ uv run job-crawler archive .runtime/runs/remapped --publish
 
 skill 包含实现定位、分页/详情/增量契约、真实验收标准、批次企业去重计数、快照复用、两份表格核对与归档步骤，并提供只读交付核验脚本。零岗位、部分覆盖和同公司多个入口不能凑足目标家数；不会仅因创建适配器文件就报告交付完成。日常运行已有站点的 day/all 命令无需调用此 skill。
 
+## 项目内公司信息整理 Skill
+
+已有岗位表需要整理公司资料时，可以告诉 Codex：
+
+> 使用 $enrich-company-profiles，根据我指定的岗位信息汇总.xlsx 搜集这批企业的公司信息，只交付本批公司；Logo 尽量使用适合圆形头像的透明 PNG，最后一列填写总部详细地址。
+
+需要合并时明确给出旧表：
+
+> 使用 $enrich-company-profiles，把指定新岗位表中的企业资料与我提供的历史公司表合并，按公司主体去重，保留来源并核对重叠公司的岗位计数。
+
+入口为 [.agents/skills/enrich-company-profiles/SKILL.md](.agents/skills/enrich-company-profiles/SKILL.md)，包含企业范围、公开资料查证、字段枚举、总部地址、PNG 头像、合并计数和导出验收规则。[公司导入模板](.agents/skills/enrich-company-profiles/assets/公司导入模板.xlsx) 随仓库保存，原始 13 列和示例保持不变；执行时删除示例并追加第 14 列 `详细地址`。不要与岗位导入模板混用。
+
+客户端未列出 skill 时，直接要求读取上述 SKILL.md 执行即可，无需全局安装。该 skill 是研究与交付指南，不是新增自动爬取 CLI，也不重新采集岗位。结果保存在 `outputs/YYYY-MM-DD/`（公司 XLSX 与 PNG ZIP），过程与逐字段依据保存在 `.runtime/company-enrichment/`；未查证资料明确标记，不承诺未知字段可以直接通过系统导入。设计与离线验收见 [SPEC-049](specs/049-company-profile-skill.md)。
+
 ## 每天新增一批适配器后的交付
 
 开发时显式指定独立工作目录，保留调试时已采到的每家公司快照。确认这批 50 家均有有效岗位、覆盖范围明确后，选择每家最新通过验收的快照路径（同来源不能重复），写入 JSON 数组，例如 `.runtime/batches/2026-10-14-inputs.json`。已压缩的输入先 restore，再选择恢复后的目录或 collections 文件。
