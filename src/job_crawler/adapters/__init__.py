@@ -29,6 +29,7 @@ from job_crawler.adapters.jd import JD
 from job_crawler.adapters.jxcc import JxccCampus
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.lixiang import LiAutoCampus
+from job_crawler.adapters.longi_legacy import LongiLegacyCampus
 from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
 from job_crawler.adapters.nbcb import NingboBank2027
@@ -71,6 +72,7 @@ REGISTRY = {
         Ansteel,
         Lenovo,
         LiAutoCampus,
+        LongiLegacyCampus,
         *FEISHU_TENANTS,
         FuyaoHeadquarters,
         *INLINE_TENANTS,

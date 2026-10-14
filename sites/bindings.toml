@@ -686,3 +686,7 @@ version = "1"
 [sources.COM0185]
 adapter = "nbcb-2027"
 version = "1"
+
+[sources.COM0251]
+adapter = "longi-legacy-campus"
+version = "1"
