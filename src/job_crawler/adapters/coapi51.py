@@ -413,4 +413,97 @@ class Scg(Coapi):
         scope.terminal = True
 
 
-TENANTS = (Nbhx, Wanxiang, Cofco, Scg)
+class Cqrcb2027(Coapi):
+    name = "coapi-cqrcb-2027"
+    host = "campus.51job.com"
+    path = "/CQRCB2027/job.html"
+    ctmid = "9586513"
+    scope_description = "重庆农商行 2027 校招全目录；排除驻行纪检监察组和子公司分支"
+
+    async def harvest(self) -> None:
+        session = cast(BrowserSession, self.session)
+        check(session.page is not None, "重庆农商行招聘页不存在")
+        assert session.page is not None
+        nav = await session.page.evaluate(
+            """() => JOB_NAV_DATA.flatMap(item => [item, ...(item.children || [])])
+              .flatMap(item => String(item.poscode || '').split(',').filter(Boolean))"""
+        )
+        expected_codes = {
+            "A",
+            "B",
+            "C",
+            *(f"D{i}" for i in range(1, 7)),
+            *(f"E{i:02}" for i in range(1, 43)),
+            *(f"F{i}" for i in range(1, 5)),
+        }
+        check(isinstance(nav, list) and set(nav) == expected_codes, "重庆农商行页面导航编码变化")
+        session.consume_request()
+        response = await session.page.evaluate(
+            LIST_JS,
+            {
+                "ctmid": self.ctmid,
+                "pagesize": 2000,
+                "poscode": "",
+                "sort": "poscode",
+                "sequence": 1,
+            },
+        )
+        check(
+            isinstance(response, dict) and isinstance(response.get("resultbody"), dict),
+            "重庆农商行目录回调结构改变",
+        )
+        body = response["resultbody"]
+        expected = int(body["totalnum"])
+        rows = body["joblist"]
+        check(
+            0 < expected <= 2000 and isinstance(rows, list) and len(rows) == expected,
+            "重庆农商行无筛选目录不完整",
+        )
+        check(
+            {text(row.get("poscode")) for row in rows} == expected_codes,
+            "重庆农商行目录编码与页面导航不符",
+        )
+        evidence = session.output / "coapi-list.json"
+        write_json(evidence, response)
+        session.last_evidence = str(evidence)
+        scope = Scope(name="cqrcb-2027-all-codes", expected=expected)
+        self.result.scopes.append(scope)
+        seen: set[str] = set()
+        self.add_page(scope, rows, seen, lambda row: str(row["jobid"]))
+        own_codes = expected_codes - {"A", "F1", "F2", "F3", "F4"}
+        for row in rows:
+            key = str(row["jobid"])
+            try:
+                check(str(row["ctmid"]) == self.ctmid, "重庆农商行目录租户 ID 不符")
+                code = text(row.get("poscode"))
+                if code not in own_codes:
+                    scope.skipped_out_of_scope += 1
+                    continue
+                check(
+                    text(row.get("coname")) == "重庆农村商业银行股份有限公司",
+                    "重庆农商行目录用人主体变化",
+                )
+                check(text(row.get("term")) == "全职", "重庆农商行岗位类型不符")
+                listing = self.listing_job(key, row)
+                resolved = self.before_detail(
+                    f"job:{key}", row, scope, listing, evidence=str(evidence)
+                )
+                if resolved is not None:
+                    self.result.jobs.extend(resolved)
+                    continue
+                detail, detail_evidence = await self.detail(key)
+                check(text(detail.get("poscode")) == code, "重庆农商行详情职位编码不符")
+                check(
+                    text(detail.get("coname")) == "重庆农村商业银行股份有限公司",
+                    "重庆农商行详情用人主体变化",
+                )
+                job = self.complete_job(key, row, detail, detail_evidence, str(evidence))
+                self.result.jobs.append(job)
+                scope.details += 1
+                self.remember(f"job:{key}", row, [job])
+            except Exception as exc:
+                self.error(exc, key)
+        scope.terminal = True
+
+
+TENANTS = (Nbhx, Wanxiang, Cofco, Scg, Cqrcb2027)

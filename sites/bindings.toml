@@ -638,3 +638,7 @@ version = "1"
 [sources.COM0468]
 adapter = "zhiye-cmhk-parent"
 version = "1"
+
+[sources.COM0309]
+adapter = "coapi-cqrcb-2027"
+version = "1"
