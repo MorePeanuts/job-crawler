@@ -525,3 +525,23 @@ version = "1"
 [sources.COM0497]
 adapter = "zhiye-luzhou-laojiao"
 version = "1"
+
+[sources.COM0191]
+adapter = "li-auto-campus"
+version = "1"
+
+[sources.COM0421]
+adapter = "yingte-campus"
+version = "1"
+
+[sources.COM0058]
+adapter = "feishu-xiaomi"
+version = "1"
+
+[sources.COM0433]
+adapter = "feishu-aac"
+version = "1"
+
+[sources.COM0386]
+adapter = "feishu-innolight"
+version = "1"
