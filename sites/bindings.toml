@@ -549,3 +549,27 @@ version = "1"
 [sources.COM0045]
 adapter = "jxcc-campus"
 version = "1"
+
+[sources.COM0283]
+adapter = "zhiye-huafeng"
+version = "1"
+
+[sources.COM0409]
+adapter = "zhiye-infore"
+version = "1"
+
+[sources.COM0230]
+adapter = "hotjob-huayou"
+version = "1"
+
+[sources.COM0156]
+adapter = "zhiye-seres"
+version = "1"
+
+[sources.COM0325]
+adapter = "zhiye-shrcb"
+version = "1"
+
+[sources.COM0183]
+adapter = "zhiye-haid"
+version = "1"

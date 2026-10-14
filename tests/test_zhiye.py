@@ -6,7 +6,19 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
-from job_crawler.adapters.zhiye import TENANTS, LuzhouLaojiao, Mindray, Shenzhou, Xiangyu, date_text
+from job_crawler.adapters.zhiye import (
+    TENANTS,
+    Haid,
+    Huafeng,
+    Infore,
+    LuzhouLaojiao,
+    Mindray,
+    Seres,
+    Shenzhou,
+    Shrcb,
+    Xiangyu,
+    date_text,
+)
 from job_crawler.config import load_bindings
 from job_crawler.models import Source
 from job_crawler.sources import read_sources
@@ -186,9 +198,15 @@ def test_group_portals_remain_unbound(source_id: str) -> None:
     assert source_id not in load_bindings(root / "sites/bindings.toml")
 
 
-@pytest.mark.parametrize("adapter", [Mindray, Shenzhou])
+@pytest.mark.parametrize("adapter", [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid])
 async def test_zhiye_inline_body_enumerates_without_detail_request(
-    now: datetime, adapter: type[Mindray] | type[Shenzhou]
+    now: datetime,
+    adapter: type[Mindray]
+    | type[Shenzhou]
+    | type[Huafeng]
+    | type[Infore]
+    | type[Shrcb]
+    | type[Haid],
 ) -> None:
     class InlineReplay(Replay):
         async def observed(self, needle: str) -> dict[str, Any]:
@@ -236,7 +254,7 @@ async def test_zhiye_inline_body_enumerates_without_detail_request(
         source_id="TEST",
         company_id="TEST",
         company="测试",
-        url=f"https://{adapter.host}/campus/jobs",
+        url=f"https://{adapter.host}{adapter.path}",
     )
     result = await adapter(src, replay, now).collect()
     assert not result.coverage_issues()
@@ -292,3 +310,44 @@ async def test_luzhou_shared_portal_rejects_other_legal_entity(now: datetime) ->
     assert len(result.jobs) == 1
     assert result.coverage_issues()
     assert any("法人" in issue.message for issue in result.issues)
+
+
+async def test_seres_optional_internship_remains_formal_campus(now: datetime) -> None:
+    class SeresReplay(Replay):
+        async def observed(self, needle: str) -> dict[str, Any]:
+            return {
+                "url": "https://sokon.zhiye.com/api/Jobad/GetJobAdPageList",
+                "post_data": json.dumps(
+                    {"Category": ["2"], "PageIndex": 0, "PageSize": 20, "KeyWords": ""}
+                ),
+            }
+
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            return {
+                "Code": 200,
+                "Count": 1,
+                "Data": [
+                    {
+                        "Id": "campus-1",
+                        "CategoryId": "2",
+                        "JobAdName": "研发工程师（可实习）【2027届校招】",
+                        "Duty": "研发工作",
+                        "Require": "硕士及以上",
+                        "PostDate": "0001-01-01T00:00:00",
+                    }
+                ],
+            }
+
+    src = Source(
+        source_id="COM0156",
+        company_id="COM0156",
+        company="赛力斯集团股份有限公司",
+        url="https://sokon.zhiye.com/campus/jobs",
+    )
+    result = await Seres(src, SeresReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert len(result.jobs) == 1
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].published == ""

@@ -348,7 +348,28 @@ class Baiyao(Cmoc):
     path = f"/{suite}/pb/school.html"
 
 
+class Huayou(Cmoc):
+    name = "hotjob-huayou"
+    suite = "SU6465f3d9bef57c0907f3bb58"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "华友钴业校园 recruitType=1 全目录；实习生和校园大使项目由公共筛选排除"
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        if "校园大使" in job.title or "校园大使" in job.batch:
+            job.work_type = "校园大使"
+        return job
+
+
 TENANTS = (
+    Huayou,
     Baiyao,
     HuaXia,
     JinTian,

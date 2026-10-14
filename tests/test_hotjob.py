@@ -11,6 +11,7 @@ from job_crawler.adapters.hotjob import (
     HaiTian,
     Hotjob,
     HuaXia,
+    Huayou,
     JinTian,
     LiuGong,
     Minth,
@@ -207,6 +208,29 @@ def test_location_tree_does_not_guess_ambiguous_city() -> None:
         ]
     )
     assert "同名市" not in paths
+
+
+async def test_huayou_excludes_intern_and_ambassador_projects(now: datetime) -> None:
+    class ProjectReplay(Replay):
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            row["projectName"] = {
+                "a": "应届生招聘",
+                "b": "实习生招聘",
+                "c": "校园大使招聘",
+            }[post_id]
+            return row
+
+    source = Source(
+        source_id="COM0230",
+        company_id="COM0230",
+        company="浙江华友钴业股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{Huayou.suite}/pb/school.html",
+    )
+    result = await Huayou(source, ProjectReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].details == 3
+    assert [job.work_type for job in result.jobs] == ["校招", "实习", "校园大使"]
 
 
 async def test_missing_requirement_is_visible_warning(now: datetime) -> None:

@@ -11,7 +11,7 @@ from job_crawler.storage import Store, redact
 def test_initial_inventory() -> None:
     sources, issues = read_sources(Path("sites/sources.csv"))
     assert len(sources) == 500
-    assert sum(bool(s.url) for s in sources) == 228
+    assert sum(bool(s.url) for s in sources) == 232
     assert issues == []
 
 

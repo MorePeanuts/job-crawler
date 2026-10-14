@@ -482,10 +482,55 @@ class LuzhouLaojiao(Zhiye):
     )
 
 
+class Huafeng(Zhiye):
+    name = "zhiye-huafeng"
+    host = "huafeng.zhiye.com"
+    path = "/campus"
+    listing_complete = True
+    regular_only = True
+    scope_description = "华峰集团 2027 校招门户 Category=2 无筛选全目录；列表提供完整职责与要求"
+
+
+class Infore(Zhiye):
+    name = "zhiye-infore"
+    host = "recruit.infore.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "盈峰集团招聘门户 Category=2 无筛选校园全目录；实习由公共筛选排除"
+
+
+class Seres(Zhiye):
+    name = "zhiye-seres"
+    host = "sokon.zhiye.com"
+    listing_complete = True
+    scope_description = "赛力斯集团独立 Category=2 正式校招全目录；可实习不等同实习岗位"
+
+
+class Shrcb(Zhiye):
+    name = "zhiye-shrcb"
+    host = "shrcb.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "上海农商银行 Category=2 校园目录；长江金租独立入口不纳入本行"
+
+
+class Haid(Zhiye):
+    name = "zhiye-haid"
+    host = "haid1.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "海大集团 2027 Category=2 校园全目录；保留业务板块和实际来源字段"
+
+
 TENANTS = (
     Mindray,
     Shenzhou,
     LuzhouLaojiao,
+    Huafeng,
+    Infore,
+    Seres,
+    Shrcb,
+    Haid,
     Dahua,
     Baic,
     Naura,
