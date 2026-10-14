@@ -635,3 +635,6 @@ version = "1"
 [sources.COM0320]
 adapter = "zhiye-yuntianhua-parent"
 version = "1"
+[sources.COM0468]
+adapter = "zhiye-cmhk-parent"
+version = "1"

@@ -74,7 +74,7 @@ class Zhiye(Adapter):
                 if abort is not None:
                     return None
                 try:
-                    if self.expected_org:
+                    if self.expected_org and (self.listing_complete or listed.get("Org")):
                         check(
                             text(listed.get("Org")) == self.expected_org,
                             "列表岗位所属法人与名录主体不一致",
@@ -138,6 +138,11 @@ class Zhiye(Adapter):
                     check(data.get("Code") == 200, "北森详情业务失败")
                     row = data["Data"]
                     check(str(row["Id"]) == str(listed["Id"]), "北森详情与列表 ID 不一致")
+                    if self.expected_org:
+                        check(
+                            text(row.get("Org")) == self.expected_org,
+                            "北森详情所属法人与名录主体不一致",
+                        )
                     check(str(row["CategoryId"]) == "2", "岗位混入非校招类别")
                     check(bool(row["JobAdName"]), "岗位名称为空")
                     check("Duty" in row and "Require" in row, "详情不再包含职位描述")
@@ -632,7 +637,30 @@ class YuntianhuaParent(Zhiye):
         return False
 
 
+class CmhkParent(Zhiye):
+    name = "zhiye-cmhk-parent"
+    host = "cmhk.zhiye.com"
+    page_size = 200
+    expected_org = "招商局能源运输股份有限公司"
+    scope_description = (
+        "招商局集团 Category=2 共享目录；仅详情 OrgId=748690 的招商局能源运输股份本级"
+    )
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        name = text(row.get("Org"))
+        org_id = str(row.get("OrgId"))
+        if name == self.expected_org or org_id == "748690":
+            check(org_id == "748690", "招商轮船本级机构编码不匹配")
+            check(not name or name == self.expected_org, "招商轮船本级列表机构名称不匹配")
+            check(str(row.get("CategoryId")) == "2", "招商轮船本级混入非校招类别")
+            check(text(row.get("Kind")) == "全职", "招商轮船本级混入非全职岗位")
+            check("2027届" in text(row.get("JobAdName")), "招商轮船本级出现未知校招项目")
+            return True
+        return False
+
+
 TENANTS = (
+    CmhkParent,
     YuntianhuaParent,
     ChinaLifeGroup,
     PICCGroup,

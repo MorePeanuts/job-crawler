@@ -10,6 +10,7 @@ from job_crawler.adapters.zhiye import (
     TENANTS,
     Chery,
     ChinaLifeGroup,
+    CmhkParent,
     Haid,
     Huafeng,
     Infore,
@@ -189,6 +190,7 @@ def test_zhiye_unset_dates(value: Any, expected: str) -> None:
         ("COM0393", "popmart.zhiye.com"),
         ("COM0452", "szgas.zhiye.com"),
         ("COM0461", "ovt-omnivision.zhiye.com"),
+        ("COM0468", "cmhk.zhiye.com"),
         ("COM0484", "juhua.zhiye.com"),
     ],
 )
@@ -202,7 +204,7 @@ def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> N
     assert bindings[source_id].adapter == adapter.name
 
 
-@pytest.mark.parametrize("source_id", ["COM0468", "COM0471"])
+@pytest.mark.parametrize("source_id", ["COM0471"])
 def test_group_portals_remain_unbound(source_id: str) -> None:
     root = Path(__file__).resolve().parents[1]
     assert source_id not in load_bindings(root / "sites/bindings.toml")
@@ -601,4 +603,73 @@ async def test_yuntianhua_only_includes_verified_parent_branch(now: datetime) ->
 async def test_yuntianhua_rejects_code_mismatch_or_duplicate(now: datetime) -> None:
     for fault in ("org_mismatch", "duplicate"):
         result = await YuntianhuaParent(yuntianhua_source(), YuntianhuaReplay(fault), now).collect()
+        assert result.coverage_issues(), fault
+
+
+class CmhkReplay(CheryReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url.startswith("https://cmhk.zhiye.com/campus/")
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        if "GetJobAdInfo" in needle:
+            return {"url": "https://cmhk.zhiye.com/api/JobAd/GetJobAdInfo?category=2"}
+        value = await super().observed(needle)
+        value["url"] = "https://cmhk.zhiye.com/api/Jobad/GetJobAdPageList"
+        return value
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        if detail:
+            return {
+                "Code": 200,
+                "Data": {
+                    "Id": "0",
+                    "Org": "招商局能源运输股份有限公司"
+                    if self.fault != "detail_org"
+                    else "其他公司",
+                    "CategoryId": "2",
+                    "Kind": "全职",
+                    "JobAdName": "招商轮船2027届管理培训生",
+                    "Duty": "参与业务管理",
+                    "Require": "本科及以上",
+                    "PostDate": "0001-01-01T00:00:00",
+                    "EndTime": "0001-01-01T00:00:00",
+                },
+            }
+        response = await super().request(url, payload=payload, detail=detail)
+        for row in response["Data"]:
+            own = row["Id"] == "0"
+            row["Org"] = None
+            row["OrgId"] = 748690 if own else 999
+            row["JobAdName"] = "招商轮船2027届管理培训生" if own else "其他法人2027届岗位"
+            if self.fault == "code" and own:
+                row["Org"] = "招商局能源运输股份有限公司"
+                row["OrgId"] = 999
+        return response
+
+
+def cmhk_source() -> Source:
+    return Source(
+        source_id="COM0468",
+        company_id="COM0468",
+        company="招商局能源运输股份有限公司",
+        url="https://cmhk.zhiye.com/campus/jobs",
+    )
+
+
+async def test_cmhk_joins_verified_parent_detail(now: datetime) -> None:
+    replay = CmhkReplay()
+    result = await CmhkParent(cmhk_source(), replay, now).collect()
+    assert not result.coverage_issues()
+    assert replay.pages == [0, 1]
+    assert [job.source_key for job in result.jobs] == ["0"]
+    assert result.jobs[0].unit == "招商局能源运输股份有限公司"
+    assert result.jobs[0].published == "2026-09-14T13:09:54"
+    assert result.scopes[0].skipped_out_of_scope == 200
+
+
+async def test_cmhk_rejects_detail_mismatch_code_and_duplicate(now: datetime) -> None:
+    for fault in ("detail_org", "code", "duplicate"):
+        result = await CmhkParent(cmhk_source(), CmhkReplay(fault), now).collect()
         assert result.coverage_issues(), fault
