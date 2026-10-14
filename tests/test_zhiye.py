@@ -6,7 +6,7 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
-from job_crawler.adapters.zhiye import TENANTS, Xiangyu, date_text
+from job_crawler.adapters.zhiye import TENANTS, LuzhouLaojiao, Mindray, Shenzhou, Xiangyu, date_text
 from job_crawler.config import load_bindings
 from job_crawler.models import Source
 from job_crawler.sources import read_sources
@@ -184,3 +184,111 @@ def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> N
 def test_group_portals_remain_unbound(source_id: str) -> None:
     root = Path(__file__).resolve().parents[1]
     assert source_id not in load_bindings(root / "sites/bindings.toml")
+
+
+@pytest.mark.parametrize("adapter", [Mindray, Shenzhou])
+async def test_zhiye_inline_body_enumerates_without_detail_request(
+    now: datetime, adapter: type[Mindray] | type[Shenzhou]
+) -> None:
+    class InlineReplay(Replay):
+        async def observed(self, needle: str) -> dict[str, Any]:
+            assert needle == "/api/Jobad/GetJobAdPageList"
+            return {
+                "url": f"https://{adapter.host}/api/Jobad/GetJobAdPageList",
+                "post_data": json.dumps(
+                    {
+                        "PageIndex": 0,
+                        "PageSize": 20,
+                        "Category": ["2"],
+                        "KeyWords": "",
+                        "PortalId": "",
+                        "SpecialType": 0,
+                    }
+                ),
+            }
+
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            assert payload is not None and not detail
+            page = payload["PageIndex"]
+            self.pages.append(page)
+            first = page * 20
+            return {
+                "Code": 200,
+                "Count": 21,
+                "Data": [
+                    {
+                        "Id": str(i),
+                        "CategoryId": "2",
+                        "JobAdName": "实习工程师" if i == 20 else f"工程师{i}",
+                        "Duty": "开发",
+                        "Require": "本科",
+                        "PostDate": "0001-01-01T00:00:00",
+                        "LocNames": ["上海市"],
+                    }
+                    for i in range(first, min(first + 20, 21))
+                ],
+            }
+
+    replay = InlineReplay()
+    src = Source(
+        source_id="TEST",
+        company_id="TEST",
+        company="测试",
+        url=f"https://{adapter.host}/campus/jobs",
+    )
+    result = await adapter(src, replay, now).collect()
+    assert not result.coverage_issues()
+    assert replay.pages == [0, 1] and len(replay.opens) == 1
+    assert len(result.jobs) == 21 and not replay.details
+    assert result.jobs[0].duties == "开发" and result.jobs[0].requirements == "本科"
+    assert result.jobs[0].published == ""
+    assert result.jobs[-1].work_type == "实习"
+
+
+async def test_luzhou_shared_portal_rejects_other_legal_entity(now: datetime) -> None:
+    class OrgReplay(Replay):
+        async def observed(self, needle: str) -> dict[str, Any]:
+            return {
+                "url": "https://job.lzlj.com/api/Jobad/GetJobAdPageList",
+                "post_data": json.dumps(
+                    {
+                        "PageIndex": 0,
+                        "PageSize": 15,
+                        "Category": ["2"],
+                        "KeyWords": "",
+                        "PortalId": "",
+                    }
+                ),
+            }
+
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            return {
+                "Code": 200,
+                "Count": 2,
+                "Data": [
+                    {
+                        "Id": str(i),
+                        "Org": org,
+                        "CategoryId": "2",
+                        "JobAdName": "工程师",
+                        "Duty": "研发",
+                        "Require": "本科",
+                    }
+                    for i, org in enumerate(["泸州老窖股份有限公司", "其他法人"])
+                ],
+            }
+
+    src = Source(
+        source_id="COM0497",
+        company_id="COM0497",
+        company="泸州老窖股份有限公司",
+        url="https://job.lzlj.com/campus",
+    )
+    result = await LuzhouLaojiao(src, OrgReplay(), now).collect()
+    assert len(result.jobs) == 1
+    assert result.coverage_issues()
+    assert any("法人" in issue.message for issue in result.issues)

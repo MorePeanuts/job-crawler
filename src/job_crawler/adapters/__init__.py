@@ -24,6 +24,7 @@ from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
 from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.newhope import NewHopeCampus
+from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.sf import SF
 from job_crawler.adapters.sinopharm import SinopharmCampus
@@ -70,6 +71,7 @@ REGISTRY = {
         SunwodaCampus,
         GreentownCampus,
         NewHopeCampus,
+        PddCampus,
         SmicCampus,
         TCLCampus,
         *CAMPAIGN51_TENANTS,

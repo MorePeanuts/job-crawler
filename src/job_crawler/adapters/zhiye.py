@@ -21,6 +21,8 @@ class Zhiye(Adapter):
     mixed_catalog = False
     detail_path = "/campus/detail"
     regular_only = False
+    listing_complete = False
+    expected_org = ""
     ready_endpoints = ("/api/Jobad/GetJobAdPageList",)
     scope_description = "北森公开校园招聘 Category=2 全目录；保留实际租户/门户范围，不含社招和实习"
 
@@ -68,6 +70,11 @@ class Zhiye(Adapter):
                 if abort is not None:
                     return None
                 try:
+                    if self.expected_org:
+                        check(
+                            text(listed.get("Org")) == self.expected_org,
+                            "列表岗位所属法人与名录主体不一致",
+                        )
                     listing = self.job(
                         str(listed["Id"]),
                         title=text(listed.get("JobAdName")),
@@ -76,6 +83,41 @@ class Zhiye(Adapter):
                         deadline=date_text(listed.get("EndTime")),
                     )
                     listing.evidence = [list_evidence] if list_evidence else []
+                    if self.listing_complete:
+                        check(str(listed.get("CategoryId")) == "2", "列表岗位混入非校招类别")
+                        check("Duty" in listed and "Require" in listed, "列表不再包含完整正文")
+                        job = self.job(
+                            str(listed["Id"]),
+                            title=text(listed["JobAdName"]),
+                            work_type=(
+                                "实习"
+                                if self.regular_only
+                                and (
+                                    "实习" in text(listed.get("Kind"))
+                                    or "实习" in text(listed["JobAdName"])
+                                )
+                                else "校招"
+                            ),
+                            source_url=self.detail_page(str(listed["Id"])),
+                            unit=text(listed.get("Org")),
+                            location=text(listed.get("LocNames")),
+                            education=text(listed.get("Degree")),
+                            address=text(listed.get("DetailAddress")),
+                            category_raw=text(listed.get("ClassificationOne")),
+                            duties=text(listed["Duty"]),
+                            requirements=text(listed["Require"]),
+                            published=date_text(listed.get("PostDate")),
+                            deadline=date_text(listed.get("EndTime")),
+                            field_sources={
+                                "duties": "GetJobAdPageList.Data[].Duty",
+                                "requirements": "GetJobAdPageList.Data[].Require",
+                                "published": "PostDate；0001 哨兵为空",
+                                "deadline": "EndTime；0001 哨兵为空",
+                            },
+                        )
+                        job.evidence = [list_evidence] if list_evidence else []
+                        scope.details += 1
+                        return job
                     resolved = self.before_detail(
                         f"job:{listed['Id']}",
                         listed,
@@ -411,7 +453,39 @@ class Dahua(Zhiye):
     regular_only = True
 
 
+class Mindray(Zhiye):
+    name = "zhiye-mindray"
+    host = "career.mindray.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = (
+        "迈瑞公开 Category=2 全校园目录，列表提供职责与任职要求；含博士校招，不含实习"
+    )
+
+
+class Shenzhou(Zhiye):
+    name = "zhiye-shenzhou"
+    host = "career.shenzhouintl.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "申洲国际公开 Category=2 全校园目录，列表提供职责与任职要求；不含社招和实习"
+
+
+class LuzhouLaojiao(Zhiye):
+    name = "zhiye-luzhou-laojiao"
+    host = "job.lzlj.com"
+    listing_complete = True
+    regular_only = True
+    expected_org = "泸州老窖股份有限公司"
+    scope_description = (
+        "泸州老窖 Category=2 校园目录中 Org 精确匹配股份公司的全部岗位；不含其他法人"
+    )
+
+
 TENANTS = (
+    Mindray,
+    Shenzhou,
+    LuzhouLaojiao,
     Dahua,
     Baic,
     Naura,
