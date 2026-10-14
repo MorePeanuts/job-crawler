@@ -632,3 +632,6 @@ version = "1"
 [sources.COM0189]
 adapter = "yili-headquarters"
 version = "1"
+[sources.COM0320]
+adapter = "zhiye-yuntianhua-parent"
+version = "1"

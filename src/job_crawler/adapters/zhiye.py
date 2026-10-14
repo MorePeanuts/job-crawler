@@ -607,7 +607,33 @@ class ChinaLifeGroup(Zhiye):
         return False
 
 
+class YuntianhuaParent(Zhiye):
+    name = "zhiye-yuntianhua-parent"
+    host = "yythzb3.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    page_size = 200
+    scope_description = "云天化 Category=2 共享目录；仅 OrgId=4022958 的云天化股份本部"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        name = text(row.get("ClassificationTwo"))
+        org_id = str(row.get("OrgId"))
+        parent = "云南云天化股份有限公司本部"
+        if name == parent or org_id == "4022958":
+            check(name == parent and org_id == "4022958", "云天化股份本部机构编码不匹配")
+            check(str(row.get("CategoryId")) == "2", "云天化股份本部混入非校招类别")
+            check(text(row.get("Kind")) == "全职", "云天化股份本部混入非全职岗位")
+            check(
+                text(row.get("PostDate")).startswith("2026-09-"),
+                "云天化股份本部岗位不属于已验证的 2027 秋招发布时间范围",
+            )
+            row["Org"] = name
+            return True
+        return False
+
+
 TENANTS = (
+    YuntianhuaParent,
     ChinaLifeGroup,
     PICCGroup,
     Chery,

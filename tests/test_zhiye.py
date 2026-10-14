@@ -20,6 +20,7 @@ from job_crawler.adapters.zhiye import (
     Shenzhou,
     Shrcb,
     Xiangyu,
+    YuntianhuaParent,
     date_text,
 )
 from job_crawler.config import load_bindings
@@ -545,4 +546,59 @@ async def test_chinalife_group_only_includes_parent_company(now: datetime) -> No
 async def test_chinalife_group_rejects_changed_parent_or_batch(now: datetime) -> None:
     for fault in ("org_mismatch", "duplicate", "date"):
         result = await ChinaLifeGroup(chinalife_source(), ChinaLifeReplay(fault), now).collect()
+        assert result.coverage_issues(), fault
+
+
+class YuntianhuaReplay(CheryReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://yythzb3.zhiye.com/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        value = await super().observed(needle)
+        value["url"] = "https://yythzb3.zhiye.com/api/Jobad/GetJobAdPageList"
+        return value
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        response = await super().request(url, payload=payload, detail=detail)
+        for row in response["Data"]:
+            own = row["Org"] == "奇瑞汽车股份（校招）"
+            row["Org"] = None
+            row["ClassificationTwo"] = (
+                "云南云天化股份有限公司本部" if own else "云南天安化工有限公司"
+            )
+            row["OrgId"] = (
+                row["OrgId"]
+                if self.fault == "org_mismatch" and row["Id"] == "200"
+                else 4022958
+                if own
+                else 4022966
+            )
+            row["EndTime"] = "2026-10-31T00:00:00"
+        return response
+
+
+def yuntianhua_source() -> Source:
+    return Source(
+        source_id="COM0320",
+        company_id="COM0320",
+        company="云南云天化股份有限公司",
+        url="https://yythzb3.zhiye.com/campus/jobs",
+    )
+
+
+async def test_yuntianhua_only_includes_verified_parent_branch(now: datetime) -> None:
+    replay = YuntianhuaReplay()
+    result = await YuntianhuaParent(yuntianhua_source(), replay, now).collect()
+    assert not result.coverage_issues()
+    assert replay.pages == [0, 1]
+    assert [job.source_key for job in result.jobs] == ["0", "200"]
+    assert all(job.unit == "云南云天化股份有限公司本部" for job in result.jobs)
+    assert result.scopes[0].skipped_out_of_scope == 199
+
+
+async def test_yuntianhua_rejects_code_mismatch_or_duplicate(now: datetime) -> None:
+    for fault in ("org_mismatch", "duplicate"):
+        result = await YuntianhuaParent(yuntianhua_source(), YuntianhuaReplay(fault), now).collect()
         assert result.coverage_issues(), fault
