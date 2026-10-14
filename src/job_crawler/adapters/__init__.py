@@ -16,6 +16,7 @@ from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
 from job_crawler.adapters.greentown import GreentownCampus
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
+from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
 from job_crawler.adapters.jd import JD
@@ -54,6 +55,7 @@ REGISTRY = {
         Alibaba,
         Wtmec,
         ZttCampus,
+        HzbankCampus,
         Hzsteel,
         Ansteel,
         Lenovo,

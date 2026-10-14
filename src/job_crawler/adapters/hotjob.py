@@ -89,6 +89,7 @@ class Hotjob(Adapter):
         self.result.scopes.append(scope)
         seen: set[str] = set()
         page = 1
+        size_corrected = False
         detail_api = ""
         first_detail: dict[str, Any] | None = None
         first_detail_id = ""
@@ -106,6 +107,16 @@ class Hotjob(Adapter):
             page_form = response["data"]["pageForm"]
             expected = int(page_form["dataCount"])
             pages = int(page_form["totalPage"])
+            returned_size = int(page_form.get("pageSize", size))
+            check(0 < returned_size <= 100, "Hotjob 返回的分页大小无效")
+            if returned_size != size:
+                check(
+                    page == 1 and scope.expected is None and not size_corrected,
+                    "Hotjob 分页大小中途变化或反复变化",
+                )
+                size = returned_size
+                size_corrected = True
+                continue
             if expected == 0:
                 check(
                     pages == 0
@@ -476,7 +487,53 @@ class Tbea(Hotjob):
         check(scope.skipped_out_of_scope == self._other_total, "特变其他机构计数不符")
 
 
+class TclIndustries(Hotjob):
+    name = "hotjob-tcl-industries"
+    suite = "SU64893571bef57c16d356b99e"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "TCL 共享校园目录全量；机构树仅 0/41 TCL 实业岗位归本主体"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        roots = {str(item["code"]): item for item in data.get("orgList", [])}
+        check(
+            {code: text(item.get("nameCh")) for code, item in roots.items()}
+            == {"0/1": "TCL科技", "0/41": "TCL实业", "0/36": "TCL财务共享中心"},
+            "TCL 校招机构树顶层分支变化",
+        )
+        self._total = sum(int(item["positionsNum"]) for item in roots.values())
+        self._other_total = sum(
+            int(item["positionsNum"]) for code, item in roots.items() if code != "0/41"
+        )
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        code = text(row.get("orgCode"))
+        root = "/".join(code.split("/")[:2])
+        check(root in {"0/1", "0/41", "0/36"}, "TCL 岗位机构超出已核对法人分支")
+        return root == "0/41"
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        scope = self.result.scopes[0]
+        check(scope.expected == self._total, "TCL 校招机构树与目录总数不符")
+        check(scope.skipped_out_of_scope == self._other_total, "TCL 其他机构计数不符")
+
+
+class Goertek(Hotjob):
+    name = "hotjob-goertek"
+    host = "goertek.hotjob.cn"
+    suite = "SU65dd9ebd1c240e4b11c4f491"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "歌尔公开校招目录全量；仅列表标明「歌尔股份」的岗位归本主体"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        company = text(row.get("company"))
+        check(bool(company), "歌尔岗位缺少所属公司")
+        return company == "歌尔股份"
+
+
 TENANTS = (
+    Goertek,
+    TclIndustries,
     Tbea,
     Huatai,
     Skyworth,

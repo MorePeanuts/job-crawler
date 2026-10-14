@@ -589,3 +589,15 @@ version = "1"
 [sources.COM0205]
 adapter = "hotjob-tbea"
 version = "1"
+
+[sources.COM0241]
+adapter = "hzbank-campus"
+version = "1"
+
+[sources.COM0153]
+adapter = "hotjob-tcl-industries"
+version = "1"
+
+[sources.COM0208]
+adapter = "hotjob-goertek"
+version = "1"

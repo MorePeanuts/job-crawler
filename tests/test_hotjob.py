@@ -8,6 +8,7 @@ import pytest
 
 from job_crawler.adapters.hotjob import (
     GF,
+    Goertek,
     HaiTian,
     Hotjob,
     Huatai,
@@ -18,6 +19,7 @@ from job_crawler.adapters.hotjob import (
     Minth,
     Skyworth,
     Tbea,
+    TclIndustries,
     detail_body,
     location_paths,
 )
@@ -159,6 +161,82 @@ async def test_hotjob_paginates_and_joins_detail(adapter: type[Hotjob], now: dat
     assert result.scopes[0].expected == result.scopes[0].unique == 3
     assert len([url for url, form in replay.calls if "currentPage" in form]) == 2
     assert len([url for url, form in replay.calls if "postId" in form]) == 2
+
+
+async def test_hotjob_uses_returned_page_size_before_advancing(now: datetime) -> None:
+    class ChangedFirstPage(Replay):
+        async def request(
+            self,
+            url: str,
+            *,
+            payload: dict[str, Any] | None = None,
+            form: dict[str, str] | None = None,
+            detail: bool = False,
+        ) -> dict[str, Any]:
+            assert payload is None and form is not None
+            if detail:
+                return await super().request(url, form=form, detail=True)
+            self.calls.append((url, form))
+            page = int(form["currentPage"])
+            return {
+                "state": "200",
+                "data": {
+                    "pageForm": {
+                        "dataCount": 3,
+                        "pageSize": 1,
+                        "totalPage": 3,
+                        "currentPage": page,
+                        "pageData": [self._listing("abc"[page - 1])],
+                    }
+                },
+            }
+
+    replay = ChangedFirstPage()
+    source = Source(
+        source_id="SITE",
+        company_id="SITE",
+        company="企业",
+        url=f"https://wecruit.hotjob.cn/{HuaXia.suite}/pb/school.html",
+    )
+    result = await HuaXia(source, replay, now).collect()
+    assert result.coverage_issues() == []
+    assert [job.source_key for job in result.jobs] == ["a", "b", "c"]
+    assert [form["pageSize"] for _, form in replay.calls if "currentPage" in form] == [
+        "2",
+        "1",
+        "1",
+        "1",
+    ]
+
+
+async def test_goertek_restricts_listings_to_legal_company(now: datetime) -> None:
+    class CompanyReplay(Replay):
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            row["company"] = "其他公司" if post_id == "b" else "歌尔股份"
+            return row
+
+    replay = CompanyReplay()
+    source = Source(
+        source_id="COM0208",
+        company_id="COM0208",
+        company="歌尔股份有限公司",
+        url=f"https://goertek.hotjob.cn/{Goertek.suite}/pb/school.html",
+    )
+    result = await Goertek(source, replay, now).collect()
+    assert result.coverage_issues() == []
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
+    assert result.scopes[0].skipped_out_of_scope == 1
+    assert all("goertek.hotjob.cn" in job.source_url for job in result.jobs)
+
+    class MissingCompany(CompanyReplay):
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            if post_id == "b":
+                row["company"] = ""
+            return row
+
+    assert (await Goertek(source, MissingCompany(), now).collect()).coverage_issues()
 
 
 @pytest.mark.parametrize(
@@ -339,6 +417,56 @@ async def test_tbea_requires_explicit_company_for_unlisted_institution(now: date
     uncertain.other_company = "其他法人"
     rejected = await Tbea(src, uncertain, now).collect()
     assert rejected.coverage_issues()
+
+
+async def test_tcl_industries_only_collects_verified_group_branch(now: datetime) -> None:
+    class GroupReplay(Replay):
+        unknown_code = False
+
+        async def observed(self, needle: str) -> dict[str, Any]:
+            if "listSearchTerm" in needle:
+                return {
+                    "url": self._url("listSearchTerm"),
+                    "body": json.dumps(
+                        {
+                            "state": "200",
+                            "data": {
+                                "orgList": [
+                                    {"code": "0/1", "nameCh": "TCL科技", "positionsNum": 1},
+                                    {"code": "0/41", "nameCh": "TCL实业", "positionsNum": 1},
+                                    {
+                                        "code": "0/36",
+                                        "nameCh": "TCL财务共享中心",
+                                        "positionsNum": 1,
+                                    },
+                                ]
+                            },
+                        },
+                        ensure_ascii=False,
+                    ),
+                }
+            return await super().observed(needle)
+
+        def _listing(self, post_id: str) -> dict[str, Any]:
+            row = super()._listing(post_id)
+            row["orgCode"] = {"a": "0/41/5", "b": "0/1/6", "c": "0/36/7"}[post_id]
+            if self.unknown_code and post_id == "c":
+                row["orgCode"] = "0/999/1"
+            return row
+
+    src = Source(
+        source_id="COM0153",
+        company_id="COM0153",
+        company="TCL实业控股股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{TclIndustries.suite}/pb/school.html",
+    )
+    result = await TclIndustries(src, GroupReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert [job.source_key for job in result.jobs] == ["a"]
+    assert result.scopes[0].skipped_out_of_scope == 2
+    unknown = GroupReplay()
+    unknown.unknown_code = True
+    assert (await TclIndustries(src, unknown, now).collect()).coverage_issues()
 
 
 async def test_missing_requirement_is_visible_warning(now: datetime) -> None:
