@@ -46,9 +46,14 @@ class Hotjob(Adapter):
     host = "wecruit.hotjob.cn"
     suite = ""
     path = ""
+    mobile_mode = False
     scope_description = "Hotjob 公开校园招聘 recruitType=1 全目录；逐条读取详情；不含社会招聘"
 
     def detail_page(self, post_id: str) -> str:
+        if self.mobile_mode:
+            return f"https://{self.host}/{self.suite}/mc/detail?" + urlencode(
+                {"postId": post_id, "recruitType": "campus", "distance": "0"}
+            )
         return f"https://{self.host}/{self.suite}/pb/posDetail.html?" + urlencode(
             {"postId": post_id, "postType": "campus"}
         )
@@ -60,11 +65,20 @@ class Hotjob(Adapter):
         values = parse_qs(observed.get("post_data") or "", keep_blank_values=True)
         check(values.get("recruitType") == ["1"], "Hotjob 目录不是校招")
         check(values.get("currentPage") == ["1"], "Hotjob 目录不是第一页")
-        check(values.get("isFrompb") == ["true"], "Hotjob 门户类型改变")
-        check(
-            set(values) <= {"isFrompb", "recruitType", "pageSize", "currentPage"},
-            "Hotjob 目录带有未知筛选",
-        )
+        if self.mobile_mode:
+            check(
+                set(values)
+                <= {"recruitType", "pageSize", "currentPage", "coordinateLat", "coordinateLng"}
+                and values.get("coordinateLat") == [""]
+                and values.get("coordinateLng") == [""],
+                "Hotjob 移动目录带有未知筛选或位置坐标",
+            )
+        else:
+            check(values.get("isFrompb") == ["true"], "Hotjob 门户类型改变")
+            check(
+                set(values) <= {"isFrompb", "recruitType", "pageSize", "currentPage"},
+                "Hotjob 目录带有未知筛选",
+            )
         size = int(values["pageSize"][0])
         check(0 < size <= 100, "Hotjob 分页大小异常")
         terms_observed = await self.session.observed("/positionInfo/listSearchTerm/")
@@ -94,15 +108,16 @@ class Hotjob(Adapter):
         first_detail: dict[str, Any] | None = None
         first_detail_id = ""
         while True:
-            response = await requester.request(
-                observed["url"],
-                form={
-                    "isFrompb": "true",
-                    "recruitType": "1",
-                    "pageSize": str(size),
-                    "currentPage": str(page),
-                },
-            )
+            form = {
+                "recruitType": "1",
+                "pageSize": str(size),
+                "currentPage": str(page),
+            }
+            if self.mobile_mode:
+                form.update({"coordinateLat": "", "coordinateLng": ""})
+            else:
+                form["isFrompb"] = "true"
+            response = await requester.request(observed["url"], form=form)
             check(response.get("state") == "200", "Hotjob 列表业务失败")
             page_form = response["data"]["pageForm"]
             expected = int(page_form["dataCount"])
@@ -603,7 +618,46 @@ class EveEnergy(Hotjob):
         return super()._job(row, listing, evidence, locations, location_evidence)
 
 
+class Zoomlion2027(Hotjob):
+    name = "hotjob-zoomlion-2027"
+    suite = "SU661f37091eb8053acd6cdf3d"
+    path = f"/{suite}/mc/position/campus"
+    mobile_mode = True
+    scope_description = "中联重科 2027 移动校招目录；排除中科云谷机器人方向，只收本级岗位"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(
+            text(row.get("projectName")) == "中联重科2027届校招"
+            and str(row.get("projectId")) == "128002"
+            and text(row.get("company")) == "中联重科股份有限公司"
+            and text(row.get("orgCode")) == "0/100001",
+            "中联重科列表项目或机构身份变化",
+        )
+        return "机器人" not in text(row.get("postName"))
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                str(row.get("postId")) == str(listing.get("postId"))
+                and text(row.get("postName")) == text(listing.get("postName"))
+                and text(row.get("orgName")) == "中联重科股份有限公司"
+                and text(row.get("company")) == "中联重科股份有限公司"
+                and text(row.get("orgCode")) == "0/100001"
+                and str(row.get("projectId")) == "128002",
+                "中联重科详情与列表或本级主体不符",
+            )
+        return super()._job(row, listing, evidence, locations, location_evidence)
+
+
 TENANTS = (
+    Zoomlion2027,
     EveEnergy,
     Luxshare,
     Goertek,

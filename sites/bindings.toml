@@ -646,3 +646,7 @@ version = "1"
 [sources.COM0335]
 adapter = "fuyao-2027-headquarters"
 version = "1"
+
+[sources.COM0304]
+adapter = "hotjob-zoomlion-2027"
+version = "1"

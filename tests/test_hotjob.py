@@ -22,6 +22,7 @@ from job_crawler.adapters.hotjob import (
     Skyworth,
     Tbea,
     TclIndustries,
+    Zoomlion2027,
     detail_body,
     location_paths,
 )
@@ -163,6 +164,109 @@ async def test_hotjob_paginates_and_joins_detail(adapter: type[Hotjob], now: dat
     assert result.scopes[0].expected == result.scopes[0].unique == 3
     assert len([url for url, form in replay.calls if "currentPage" in form]) == 2
     assert len([url for url, form in replay.calls if "postId" in form]) == 2
+
+
+class ZoomlionReplay(Replay):
+    def __init__(self, *, wrong_detail: bool = False):
+        super().__init__()
+        self.wrong_detail = wrong_detail
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        if "listPosition" in needle and "Detail" not in needle:
+            return {
+                "url": self._url("listPosition"),
+                "post_data": "recruitType=1&currentPage=1&pageSize=10&coordinateLat=&coordinateLng=",
+            }
+        if "listPositionDetail" in needle:
+            return {"url": self._url("listPositionDetail"), "body": json.dumps(self._detail("1"))}
+        return await super().observed(needle)
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        number = int(post_id)
+        row.update(
+            {
+                "postName": f"{'机器人研发工程师' if 6 <= number <= 14 else '技术研发岗'}{number}",
+                "company": "中联重科股份有限公司",
+                "orgCode": "0/100001",
+                "projectName": "中联重科2027届校招",
+                "projectId": 128002,
+            }
+        )
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        row = self._listing(post_id)
+        row.update(
+            {
+                "orgName": "子公司"
+                if self.wrong_detail and post_id == "1"
+                else "中联重科股份有限公司",
+                "education": "本科及以上",
+                "workContent": "负责技术研发",
+                "serviceCondition": "2027届本科毕业生",
+            }
+        )
+        return {"state": "200", "data": row}
+
+    async def request(
+        self,
+        url: str,
+        *,
+        payload: dict[str, Any] | None = None,
+        form: dict[str, str] | None = None,
+        detail: bool = False,
+    ) -> dict[str, Any]:
+        assert payload is None and form is not None
+        self.calls.append((url, form))
+        if detail:
+            return self._detail(form["postId"])
+        assert form["coordinateLat"] == form["coordinateLng"] == ""
+        page = int(form["currentPage"])
+        ids = range(1, 11) if page == 1 else range(11, 17)
+        return {
+            "state": "200",
+            "data": {
+                "pageForm": {
+                    "dataCount": 16,
+                    "totalPage": 2,
+                    "pageSize": 10,
+                    "currentPage": page,
+                    "pageData": [self._listing(str(i)) for i in ids],
+                }
+            },
+        }
+
+
+async def test_zoomlion_mobile_scope_and_details(now: datetime) -> None:
+    replay = ZoomlionReplay()
+    source = Source(
+        source_id="COM0304",
+        company_id="COM0304",
+        company="中联重科股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{Zoomlion2027.suite}/mc/position/campus",
+    )
+    result = await Zoomlion2027(source, replay, now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].unique == 16
+    assert result.scopes[0].details == 7
+    assert result.scopes[0].skipped_out_of_scope == 9
+    assert len(result.jobs) == 7
+    assert all("/mc/detail?" in job.source_url for job in result.jobs)
+
+
+async def test_zoomlion_rejects_detail_legal_entity_conflict(now: datetime) -> None:
+    replay = ZoomlionReplay(wrong_detail=True)
+    source = Source(
+        source_id="COM0304",
+        company_id="COM0304",
+        company="中联重科股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{Zoomlion2027.suite}/mc/position/campus",
+    )
+    result = await Zoomlion2027(source, replay, now).collect()
+    assert result.coverage_issues()
+    assert result.scopes[0].details == 6
+    assert any(issue.job_key == "1" for issue in result.issues)
 
 
 async def test_hotjob_uses_returned_page_size_before_advancing(now: datetime) -> None:
