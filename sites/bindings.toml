@@ -674,3 +674,7 @@ version = "1"
 [sources.COM0170]
 adapter = "ceair-2027"
 version = "1"
+
+[sources.COM0111]
+adapter = "datang-2027"
+version = "1"
