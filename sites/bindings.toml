@@ -642,3 +642,7 @@ version = "1"
 [sources.COM0309]
 adapter = "coapi-cqrcb-2027"
 version = "1"
+
+[sources.COM0335]
+adapter = "fuyao-2027-headquarters"
+version = "1"

@@ -14,6 +14,7 @@ from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
+from job_crawler.adapters.fuyao import FuyaoHeadquarters
 from job_crawler.adapters.greentown import GreentownCampus
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
@@ -64,6 +65,7 @@ REGISTRY = {
         Lenovo,
         LiAutoCampus,
         *FEISHU_TENANTS,
+        FuyaoHeadquarters,
         *INLINE_TENANTS,
         *EXTRA_TENANTS,
         JD,
