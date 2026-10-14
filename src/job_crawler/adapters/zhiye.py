@@ -19,8 +19,13 @@ def date_text(value: Any) -> str:
 class Zhiye(Adapter):
     path = "/campus/jobs"
     mixed_catalog = False
+    detail_path = "/campus/detail"
+    regular_only = False
     ready_endpoints = ("/api/Jobad/GetJobAdPageList",)
     scope_description = "北森公开校园招聘 Category=2 全目录；保留实际租户/门户范围，不含社招和实习"
+
+    def detail_page(self, job_id: str) -> str:
+        return f"https://{self.host}{self.detail_path}?{urlencode({'jobAdId': job_id})}"
 
     async def harvest(self) -> None:
         observed = await self.session.observed("/api/Jobad/GetJobAdPageList")
@@ -66,7 +71,7 @@ class Zhiye(Adapter):
                     listing = self.job(
                         str(listed["Id"]),
                         title=text(listed.get("JobAdName")),
-                        source_url=f"https://{self.host}/campus/detail?{urlencode({'jobAdId': listed['Id']})}",
+                        source_url=self.detail_page(str(listed["Id"])),
                         published=date_text(listed.get("PostDate")),
                         deadline=date_text(listed.get("EndTime")),
                     )
@@ -93,7 +98,15 @@ class Zhiye(Adapter):
                     job = self.job(
                         str(row["Id"]),
                         title=text(row["JobAdName"]),
-                        source_url=f"https://{self.host}/campus/detail?{urlencode({'jobAdId': row['Id']})}",
+                        work_type=(
+                            "实习"
+                            if self.regular_only
+                            and (
+                                "实习" in text(row.get("Kind")) or "实习" in text(row["JobAdName"])
+                            )
+                            else "校招"
+                        ),
+                        source_url=self.detail_page(str(row["Id"])),
                         unit=text(row.get("Org") or listed.get("Org")),
                         location=text(row.get("LocNames") or listed.get("LocNames")),
                         education=text(row.get("Degree") or listed.get("Degree")),
@@ -131,7 +144,7 @@ class Zhiye(Adapter):
             async with detail_lock:
                 if not detail_url:
                     await self.session.open(
-                        f"https://{self.host}/campus/detail?{urlencode({'jobAdId': listed['Id']})}",
+                        self.detail_page(str(listed["Id"])),
                         ready_endpoints=("/api/JobAd/GetJobAdInfo?",),
                     )
                     detail_url = (await self.session.observed("/api/JobAd/GetJobAdInfo?"))["url"]
@@ -350,8 +363,11 @@ class CALB(Zhiye):
 
 
 class CICC(Zhiye):
+    regular_only = True
     name = "zhiye-cicc"
     host = "cicc.zhiye.com"
+    path = "/custom/campus?hideMenu=1"
+    detail_path = "/custom/campusxq"
 
 
 class Jiangling(Zhiye):
@@ -365,8 +381,11 @@ class Avary(Zhiye):
 
 
 class ChinaStock(Zhiye):
+    regular_only = True
     name = "zhiye-chinastock"
     host = "chinastock.zhiye.com"
+    path = "/custom/campus"
+    detail_path = "/custom/campusxq"
 
 
 class AUX(Zhiye):
@@ -374,7 +393,28 @@ class AUX(Zhiye):
     host = "auxgroup.zhiye.com"
 
 
+class Baic(Zhiye):
+    regular_only = True
+    name = "zhiye-baic"
+    host = "baicgroup.zhiye.com"
+
+
+class Naura(Zhiye):
+    regular_only = True
+    name = "zhiye-naura"
+    host = "career.naura.com"
+
+
+class Dahua(Zhiye):
+    name = "zhiye-dahua"
+    host = "dahua.zhiye.com"
+    regular_only = True
+
+
 TENANTS = (
+    Dahua,
+    Baic,
+    Naura,
     Poly,
     Xiangyu,
     Changan,

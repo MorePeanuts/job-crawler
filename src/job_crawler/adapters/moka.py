@@ -417,7 +417,119 @@ class XCMG(Moka):
     path = f"/campus-recruitment/{org}/{site_id}#/jobs"
 
 
+class Wzgroup(Moka):
+    name = "moka-wzgroup"
+    host = "campus.wzgroup.cn"
+    org = "wzgroup"
+    site_id = 41923
+    route = "campus_apply"
+    path = f"/{route}/{org}/{site_id}#/jobs"
+
+
+class Vipshop(Moka):
+    name = "moka-vipshop"
+    host = "app-tc.mokahr.com"
+    org = "vipshophr"
+    site_id = 10039
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "唯品会官网跳转的10039、8015两公开校园门户；实习排除；源岗位ID跨门户去重"
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        self.site_id = 8015
+        await self.session.open(
+            f"https://{self.host}/{self.route}/{self.org}/{self.site_id}#/jobs",
+            ready_endpoints=self.ready_endpoints,
+        )
+        await super().harvest()
+        unique: dict[str, Job] = {}
+        for job in self.result.jobs:
+            if job.source_key in unique:
+                first = unique[job.source_key]
+                check(
+                    first.title == job.title and first.duties == job.duties,
+                    "唯品会跨门户岗位内容不一致",
+                )
+                first.evidence = list(dict.fromkeys([*first.evidence, *job.evidence]))
+            else:
+                unique[job.source_key] = job
+        self.result.jobs = list(unique.values())
+
+
+class Nongfu(Moka):
+    name = "moka-nongfu"
+    host = "jobs.yst.com.cn"
+    org = "yst"
+    site_id = 68367
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "养生堂校园共享全目录中明确隶属农夫山泉的岗位；排除其他法人和实习"
+
+    async def harvest(self) -> None:
+        observed = await self.session.observed("/api/outer/ats-apply/website/jobs/departments/flat")
+        response = json.loads(observed["body"])
+        check(response.get("code") == 0, "养生堂部门字典失败")
+        self.departments = {str(d["id"]): str(d["label"]) for d in response["data"]}
+        check(self.departments.get("1867931") == "农夫山泉股份有限公司", "农夫山泉法人字典变化")
+        await super().harvest()
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        *,
+        is_detail: bool = False,
+    ) -> Job:
+        dept_id = str(row.get("deptId") or listing.get("deptId") or "")
+        department = (
+            row.get("department")
+            or listing.get("department")
+            or {"id": dept_id, "name": self.departments.get(dept_id)}
+        )
+        row = {**row, "department": department}
+        job = super()._job(row, listing, evidence, is_detail=is_detail)
+        if not is_detail:
+            return job
+        check(bool(department.get("id") and department.get("name")), "养生堂共享门户缺少企业归属")
+        if str(department["id"]) != "1867931":
+            job.work_type = "非农夫山泉主体"
+        else:
+            check(department["name"] == "农夫山泉股份有限公司", "农夫山泉部门名称与已验证ID不符")
+        return job
+
+
+class Joyson(Moka):
+    name = "moka-joyson"
+    org = "joyson"
+    site_id = 94311
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+
+
+class Zijin(Moka):
+    name = "moka-zijin"
+    host = "join.zjky.cn"
+    org = "zijinmining"
+    site_id = 117957
+    path = f"/campus-recruitment/{org}/{site_id}/#/jobs"
+
+    def detail_page(self, job_id: str) -> str:
+        return f"https://{self.host}/campus-recruitment/{self.org}/{self.site_id}/#/job/{job_id}"
+
+
+class ZTE(Moka):
+    name = "moka-zte"
+    org = "zte"
+    site_id = 46903
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+
+
 TENANTS = (
+    Zijin,
+    ZTE,
+    Wzgroup,
+    Vipshop,
+    Nongfu,
+    Joyson,
     CATL,
     Huaqin,
     Jinko,
