@@ -19,3 +19,7 @@
 3. Ruff、ty、pytest 和真实采集完成并记录限制。
 
 对应测试：`tests/test_zhaopin.py` 复星用例与智联公共契约测试。
+
+## 实站验收
+
+2026-10-15 13:33 上海时间，`outputs/dev-20261015-COM0148-v2/report.json` 记录 10 个招聘单位合计 191，`expected=listed=unique=details=191`、`coverage=complete`；46 条明确实习岗位被公共筛选排除，正式校招选中/信息表/待补全 145、严格导入 0。站点验收禁用模型，分类等导入字段待补全。完整门禁 593 项测试通过。
