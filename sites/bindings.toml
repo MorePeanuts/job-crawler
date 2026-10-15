@@ -818,3 +818,7 @@ version = "1"
 [sources.COM0060]
 adapter = "iguopin-cosco-2027"
 version = "1"
+
+[sources.COM0110]
+adapter = "cec-campus"
+version = "1"
