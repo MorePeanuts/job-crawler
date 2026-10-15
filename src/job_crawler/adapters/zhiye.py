@@ -744,7 +744,21 @@ class Cinda2027(Zhiye):
         return published[:10] >= "2026-10-09"
 
 
+class Vanchen2027(Zhiye):
+    name = "zhiye-vanchen-2027"
+    host = "vanchen1.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "万辰集团 2027 校招北森 Category=2 全目录；总部与好想来原文保留"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "万辰校招目录混入非校招类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "万辰校招岗位类型改变")
+        return True
+
+
 TENANTS = (
+    Vanchen2027,
     Mxbc2027,
     GenertecCampus,
     Sph2027,

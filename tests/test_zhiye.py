@@ -24,6 +24,7 @@ from job_crawler.adapters.zhiye import (
     Shenzhou,
     Shrcb,
     Sph2027,
+    Vanchen2027,
     Xiangyu,
     YuntianhuaParent,
     Zhenshi2027,
@@ -856,4 +857,74 @@ async def test_cinda_2027_all_pages_uses_institution_and_excludes_old(now: datet
 
 async def test_cinda_2027_rejects_foreign_institution(now: datetime) -> None:
     result = await Cinda2027(cinda_source(), CindaReplay(foreign_unit=True), now).collect()
+    assert result.coverage_issues()
+
+
+class VanchenReplay:
+    last_evidence = "vanchen-list.json"
+
+    def __init__(self, *, wrong_category: bool = False, wrong_kind: bool = False):
+        self.wrong_category = wrong_category
+        self.wrong_kind = wrong_kind
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://vanchen1.zhiye.com/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        return {
+            "url": "https://vanchen1.zhiye.com/api/Jobad/GetJobAdPageList",
+            "post_data": json.dumps(
+                {"PageIndex": 0, "PageSize": 20, "Category": ["2"], "KeyWords": ""}
+            ),
+        }
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        assert payload is not None and payload["PageIndex"] == 0 and not detail
+        return {
+            "Code": 200,
+            "Count": 2,
+            "Data": [
+                {
+                    "Id": str(index),
+                    "CategoryId": "1" if self.wrong_category and index else "2",
+                    "Kind": "兼职" if self.wrong_kind and index else "全职",
+                    "JobAdName": f"万辰管培生{index}",
+                    "Duty": "轮岗学习",
+                    "Require": "本科及以上",
+                    "LocNames": ["江苏省·南京市"],
+                    "Org": None,
+                    "PostDate": "0001-01-01T00:00:00",
+                    "EndTime": "0001-01-01T00:00:00",
+                }
+                for index in range(2)
+            ],
+        }
+
+
+def vanchen_source() -> Source:
+    return Source(
+        source_id="COM0307",
+        company_id="COM0307",
+        company="福建万辰食品集团股份有限公司",
+        url="https://vanchen1.zhiye.com/campus/jobs",
+    )
+
+
+async def test_vanchen_full_campus_listing_keeps_unknown_unit_and_date(now: datetime) -> None:
+    result = await Vanchen2027(vanchen_source(), VanchenReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
+    assert all(job.unit == job.published == job.deadline == "" for job in result.jobs)
+    assert all(job.duties == "轮岗学习" and job.requirements == "本科及以上" for job in result.jobs)
+
+
+@pytest.mark.parametrize("fault", ["category", "kind"])
+async def test_vanchen_rejects_changed_scope(fault: str, now: datetime) -> None:
+    result = await Vanchen2027(
+        vanchen_source(),
+        VanchenReplay(wrong_category=fault == "category", wrong_kind=fault == "kind"),
+        now,
+    ).collect()
     assert result.coverage_issues()
