@@ -12,17 +12,21 @@ from job_crawler.adapters.zhiye import (
     ChinaLifeGroup,
     Cinda2027,
     CmhkParent,
+    GenertecCampus,
     Haid,
     Huafeng,
     Infore,
     LuzhouLaojiao,
     Mindray,
+    Mxbc2027,
     PICCGroup,
     Seres,
     Shenzhou,
     Shrcb,
+    Sph2027,
     Xiangyu,
     YuntianhuaParent,
+    Zhiye,
     date_text,
 )
 from job_crawler.config import load_bindings
@@ -149,6 +153,106 @@ async def test_zhiye_verified_zero(now: datetime) -> None:
     result = await Xiangyu(source(), replay, now).collect()
     assert not result.jobs and not result.coverage_issues()
     assert not replay.details and len(replay.opens) == 1
+
+
+@pytest.mark.parametrize(
+    "adapter,source_id,company,url",
+    [
+        (Mxbc2027, "COM0423", "蜜雪冰城股份有限公司", "https://careers.mxbc.com/campus/jobs"),
+        (
+            GenertecCampus,
+            "COM0082",
+            "中国通用技术（集团）控股有限责任公司",
+            "https://genertec.zhiye.com/campus/jobs",
+        ),
+    ],
+)
+async def test_group_complete_listing_keeps_unknown_unit(
+    now: datetime, adapter: type[Zhiye], source_id: str, company: str, url: str
+) -> None:
+    class MxbcReplay(Replay):
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            assert payload is not None and not detail
+            page = int(payload["PageIndex"])
+            self.pages.append(page)
+            start = page * 20
+            return {
+                "Code": 200,
+                "Count": 21,
+                "Data": [
+                    {
+                        "Id": str(i),
+                        "CategoryId": "2",
+                        "JobAdName": f"2027届校招岗位{i}",
+                        "OrgId": 3620417,
+                        "Org": None,
+                        "Duty": "负责生产管理",
+                        "Require": "本科及以上",
+                        "PostDate": "2026-10-13T00:00:00",
+                        "EndTime": "0001-01-01T00:00:00",
+                        "LocNames": ["河南省·郑州市"],
+                    }
+                    for i in range(start, min(start + 20, 21))
+                ],
+            }
+
+    replay = MxbcReplay()
+    result = await adapter(
+        Source(
+            source_id=source_id,
+            company_id=source_id,
+            company=company,
+            url=url,
+        ),
+        replay,
+        now,
+    ).collect()
+    assert result.coverage_issues() == []
+    assert len(result.jobs) == 21 and replay.pages == [0, 1]
+    assert all(job.unit == "" for job in result.jobs)
+    assert result.jobs[0].duties == "负责生产管理"
+    assert result.jobs[0].requirements == "本科及以上"
+
+
+async def test_sph_listing_retains_actual_unit_and_unset_date(now: datetime) -> None:
+    class SphReplay(Replay):
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            assert payload is not None and not detail
+            return {
+                "Code": 200,
+                "Count": 1,
+                "Data": [
+                    {
+                        "Id": "sph-one",
+                        "CategoryId": "2",
+                        "JobAdName": "2027研发工程师",
+                        "Org": "上药控股广东有限公司",
+                        "Duty": "负责研发",
+                        "Require": "硕士研究生及以上",
+                        "PostDate": "0001-01-01T00:00:00",
+                        "EndTime": "0001-01-01T00:00:00",
+                    }
+                ],
+            }
+
+    result = await Sph2027(
+        Source(
+            source_id="COM0096",
+            company_id="COM0096",
+            company="上海医药集团股份有限公司",
+            url="https://sph.zhiye.com/campus/jobs",
+        ),
+        SphReplay(),
+        now,
+    ).collect()
+    assert not result.coverage_issues()
+    assert len(result.jobs) == 1
+    assert result.jobs[0].unit == "上药控股广东有限公司"
+    assert result.jobs[0].published == result.jobs[0].deadline == ""
 
 
 async def test_zhiye_stops_queued_details_after_access_denied(now: datetime) -> None:

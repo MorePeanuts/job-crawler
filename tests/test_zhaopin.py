@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Any
 
-from job_crawler.adapters.zhaopin import ChinaPost2027, Unicom, split_detail
+from job_crawler.adapters.zhaopin import ChinaPost2027, Longfor2027, Unicom, split_detail
 from job_crawler.models import Source
 
 
@@ -112,6 +112,105 @@ async def test_zhaopin_total_change_is_incomplete(now: datetime) -> None:
 
 def test_zhaopin_detail_without_requirements() -> None:
     assert split_detail("负责开发软件") == ("负责开发软件", "")
+
+
+class LongforReplay:
+    last_evidence = "longfor-list.json"
+
+    def __init__(self, *, foreign: bool = False):
+        self.foreign = foreign
+        self.pages: list[int] = []
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://longfor.zhaopin.com/sgs/index.html#jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        return {
+            "url": needle,
+            "post_data": json.dumps(
+                {
+                    "orgNumbers": "105173",
+                    "jobSource": 2,
+                    "pageIndex": 1,
+                    "pageSize": 21,
+                    "orgDepartmentIds": [10126970],
+                    "campusParentDepartmentIds": 10126975,
+                    "workRegionIds": "530",
+                    "jobTypes": "",
+                    "priorityMajors": "",
+                    "customTags": "",
+                    "keyword": "仕官生",
+                }
+            ),
+        }
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        assert payload is not None and not detail
+        assert payload["orgNumbers"] == "105173" and payload["jobSource"] == 2
+        assert payload["orgDepartmentIds"] == []
+        assert payload["campusParentDepartmentIds"] == payload["workRegionIds"] == ""
+        assert payload["keyword"] == ""
+        page = int(payload["pageIndex"])
+        self.pages.append(page)
+        start = (page - 1) * 50
+        rows = []
+        projects = ("仕官生", "绽放", "点将")
+        for i in range(start, min(start + 50, 51)):
+            rows.append(
+                {
+                    "company": {
+                        "companyId": 105173,
+                        "slaveDisplayOrgName": "其他集团"
+                        if self.foreign and i == 50
+                        else "龙湖集团",
+                        "campusOrgName": projects[i % 3],
+                        "campusParentDepartment": {"name": "地产开发"},
+                        "campusDepartment": {"name": "北京"},
+                    },
+                    "job": {
+                        "jobNumber": f"LONGFOR{i}",
+                        "positionSourceType": 2,
+                        "title": f"岗位{i}",
+                        "detail": "岗位职责：负责项目管理\n任职要求：本科及以上",
+                        "url": f"https://xiaoyuan.zhaopin.com/job/LONGFOR{i}",
+                        "address": "北京",
+                    },
+                }
+            )
+        return {
+            "code": 200,
+            "data": {
+                "jobList": rows,
+                "pageInfo": {
+                    "pageIndex": page,
+                    "pageSize": 50,
+                    "totalNum": 51,
+                    "totalPage": 2,
+                },
+            },
+        }
+
+
+async def test_longfor_clears_local_filters_and_keeps_three_projects(now: datetime) -> None:
+    source = Source(
+        source_id="COM0206",
+        company_id="COM0206",
+        company="龙湖集团控股有限公司",
+        url="https://longfor.zhaopin.com/sgs/index.html#jobs",
+    )
+    replay = LongforReplay()
+    result = await Longfor2027(source, replay, now).collect()
+    assert result.coverage_issues() == []
+    assert replay.pages == [1, 2] and len(result.jobs) == 51
+    assert {job.unit for job in result.jobs} == {
+        "仕官生 / 地产开发 / 北京",
+        "绽放 / 地产开发 / 北京",
+        "点将 / 地产开发 / 北京",
+    }
+    foreign = await Longfor2027(source, LongforReplay(foreign=True), now).collect()
+    assert foreign.coverage_issues()
 
 
 class PostReplay:

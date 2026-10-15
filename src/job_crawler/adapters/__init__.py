@@ -5,6 +5,7 @@ from job_crawler.adapters.ansteel import Ansteel
 from job_crawler.adapters.bank_catalogs import TENANTS as BANK_TENANTS
 from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bilibili import Bilibili
+from job_crawler.adapters.boe import BoeCampus
 from job_crawler.adapters.bohai import Bohai2027
 from job_crawler.adapters.byd import BYDCampus
 from job_crawler.adapters.campaign51 import TENANTS as CAMPAIGN51_TENANTS
@@ -16,6 +17,7 @@ from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
 from job_crawler.adapters.ctg_dutyfree import CtgDutyFreeCampus
+from job_crawler.adapters.ctrip import CtripCampus
 from job_crawler.adapters.datang import Datang2027
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
@@ -27,6 +29,7 @@ from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
+from job_crawler.adapters.inovance import InovanceCampus
 from job_crawler.adapters.jd import JD
 from job_crawler.adapters.jxcc import JxccCampus
 from job_crawler.adapters.lenovo import Lenovo
@@ -39,6 +42,7 @@ from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
+from job_crawler.adapters.sdicpower import SdicPowerCampus
 from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
 from job_crawler.adapters.shougang import ShougangCampus
@@ -67,6 +71,7 @@ REGISTRY = {
         CCB,
         CNPC,
         CtgDutyFreeCampus,
+        CtripCampus,
         Alibaba,
         Wtmec,
         XiamenTungsten2027,
@@ -81,16 +86,19 @@ REGISTRY = {
         *FEISHU_TENANTS,
         FuyaoHeadquarters,
         *INLINE_TENANTS,
+        InovanceCampus,
         *EXTRA_TENANTS,
         JD,
         JxccCampus,
         Tencent,
         SF,
+        SdicPowerCampus,
         ShccigHeadquartersTrainees,
         ShougangCampus,
         BankComm,
         Meituan,
         Bilibili,
+        BoeCampus,
         Bohai2027,
         BYDCampus,
         Cdkj,

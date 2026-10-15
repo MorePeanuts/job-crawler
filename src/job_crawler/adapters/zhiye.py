@@ -235,6 +235,27 @@ class Poly(Zhiye):
     host = "polycareer.zhiye.com"
 
 
+class Mxbc2027(Zhiye):
+    name = "zhiye-mxbc-2027"
+    host = "careers.mxbc.com"
+    listing_complete = True
+    scope_description = "蜜雪集团2027届公开校园招聘 Category=2 全目录；实际招聘单位未公开时留空"
+
+
+class GenertecCampus(Zhiye):
+    name = "zhiye-genertec-campus"
+    host = "genertec.zhiye.com"
+    listing_complete = True
+    scope_description = "通用技术集团公开校园招聘 Category=2 全目录；实际招聘单位未公开时留空"
+
+
+class Sph2027(Zhiye):
+    name = "zhiye-sph-2027"
+    host = "sph.zhiye.com"
+    listing_complete = True
+    scope_description = "上海医药2027秋季校园招聘 Category=2 全目录；保留逐岗实际招聘单位"
+
+
 class Xiangyu(Zhiye):
     name = "zhiye-xiangyu"
     host = "xiangyu.zhiye.com"
@@ -683,6 +704,9 @@ class Cinda2027(Zhiye):
 
 
 TENANTS = (
+    Mxbc2027,
+    GenertecCampus,
+    Sph2027,
     Cinda2027,
     CmhkParent,
     YuntianhuaParent,

@@ -708,5 +708,45 @@ adapter = "grcbank-campus"
 version = "1"
 
 [sources.COM0085]
-adapter = "hotjob-sinomach-headquarters"
+adapter = "hotjob-sinomach-group"
+version = "3"
+
+[sources.COM0262]
+adapter = "moka-trinasolar-2027"
+version = "1"
+
+[sources.COM0231]
+adapter = "moka-anta-2027"
+version = "1"
+
+[sources.COM0423]
+adapter = "zhiye-mxbc-2027"
+version = "1"
+
+[sources.COM0206]
+adapter = "zhaopin-longfor-2027"
+version = "1"
+
+[sources.COM0341]
+adapter = "inovance-campus"
+version = "1"
+
+[sources.COM0082]
+adapter = "zhiye-genertec-campus"
+version = "1"
+
+[sources.COM0276]
+adapter = "ctrip-2027-campus"
+version = "1"
+
+[sources.COM0137]
+adapter = "boe-2027-campus"
+version = "1"
+
+[sources.COM0096]
+adapter = "zhiye-sph-2027"
+version = "1"
+
+[sources.COM0299]
+adapter = "sdicpower-campus"
 version = "1"

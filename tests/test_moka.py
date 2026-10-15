@@ -13,6 +13,7 @@ from job_crawler.adapters.moka import (
     CATL,
     HFSP,
     STO,
+    Anta2027,
     Dasenlin,
     Digiloong,
     EastchinaPharm,
@@ -23,6 +24,7 @@ from job_crawler.adapters.moka import (
     Moka,
     Sanhua,
     Sungrow,
+    TrinaSolar,
     Yadea,
     ZhongAn,
     decode,
@@ -149,6 +151,8 @@ class Replay:
         Yadea,
         Fehorizon,
         Dasenlin,
+        TrinaSolar,
+        Anta2027,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:

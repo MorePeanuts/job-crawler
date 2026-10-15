@@ -24,6 +24,7 @@ FILTERS = {
     "jobTypes",
     "priorityMajors",
     "customTags",
+    "keyword",
 }
 ALLOWED = FILTERS | {"orgNumbers", "jobSource", "pageIndex", "pageSize"}
 
@@ -151,6 +152,31 @@ class Unicom(Zhaopin):
     org_number = "105347"
 
 
+class Longfor2027(Zhaopin):
+    name = "zhaopin-longfor-2027"
+    host = "longfor.zhaopin.com"
+    path = "/sgs/index.html#jobs"
+    org_number = "105173"
+    scope_description = "龙湖集团2027届仕官生、绽放、点将三个项目的无筛选联合校招目录"
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "龙湖集团"
+            and text(company_data.get("campusOrgName")) in {"仕官生", "绽放", "点将"},
+            "龙湖岗位集团归属或招聘项目变化",
+        )
+
+    def unit_name(self, company_data: dict[str, Any]) -> str:
+        names = [text(company_data.get("campusOrgName"))]
+        for key in ("campusParentDepartment", "campusDepartment"):
+            node = company_data.get(key)
+            if isinstance(node, dict):
+                name = text(node.get("name"))
+                if name and name not in names:
+                    names.append(name)
+        return " / ".join(names)
+
+
 class Sipg(Zhaopin):
     name = "zhaopin-sipg"
     host = "sipg.zhaopin.com"
@@ -265,4 +291,4 @@ class ChinaPost2027(Zhaopin):
         self.result.scopes[0].evidence.append(tree_evidence)
 
 
-TENANTS = (ChinaPost2027, Hadian, Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)
+TENANTS = (Longfor2027, ChinaPost2027, Hadian, Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)

@@ -146,6 +146,7 @@ class BrowserSession:
                         "url": response.url,
                         "body": body,
                         "post_data": response.request.post_data,
+                        "portal_id": response.request.headers.get("x-portal-id", ""),
                         "status": response.status,
                     }
                 )
@@ -379,6 +380,7 @@ class BrowserSession:
         *,
         payload: dict[str, Any] | None = None,
         form: dict[str, str] | None = None,
+        headers: dict[str, str] | None = None,
         detail: bool = False,
         credentials: str = "include",
     ) -> dict[str, Any]:
@@ -386,7 +388,9 @@ class BrowserSession:
             raise ValueError("不支持的凭据模式")
         if payload is not None and form is not None:
             raise ValueError("同一次请求不能同时发送 JSON 和表单")
-        identity: dict[str, Any] = {"url": url, "payload": payload}
+        if headers and set(headers) != {"X-Portal-Id"}:
+            raise ValueError("仅允许公开站点的 X-Portal-Id 请求头")
+        identity: dict[str, Any] = {"url": url, "payload": payload, "headers": headers}
         if form is not None:
             identity["form"] = form
         if credentials != "include":
@@ -402,7 +406,7 @@ class BrowserSession:
         options: dict[str, Any] = {
             "method": "POST" if payload is not None or form is not None else "GET",
             "credentials": credentials,
-            "headers": {},
+            "headers": dict(headers or {}),
         }
         if payload is not None:
             options["headers"]["Content-Type"] = "application/json"

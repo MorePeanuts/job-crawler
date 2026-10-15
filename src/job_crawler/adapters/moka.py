@@ -413,6 +413,34 @@ class XCMG(Moka):
     path = f"/campus-recruitment/{org}/{site_id}#/jobs"
 
 
+class TrinaSolar(Moka):
+    name = "moka-trinasolar-2027"
+    org = "trinasolar"
+    site_id = 126157
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "天合光能2027届公开校园门户全目录；部门与岗位标题保留原文"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(
+            text(detail.get("title")) == text(listing.get("title")),
+            "天合光能详情与列表标题不一致",
+        )
+
+
+class Anta2027(Moka):
+    name = "moka-anta-2027"
+    org = "antahr"
+    site_id = 142914
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "安踏集团2027届公开校招全目录；品牌和业务部门保留原文"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(
+            text(detail.get("title")) == text(listing.get("title")),
+            "安踏详情与列表标题不一致",
+        )
+
+
 class Wzgroup(Moka):
     name = "moka-wzgroup"
     host = "campus.wzgroup.cn"
@@ -546,6 +574,8 @@ class ZhongAn(Moka):
 
 
 TENANTS = (
+    Anta2027,
+    TrinaSolar,
     ZhongAn,
     Zijin,
     ZTE,

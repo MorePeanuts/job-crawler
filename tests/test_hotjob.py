@@ -19,7 +19,7 @@ from job_crawler.adapters.hotjob import (
     LiuGong,
     Luxshare,
     Minth,
-    SinomachHeadquarters,
+    SinomachGroup,
     Skyworth,
     Tbea,
     TclIndustries,
@@ -155,24 +155,37 @@ class SinomachReplay(Replay):
         wrong_tree: bool = False,
         wrong_listing: bool = False,
         wrong_count: bool = False,
+        internship: bool = False,
     ):
         super().__init__()
         self.wrong_detail = wrong_detail
         self.wrong_tree = wrong_tree
         self.wrong_listing = wrong_listing
         self.wrong_count = wrong_count
+        self.internship = internship
 
     async def observed(self, needle: str) -> dict[str, Any]:
         response = await super().observed(needle)
         if "listSearchTerm" in needle:
             terms = json.loads(response["body"])
-            terms["data"]["orgList"] = [
-                {
-                    "code": "0/2688" if not self.wrong_tree else "0/9999",
-                    "nameCh": "国机集团总部",
-                    "positionsNum": 3 if self.wrong_count else 2,
-                }
-            ]
+            terms["data"]["orgList"] = (
+                []
+                if self.wrong_tree
+                else [
+                    {
+                        "code": "0/2688",
+                        "nameCh": "国机集团总部",
+                        "positionsNum": 3 if self.wrong_count else 2,
+                        "childNodes": [{"code": "0/2688/1317", "childNodes": []}],
+                    },
+                    {
+                        "code": "0/1289",
+                        "nameCh": "中国机械设备工程股份有限公司",
+                        "positionsNum": 1,
+                        "childNodes": [{"code": "0/1289/2693", "childNodes": []}],
+                    },
+                ]
+            )
             response["body"] = json.dumps(terms, ensure_ascii=False)
         elif "listPositionDetail" not in needle:
             response["post_data"] = (
@@ -190,11 +203,15 @@ class SinomachReplay(Replay):
             }
         )
         if self.wrong_listing and post_id == "c":
-            row["orgCode"] = "0/1289/2693"
+            row["orgCode"] = "0/9999/2693"
+        if self.internship and post_id == "c":
+            row["projectName"] = "实习见习岗位"
+            row["workTypeStr"] = "全职"
         return row
 
     def _detail(self, post_id: str) -> dict[str, Any]:
         detail = super()._detail(post_id)
+        detail["data"].update(self._listing(post_id))
         if self.wrong_detail and post_id == "c":
             detail["data"]["orgCode"] = "0/1289/2693"
         return detail
@@ -210,7 +227,7 @@ class SinomachReplay(Replay):
         (False, False, False, True),
     ],
 )
-async def test_sinomach_headquarters_boundary(
+async def test_sinomach_group_directory_and_identity(
     wrong_detail: bool,
     wrong_tree: bool,
     wrong_listing: bool,
@@ -229,23 +246,39 @@ async def test_sinomach_headquarters_boundary(
         company="中国机械工业集团有限公司",
         url=("https://zhaopin.sinomach.com.cn/SU64b60d25bef57c7e363ff1a3/mc/position/campus"),
     )
-    result = await SinomachHeadquarters(source, replay, now).collect()
+    result = await SinomachGroup(source, replay, now).collect()
     if wrong_tree:
         assert result.coverage_issues()
         assert result.jobs == []
     elif wrong_detail or wrong_listing:
         assert result.coverage_issues()
-        assert [job.source_key for job in result.jobs] == ["a"]
+        assert [job.source_key for job in result.jobs] == ["a", "b"]
     elif wrong_count:
         assert result.coverage_issues()
-        assert [job.source_key for job in result.jobs] == ["a", "c"]
+        assert [job.source_key for job in result.jobs] == ["a", "b", "c"]
     else:
         assert result.coverage_issues() == []
-        assert [job.source_key for job in result.jobs] == ["a", "c"]
-        assert result.scopes[0].skipped_out_of_scope == 1
-        assert result.scopes[0].details == 2
-        assert all(job.unit == "某业务单位" for job in result.jobs)
+        assert [job.source_key for job in result.jobs] == ["a", "b", "c"]
+        assert result.scopes[0].skipped_out_of_scope == 0
+        assert result.scopes[0].details == 3
+        assert [job.unit for job in result.jobs] == [
+            "国机集团总部 / 某业务单位",
+            "中国机械设备工程股份有限公司 / 某业务单位",
+            "国机集团总部 / 某业务单位",
+        ]
         assert all(job.published == "2026-10-10 09:00:00" for job in result.jobs)
+
+
+async def test_sinomach_internship_project_is_not_regular_campus(now: datetime) -> None:
+    source = Source(
+        source_id="COM0085",
+        company_id="COM0085",
+        company="中国机械工业集团有限公司",
+        url="https://zhaopin.sinomach.com.cn/SU64b60d25bef57c7e363ff1a3/mc/position/campus",
+    )
+    result = await SinomachGroup(source, SinomachReplay(internship=True), now).collect()
+    assert result.coverage_issues() == []
+    assert [job.work_type for job in result.jobs] == ["校招", "校招", "实习"]
 
 
 @pytest.mark.parametrize("adapter", [HuaXia, JinTian, GF, LiuGong, HaiTian, Minth])
