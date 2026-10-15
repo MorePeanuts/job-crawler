@@ -4,7 +4,7 @@
 
 维护企业招聘来源，使用 Crawl4AI 与平台适配器采集校招岗位，筛选仍展示且未截止的岗位，由程序导出符合用户模板的 Excel。支持全部存量、最近一天、最近一周、最近一个月，默认自动进行缓存优先的 LLM 分类及必要学历补全，完成校验后直接输出最终表格。
 
-已导入 **500 家企业、251 个招聘链接**，目前已接入并真实验收 **178 家企业**；其余 **73 个有链接来源**待适配，空链接待补充。平台逻辑共享，企业入口和覆盖逐家核验。2026-10-14 新批次 **50 家有实际岗位的企业、6,287 条有效岗位**已交付，见[本批验收](docs/adapter-batch7-acceptance.md)；历史批次见 [前一批 50 家交付](docs/adapter-batch6-acceptance.md)、[首轮验收](docs/acceptance.md)、[第三批](docs/adapter-batch3-acceptance.md)、[第四批](docs/adapter-batch4-acceptance.md) 和 [42 家复查](docs/adapter-batch5-triage.md)。
+已导入 **500 家企业、252 个招聘链接**，目前已接入并真实验收 **179 家企业**；其余 **73 个有链接来源**待适配，空链接待补充。平台逻辑共享，企业入口和覆盖逐家核验。2026-10-15 新增 50 家任务正在进行，当前已通过国机集团总部 1 家的站点覆盖验收；[阶段岗位信息表](outputs/2026-10-15/新增1家-阶段汇总-岗位信息汇总.xlsx)有 8 条，[严格导入表](outputs/2026-10-15/新增1家-阶段汇总-严格导入.xlsx)为 0 条，原因见[本批阶段验收](docs/adapter-batch8-acceptance.md)。2026-10-14 新批次 **50 家有实际岗位的企业、6,287 条有效岗位**已交付，见[前批验收](docs/adapter-batch7-acceptance.md)；历史批次见 [前一批 50 家交付](docs/adapter-batch6-acceptance.md)、[首轮验收](docs/acceptance.md)、[第三批](docs/adapter-batch3-acceptance.md)、[第四批](docs/adapter-batch4-acceptance.md) 和 [42 家复查](docs/adapter-batch5-triage.md)。
 
 **已配置用户提供的真实分类树：20 个一级分类、113 条二级路径。** 分类来源是 `job-position.js`，第三级岗位名称用于模型理解，Excel 仍保留原来的一级、二级两列。缺少合法分类、学历或地点格式的记录保留在 `review.json`，不进入严格导入表。可以对已保存岗位进行批量分类和重新导出，无须重复爬取。
 
