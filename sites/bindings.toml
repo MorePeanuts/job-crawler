@@ -890,3 +890,7 @@ version = "1"
 [sources.COM0360]
 adapter = "moka-longcheer-2027"
 version = "1"
+
+[sources.COM0075]
+adapter = "zjjt-2027-campus"
+version = "1"
