@@ -507,9 +507,10 @@ class BrowserSession:
         form: dict[str, str] | None = None,
         detail: bool = False,
         encoding: str = "utf-8",
+        validate_html: bool = True,
     ) -> str:
-        """Read a server-rendered page in the active Crawl4AI browser context."""
-        identity = {"url": url, "form": form, "format": "html"}
+        """Read a page or a declared text asset in the active browser context."""
+        identity = {"url": url, "form": form, "format": "html" if validate_html else "text"}
         if encoding not in {"utf-8", "gb18030"}:
             raise ValueError("未支持的HTML编码")
         if encoding != "utf-8":
@@ -565,7 +566,7 @@ class BrowserSession:
                         f"HTTP {response['status']}",
                     )
                 html = response["body"]
-                if "<html" not in html[:50000].lower():
+                if validate_html and "<html" not in html[:50000].lower():
                     write_json(
                         path,
                         {

@@ -64,6 +64,7 @@ from job_crawler.adapters.xfusion import XfusionCampus
 from job_crawler.adapters.xmwy import XiamenTungsten2027
 from job_crawler.adapters.yili import YiliHeadquarters
 from job_crawler.adapters.yingte import YingteCampus
+from job_crawler.adapters.yuexiu2027 import YuexiuProperty2027
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhaopin import Cnooc2027
 from job_crawler.adapters.zhiye import TENANTS, Ctf2027, WeichaiPower2027
@@ -136,6 +137,7 @@ REGISTRY = {
         NewHopeCampus,
         PddCampus,
         YingteCampus,
+        YuexiuProperty2027,
         YiliHeadquarters,
         SmicCampus,
         Spic2027,
