@@ -778,3 +778,11 @@ version = "1"
 [sources.COM0095]
 adapter = "hotjob-crrc-group"
 version = "1"
+
+[sources.COM0051]
+adapter = "iguopin-chinalco-2027"
+version = "1"
+
+[sources.COM0435]
+adapter = "moka-hengrui"
+version = "1"
