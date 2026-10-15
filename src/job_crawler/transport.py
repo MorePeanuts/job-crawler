@@ -146,6 +146,12 @@ class BrowserSession:
                         "url": response.url,
                         "body": body,
                         "post_data": response.request.post_data,
+                        "portal_id": response.request.headers.get("x-portal-id", ""),
+                        "public_headers": {
+                            key: response.request.headers[key]
+                            for key in ("lang", "datasource", "x-hw-id")
+                            if key in response.request.headers
+                        },
                         "status": response.status,
                     }
                 )
@@ -379,6 +385,7 @@ class BrowserSession:
         *,
         payload: dict[str, Any] | None = None,
         form: dict[str, str] | None = None,
+        headers: dict[str, str] | None = None,
         detail: bool = False,
         credentials: str = "include",
     ) -> dict[str, Any]:
@@ -386,7 +393,9 @@ class BrowserSession:
             raise ValueError("不支持的凭据模式")
         if payload is not None and form is not None:
             raise ValueError("同一次请求不能同时发送 JSON 和表单")
-        identity: dict[str, Any] = {"url": url, "payload": payload}
+        if headers and not set(headers) <= {"X-Portal-Id", "lang", "datasource", "X-HW-ID"}:
+            raise ValueError("仅允许已验证的公开站点请求头")
+        identity: dict[str, Any] = {"url": url, "payload": payload, "headers": headers}
         if form is not None:
             identity["form"] = form
         if credentials != "include":
@@ -402,7 +411,7 @@ class BrowserSession:
         options: dict[str, Any] = {
             "method": "POST" if payload is not None or form is not None else "GET",
             "credentials": credentials,
-            "headers": {},
+            "headers": dict(headers or {}),
         }
         if payload is not None:
             options["headers"]["Content-Type"] = "application/json"
@@ -498,9 +507,10 @@ class BrowserSession:
         form: dict[str, str] | None = None,
         detail: bool = False,
         encoding: str = "utf-8",
+        validate_html: bool = True,
     ) -> str:
-        """Read a server-rendered page in the active Crawl4AI browser context."""
-        identity = {"url": url, "form": form, "format": "html"}
+        """Read a page or a declared text asset in the active browser context."""
+        identity = {"url": url, "form": form, "format": "html" if validate_html else "text"}
         if encoding not in {"utf-8", "gb18030"}:
             raise ValueError("未支持的HTML编码")
         if encoding != "utf-8":
@@ -556,7 +566,7 @@ class BrowserSession:
                         f"HTTP {response['status']}",
                     )
                 html = response["body"]
-                if "<html" not in html[:50000].lower():
+                if validate_html and "<html" not in html[:50000].lower():
                     write_json(
                         path,
                         {

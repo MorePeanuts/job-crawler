@@ -8,9 +8,12 @@ import pytest
 
 from job_crawler.adapters.hotjob import (
     GF,
+    CrrcGroup,
     EveEnergy,
     Goertek,
+    GwmListed,
     HaiTian,
+    HengyiGroup,
     Hotjob,
     Huatai,
     HuaXia,
@@ -18,8 +21,9 @@ from job_crawler.adapters.hotjob import (
     JinTian,
     LiuGong,
     Luxshare,
+    MinmetalsGroup,
     Minth,
-    SinomachHeadquarters,
+    SinomachGroup,
     Skyworth,
     Tbea,
     TclIndustries,
@@ -155,24 +159,37 @@ class SinomachReplay(Replay):
         wrong_tree: bool = False,
         wrong_listing: bool = False,
         wrong_count: bool = False,
+        internship: bool = False,
     ):
         super().__init__()
         self.wrong_detail = wrong_detail
         self.wrong_tree = wrong_tree
         self.wrong_listing = wrong_listing
         self.wrong_count = wrong_count
+        self.internship = internship
 
     async def observed(self, needle: str) -> dict[str, Any]:
         response = await super().observed(needle)
         if "listSearchTerm" in needle:
             terms = json.loads(response["body"])
-            terms["data"]["orgList"] = [
-                {
-                    "code": "0/2688" if not self.wrong_tree else "0/9999",
-                    "nameCh": "国机集团总部",
-                    "positionsNum": 3 if self.wrong_count else 2,
-                }
-            ]
+            terms["data"]["orgList"] = (
+                []
+                if self.wrong_tree
+                else [
+                    {
+                        "code": "0/2688",
+                        "nameCh": "国机集团总部",
+                        "positionsNum": 3 if self.wrong_count else 2,
+                        "childNodes": [{"code": "0/2688/1317", "childNodes": []}],
+                    },
+                    {
+                        "code": "0/1289",
+                        "nameCh": "中国机械设备工程股份有限公司",
+                        "positionsNum": 1,
+                        "childNodes": [{"code": "0/1289/2693", "childNodes": []}],
+                    },
+                ]
+            )
             response["body"] = json.dumps(terms, ensure_ascii=False)
         elif "listPositionDetail" not in needle:
             response["post_data"] = (
@@ -190,11 +207,15 @@ class SinomachReplay(Replay):
             }
         )
         if self.wrong_listing and post_id == "c":
-            row["orgCode"] = "0/1289/2693"
+            row["orgCode"] = "0/9999/2693"
+        if self.internship and post_id == "c":
+            row["projectName"] = "实习见习岗位"
+            row["workTypeStr"] = "全职"
         return row
 
     def _detail(self, post_id: str) -> dict[str, Any]:
         detail = super()._detail(post_id)
+        detail["data"].update(self._listing(post_id))
         if self.wrong_detail and post_id == "c":
             detail["data"]["orgCode"] = "0/1289/2693"
         return detail
@@ -210,7 +231,7 @@ class SinomachReplay(Replay):
         (False, False, False, True),
     ],
 )
-async def test_sinomach_headquarters_boundary(
+async def test_sinomach_group_directory_and_identity(
     wrong_detail: bool,
     wrong_tree: bool,
     wrong_listing: bool,
@@ -229,23 +250,240 @@ async def test_sinomach_headquarters_boundary(
         company="中国机械工业集团有限公司",
         url=("https://zhaopin.sinomach.com.cn/SU64b60d25bef57c7e363ff1a3/mc/position/campus"),
     )
-    result = await SinomachHeadquarters(source, replay, now).collect()
+    result = await SinomachGroup(source, replay, now).collect()
     if wrong_tree:
         assert result.coverage_issues()
         assert result.jobs == []
     elif wrong_detail or wrong_listing:
         assert result.coverage_issues()
-        assert [job.source_key for job in result.jobs] == ["a"]
+        assert [job.source_key for job in result.jobs] == ["a", "b"]
     elif wrong_count:
         assert result.coverage_issues()
-        assert [job.source_key for job in result.jobs] == ["a", "c"]
+        assert [job.source_key for job in result.jobs] == ["a", "b", "c"]
     else:
         assert result.coverage_issues() == []
-        assert [job.source_key for job in result.jobs] == ["a", "c"]
-        assert result.scopes[0].skipped_out_of_scope == 1
-        assert result.scopes[0].details == 2
-        assert all(job.unit == "某业务单位" for job in result.jobs)
+        assert [job.source_key for job in result.jobs] == ["a", "b", "c"]
+        assert result.scopes[0].skipped_out_of_scope == 0
+        assert result.scopes[0].details == 3
+        assert [job.unit for job in result.jobs] == [
+            "国机集团总部 / 某业务单位",
+            "中国机械设备工程股份有限公司 / 某业务单位",
+            "国机集团总部 / 某业务单位",
+        ]
         assert all(job.published == "2026-10-10 09:00:00" for job in result.jobs)
+
+
+async def test_sinomach_internship_project_is_not_regular_campus(now: datetime) -> None:
+    source = Source(
+        source_id="COM0085",
+        company_id="COM0085",
+        company="中国机械工业集团有限公司",
+        url="https://zhaopin.sinomach.com.cn/SU64b60d25bef57c7e363ff1a3/mc/position/campus",
+    )
+    result = await SinomachGroup(source, SinomachReplay(internship=True), now).collect()
+    assert result.coverage_issues() == []
+    assert [job.work_type for job in result.jobs] == ["校招", "校招", "实习"]
+
+
+class MinmetalsReplay(SinomachReplay):
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        if "listSearchTerm" in needle:
+            terms = json.loads(response["body"])
+            terms["data"]["orgList"] = [
+                {
+                    "code": "0/1",
+                    "nameCh": "集团总部",
+                    "positionsNum": 2,
+                    "childNodes": [],
+                },
+                {
+                    "code": "0/496",
+                    "nameCh": "中国冶金科工股份有限公司",
+                    "positionsNum": 1,
+                    "childNodes": [{"code": "0/496/612", "childNodes": []}],
+                },
+            ]
+            response["body"] = json.dumps(terms, ensure_ascii=False)
+        elif "listPositionDetail" not in needle:
+            response["post_data"] = "isFrompb=true&recruitType=1&pageSize=2&currentPage=1"
+        return response
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = Replay._listing(self, post_id)
+        row.update(
+            {
+                "company": "中国冶金科工股份有限公司" if post_id == "b" else "中国五矿集团总部",
+                "orgCode": "0/496/612" if post_id == "b" else "0/1/491/190",
+                "projectName": "2027届校园招聘",
+            }
+        )
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        detail = Replay._detail(self, post_id)
+        detail["data"].update(self._listing(post_id))
+        return detail
+
+
+async def test_minmetals_group_directory_and_member_units(now: datetime) -> None:
+    source = Source(
+        source_id="COM0028",
+        company_id="COM0028",
+        company="中国五矿集团有限公司",
+        url=f"https://wecruit.hotjob.cn/{MinmetalsGroup.suite}/pb/school.html",
+    )
+    result = await MinmetalsGroup(source, MinmetalsReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert [job.unit for job in result.jobs] == [
+        "中国五矿集团总部 / 某业务单位",
+        "中国冶金科工股份有限公司 / 某业务单位",
+        "中国五矿集团总部 / 某业务单位",
+    ]
+
+
+class HengyiReplay(SinomachReplay):
+    def __init__(
+        self, *, wrong_project: bool = False, wrong_tree: bool = False, daily: bool = False
+    ):
+        super().__init__()
+        self.wrong_project = wrong_project
+        self.wrong_tree = wrong_tree
+        self.daily = daily
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        if "listSearchTerm" in needle:
+            terms = json.loads(response["body"])
+            terms["data"]["orgList"] = [
+                {
+                    "code": "0/3",
+                    "nameCh": "错误集团" if self.wrong_tree else "浙江恒逸集团有限公司",
+                    "positionsNum": 2,
+                    "childNodes": [],
+                },
+                {
+                    "code": "0/4",
+                    "nameCh": "恒逸石化股份有限公司",
+                    "positionsNum": 1,
+                    "childNodes": [{"code": "0/4/17", "childNodes": []}],
+                },
+            ]
+            response["body"] = json.dumps(terms, ensure_ascii=False)
+        return response
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = Replay._listing(self, post_id)
+        row.update(
+            {
+                "company": "浙江恒逸物流有限公司" if post_id == "b" else "浙江恒逸集团有限公司",
+                "orgCode": "0/4/17" if post_id == "b" else "0/3",
+                "projectName": "未知项目"
+                if self.wrong_project and post_id == "c"
+                else "日常招聘"
+                if self.daily and post_id == "c"
+                else "2027届校园招聘",
+                "projectId": 0 if self.daily and post_id == "c" else 100901,
+            }
+        )
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        detail = Replay._detail(self, post_id)
+        detail["data"].update(self._listing(post_id))
+        return detail
+
+
+@pytest.mark.parametrize(
+    "wrong_project,wrong_tree,daily",
+    [(False, False, False), (True, False, False), (False, True, False), (False, False, True)],
+)
+async def test_hengyi_group_contract(
+    wrong_project: bool, wrong_tree: bool, daily: bool, now: datetime
+) -> None:
+    source = Source(
+        source_id="COM0050",
+        company_id="COM0050",
+        company="浙江恒逸集团有限公司",
+        url=f"https://wecruit.hotjob.cn/{HengyiGroup.suite}/mc/position/campus",
+    )
+    result = await HengyiGroup(
+        source,
+        HengyiReplay(wrong_project=wrong_project, wrong_tree=wrong_tree, daily=daily),
+        now,
+    ).collect()
+    if wrong_project or wrong_tree:
+        assert result.coverage_issues()
+    else:
+        assert result.coverage_issues() == []
+        assert result.scopes[0].expected == result.scopes[0].unique == 3
+        assert result.scopes[0].skipped_out_of_scope == int(daily)
+        assert [job.unit for job in result.jobs] == (
+            ["浙江恒逸集团有限公司 / 某业务单位", "浙江恒逸物流有限公司 / 某业务单位"]
+            + ([] if daily else ["浙江恒逸集团有限公司 / 某业务单位"])
+        )
+
+
+class CrrcReplay(MinmetalsReplay):
+    def _url(self, endpoint: str) -> str:
+        return super()._url(endpoint).replace("wecruit.hotjob.cn", "crrc.hotjob.cn")
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row["company"] = "中车齐齐哈尔车辆有限公司" if post_id == "b" else "中车集团总部"
+        return row
+
+
+async def test_crrc_group_directory_and_detail_identity(now: datetime) -> None:
+    source = Source(
+        source_id="COM0095",
+        company_id="COM0095",
+        company="中国中车集团有限公司",
+        url=f"https://crrc.hotjob.cn/{CrrcGroup.suite}/pb/school.html",
+    )
+    result = await CrrcGroup(source, CrrcReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert [job.unit for job in result.jobs] == [
+        "中车集团总部 / 某业务单位",
+        "中车齐齐哈尔车辆有限公司 / 某业务单位",
+        "中车集团总部 / 某业务单位",
+    ]
+
+
+class GwmListedReplay(MinmetalsReplay):
+    def _url(self, endpoint: str) -> str:
+        return super()._url(endpoint).replace("wecruit.hotjob.cn", "zhaopin.gwm.cn")
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        if "listSearchTerm" in needle:
+            terms = json.loads(response["body"])
+            terms["data"]["orgList"][0]["code"] = "0/14"
+            terms["data"]["orgList"][0]["nameCh"] = "长城汽车股份有限公司"
+            response["body"] = json.dumps(terms, ensure_ascii=False)
+        return response
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row["company"] = "曼德电子电器有限公司" if post_id == "b" else "长城汽车股份有限公司"
+        row["orgCode"] = "0/496/612" if post_id == "b" else "0/14/22"
+        return row
+
+
+async def test_gwm_listed_entity_filters_other_group_units(now: datetime) -> None:
+    source = Source(
+        source_id="COM0130",
+        company_id="COM0130",
+        company="长城汽车股份有限公司",
+        url=f"https://zhaopin.gwm.cn/{GwmListed.suite}/pb/school.html",
+    )
+    result = await GwmListed(source, GwmListedReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert result.scopes[0].skipped_out_of_scope == 1
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
 
 
 @pytest.mark.parametrize("adapter", [HuaXia, JinTian, GF, LiuGong, HaiTian, Minth])

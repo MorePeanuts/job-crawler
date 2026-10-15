@@ -11,6 +11,7 @@ from job_crawler.models import Scope
 API = "https://fe.zhaopin.com/grace/api/dsc/search-job-list"
 TREE_API = "https://fe.zhaopin.com/grace/api/dsc/get-sub-company-and-department-list"
 FILTERS = {
+    "orgIds",
     "workExperiences",
     "minSalary",
     "maxSalary",
@@ -24,6 +25,7 @@ FILTERS = {
     "jobTypes",
     "priorityMajors",
     "customTags",
+    "keyword",
 }
 ALLOWED = FILTERS | {"orgNumbers", "jobSource", "pageIndex", "pageSize"}
 
@@ -34,6 +36,10 @@ def split_detail(value: str) -> tuple[str, str]:
 
 class Zhaopin(Adapter):
     org_number = ""
+    request_org_number = ""
+    job_source = 2
+    required_custom_tag = ""
+    observed_custom_tag = ""
     page_size = 50
     scope_description = (
         "智联招聘公开校园招聘 jobSource=2 无部门/地区/标签筛选全目录；列表包含完整岗位正文"
@@ -49,28 +55,43 @@ class Zhaopin(Adapter):
     def unit_name(self, company_data: dict[str, Any]) -> str:
         return text(company_data.get("campusOrgName"))
 
+    def work_type(self, job_data: dict[str, Any]) -> str:
+        return "校招"
+
     async def harvest(self) -> None:
         observed = await self.session.observed(API)
         check(observed["url"] == API, "智联岗位接口地址改变")
         payload = json.loads(observed["post_data"])
         check(isinstance(payload, dict) and set(payload) <= ALLOWED, "智联岗位查询出现未知参数")
         numbers = payload["orgNumbers"]
+        request_org_number = self.request_org_number or self.org_number
         check(
-            [str(number) for number in numbers] == [self.org_number]
+            [str(number) for number in numbers] == [request_org_number]
             if isinstance(numbers, list)
-            else str(numbers) == self.org_number,
+            else str(numbers) == request_org_number,
             "智联岗位查询与租户组织号不符",
         )
-        check(payload.get("jobSource") == 2, "智联目录不是校招 jobSource=2")
+        check(payload.get("jobSource") == self.job_source, "智联目录来源码与租户契约不符")
+        check(
+            text(payload.get("customTags"))
+            == (self.observed_custom_tag or self.required_custom_tag),
+            "智联目录校招标签与租户契约不符",
+        )
         check(payload.get("pageIndex") == 1, "智联目录不是第一页")
         for key in FILTERS:
-            payload[key] = [] if key == "orgDepartmentIds" else ""
+            payload[key] = (
+                self.required_custom_tag
+                if key == "customTags"
+                else []
+                if key == "orgDepartmentIds"
+                else ""
+            )
         await self.collect_catalog(payload)
 
     async def collect_catalog(self, payload: dict[str, Any]) -> None:
         size = self.page_size
         payload["pageSize"] = size
-        scope = Scope(name="campus-job-source-2")
+        scope = Scope(name=f"campus-job-source-{self.job_source}")
         self.result.scopes.append(scope)
         seen: set[str] = set()
         page = 1
@@ -97,7 +118,15 @@ class Zhaopin(Adapter):
                 company_data: dict[str, Any] = row["company"]
                 check(str(company_data["companyId"]) == self.org_number, "岗位混入其他组织")
                 self.validate_company(company_data)
-                check(job_data.get("positionSourceType") == 2, "岗位混入非校招来源")
+                check(
+                    job_data.get("positionSourceType") == self.job_source,
+                    "岗位来源码与租户契约不符",
+                )
+                if self.required_custom_tag:
+                    check(
+                        self.required_custom_tag in job_data.get("jobCategories", []),
+                        "岗位缺少校招标签",
+                    )
                 key = str(job_data["jobNumber"])
                 detail = text(job_data.get("detail"))
                 check(bool(text(job_data.get("title"))) and bool(detail), "岗位标题或正文缺失")
@@ -113,6 +142,7 @@ class Zhaopin(Adapter):
                     category_raw=text(job_data.get("jobTypeName")),
                     duties=duties,
                     requirements=requirements,
+                    work_type=self.work_type(job_data),
                     field_sources={
                         "duties": (
                             "search-job-list.data.jobList[].job.detail"
@@ -149,6 +179,222 @@ class Unicom(Zhaopin):
     host = "zglt.zhaopin.com"
     path = "/scjobs/index.html"
     org_number = "105347"
+
+
+class Longfor2027(Zhaopin):
+    name = "zhaopin-longfor-2027"
+    host = "longfor.zhaopin.com"
+    path = "/sgs/index.html#jobs"
+    org_number = "105173"
+    scope_description = "龙湖集团2027届仕官生、绽放、点将三个项目的无筛选联合校招目录"
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "龙湖集团"
+            and text(company_data.get("campusOrgName")) in {"仕官生", "绽放", "点将"},
+            "龙湖岗位集团归属或招聘项目变化",
+        )
+
+    def unit_name(self, company_data: dict[str, Any]) -> str:
+        names = [text(company_data.get("campusOrgName"))]
+        for key in ("campusParentDepartment", "campusDepartment"):
+            node = company_data.get(key)
+            if isinstance(node, dict):
+                name = text(node.get("name"))
+                if name and name not in names:
+                    names.append(name)
+        return " / ".join(names)
+
+
+class Cnooc2027(Zhaopin):
+    name = "zhaopin-cnooc-2027"
+    host = "cnooc.zhaopin.com"
+    path = "/job/index.html"
+    org_number = "105147"
+    page_size = 100
+    scope_description = (
+        "中国海油2027集团校招 16 个招聘单位；清除页面默认首单位筛选后遍历根组织全目录"
+    )
+
+    async def harvest(self) -> None:
+        observed = await self.session.observed("/get-search-aggregation")
+        payload = json.loads(observed["post_data"])
+        check(
+            str(payload.get("orgNumber")) == self.org_number
+            and payload.get("jobSource") == 2
+            and payload.get("facetFields") == ["SOU_COMPANY_ID"],
+            "中国海油聚合目录组织或校招来源改变",
+        )
+        result = json.loads(observed["body"])
+        check(result.get("code") == 200, "中国海油单位聚合接口失败")
+        units = result["data"]["itemMap"]["SOU_COMPANY_ID"]
+        check(isinstance(units, list) and len(units) >= 16, "中国海油招聘单位树缺失")
+        self._units: dict[str, str] = {}
+        self._aggregate_total = 0
+        for unit in units:
+            company_number = str(unit["name"])
+            company_name = text(unit["extend"]["campusOrgName"])
+            company_info = json.loads(unit["extend"]["companyInfo"])
+            check(
+                company_number not in self._units
+                and bool(company_name)
+                and company_info.get("campusOrgName") == company_name
+                and str(company_info.get("rootOrgId")) == self.org_number,
+                "中国海油招聘单位身份改变",
+            )
+            self._units[company_number] = company_name
+            self._aggregate_total += int(unit["count"])
+        await super().harvest()
+        check(
+            self.result.scopes[0].expected == self._aggregate_total,
+            "中国海油根目录总数与招聘单位聚合不一致",
+        )
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "中国海油"
+            and self._units.get(str(company_data.get("companyNumber")))
+            == text(company_data.get("campusOrgName")),
+            "中国海油岗位招聘单位不在聚合目录内",
+        )
+
+
+class Fosun2027(Zhaopin):
+    name = "zhaopin-fosun-2027"
+    host = "fosun.zhaopin.com"
+    path = "/job/index.html"
+    org_number = "102124"
+    observed_custom_tag = "复星财富"
+    page_size = 50
+    scope_description = "复星2027集团校招 10 单位 191 岗全目录；清除默认子项目标签，实习明确排除"
+
+    async def harvest(self) -> None:
+        response = await self.session.request(
+            "https://fe.zhaopin.com/grace/api/dsc/get-search-aggregation",
+            payload={
+                "orgNumber": self.org_number,
+                "jobSource": 2,
+                "facetFields": ["SOU_COMPANY_ID"],
+                "orgName": "",
+                "sortType": 1,
+                "pageIndex": 1,
+                "pageSize": 21,
+            },
+        )
+        check(response.get("code") == 200, "复星单位聚合接口失败")
+        units = response["data"]["itemMap"]["SOU_COMPANY_ID"]
+        check(isinstance(units, list) and len(units) == 10, "复星招聘单位数量变化")
+        self._units: dict[str, str] = {}
+        self._aggregate_total = 0
+        for unit in units:
+            number = str(unit["name"])
+            name = text(unit["extend"]["campusOrgName"])
+            info = json.loads(unit["extend"]["companyInfo"])
+            check(
+                number not in self._units
+                and bool(name)
+                and text(info.get("campusOrgName")) == name
+                and str(info.get("rootOrgId")) == self.org_number,
+                "复星招聘单位身份变化",
+            )
+            self._units[number] = name
+            self._aggregate_total += int(unit["count"])
+        aggregation_evidence = self.session.last_evidence
+        await super().harvest()
+        scope = self.result.scopes[0]
+        scope.evidence.append(aggregation_evidence)
+        check(scope.expected == self._aggregate_total, "复星单位聚合与完整岗位目录计数不符")
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "上海复星高科技（集团）有限公司"
+            and self._units.get(str(company_data.get("companyNumber")))
+            == text(company_data.get("campusOrgName")),
+            "复星岗位单位不在集团聚合目录",
+        )
+
+    def work_type(self, job_data: dict[str, Any]) -> str:
+        tags = job_data.get("jobCategories") or []
+        check(isinstance(tags, list), "复星岗位标签结构变化")
+        return (
+            "实习"
+            if "实习" in text(job_data.get("title")) or any("实习" in text(tag) for tag in tags)
+            else "校招"
+        )
+
+
+class Dongfang2027(Zhaopin):
+    name = "zhaopin-dongfang-2027"
+    host = "dongfang2027.zhaopin.com"
+    path = "/jobs/index.html"
+    org_number = "101340"
+    ready_endpoints = ("https://fe.zhaopin.com/grace/api/dsc/get-search-aggregation",)
+    scope_description = "东方电气集团 2027 届校招门户，15 个招聘单位无筛选全目录；逐岗保留实际单位"
+
+    async def harvest(self) -> None:
+        observed = await self.session.observed("/grace/api/dsc/get-search-aggregation")
+        initial = json.loads(observed["post_data"])
+        check(
+            str(initial.get("orgNumber")) == self.org_number
+            and initial.get("jobSource") == 2
+            and initial.get("facetFields") == ["SOU_COMPANY_ID"],
+            "东方电气 2027 单位聚合初始范围变化",
+        )
+        response = json.loads(observed["body"])
+        check(response.get("code") == 200, "东方电气单位聚合失败")
+        units = response["data"]["itemMap"]["SOU_COMPANY_ID"]
+        check(isinstance(units, list) and len(units) == 15, "东方电气招聘单位数量变化")
+        self._units: dict[str, str] = {}
+        expected = 0
+        for unit in units:
+            number = str(unit["name"])
+            name = text(unit["extend"]["campusOrgName"])
+            info = json.loads(unit["extend"]["companyInfo"])
+            check(
+                number not in self._units
+                and bool(name)
+                and text(info.get("campusOrgName")) == name
+                and str(info.get("rootOrgId")) == self.org_number,
+                "东方电气聚合单位身份变化",
+            )
+            self._units[number] = name
+            expected += int(unit["count"])
+        aggregation_evidence = self.session.last_evidence
+        # The observed unit-click request uses these fields. Clear its department
+        # filter to collect every unit in the same 2027 portal.
+        payload: dict[str, Any] = {
+            "orgNumbers": self.org_number,
+            "jobSource": 2,
+            "pageIndex": 1,
+            "pageSize": 12,
+            **{key: ([] if key == "orgDepartmentIds" else "") for key in FILTERS},
+        }
+        await self.collect_catalog(payload)
+        scope = self.result.scopes[0]
+        scope.evidence.append(aggregation_evidence)
+        check(scope.expected == expected, "东方电气聚合单位计数与全目录不符")
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "中国东方电气集团有限公司"
+            and self._units.get(str(company_data.get("companyNumber")))
+            == text(company_data.get("campusOrgName")),
+            "东方电气岗位单位不在 2027 门户聚合目录",
+        )
+
+
+class TuopuCampus(Zhaopin):
+    name = "zhaopin-tuopu-campus"
+    host = "tuopu.zhaopin.com"
+    path = "/school/index.html"
+    org_number = "45914881"
+    request_org_number = "CZ459148810"
+    job_source = 1
+    required_custom_tag = "校招"
+    scope_description = "拓普集团官方校招页 jobSource=1 且 customTags=校招的无地区筛选完整目录"
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(text(company_data.get("slaveDisplayOrgName")) == "拓普集团", "拓普组织归属变化")
 
 
 class Sipg(Zhaopin):
@@ -265,4 +511,17 @@ class ChinaPost2027(Zhaopin):
         self.result.scopes[0].evidence.append(tree_evidence)
 
 
-TENANTS = (ChinaPost2027, Hadian, Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)
+TENANTS = (
+    Longfor2027,
+    Fosun2027,
+    Dongfang2027,
+    ChinaPost2027,
+    Hadian,
+    Unicom,
+    Sipg,
+    Cqbank,
+    Lbjt,
+    Zndl,
+    ShenzhenEnergy,
+    TuopuCampus,
+)

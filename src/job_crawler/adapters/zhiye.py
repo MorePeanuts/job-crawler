@@ -235,6 +235,35 @@ class Poly(Zhiye):
     host = "polycareer.zhiye.com"
 
 
+class Mxbc2027(Zhiye):
+    name = "zhiye-mxbc-2027"
+    host = "careers.mxbc.com"
+    listing_complete = True
+    scope_description = "蜜雪集团2027届公开校园招聘 Category=2 全目录；实际招聘单位未公开时留空"
+
+
+class GenertecCampus(Zhiye):
+    name = "zhiye-genertec-campus"
+    host = "genertec.zhiye.com"
+    listing_complete = True
+    scope_description = "通用技术集团公开校园招聘 Category=2 全目录；实际招聘单位未公开时留空"
+
+
+class Sph2027(Zhiye):
+    name = "zhiye-sph-2027"
+    host = "sph.zhiye.com"
+    listing_complete = True
+    scope_description = "上海医药2027秋季校园招聘 Category=2 全目录；保留逐岗实际招聘单位"
+
+
+class Zhenshi2027(Zhiye):
+    name = "zhiye-zhenshi-2027"
+    host = "zhenshigroup.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "振石控股集团2027届公开校园招聘 Category=2 全目录；源未给实际招聘法人时留空"
+
+
 class Xiangyu(Zhiye):
     name = "zhiye-xiangyu"
     host = "xiangyu.zhiye.com"
@@ -403,8 +432,41 @@ class Vital(Zhiye):
 
 
 class WuxiApptec(Zhiye):
-    name = "zhiye-wuxiapptec"
-    host = "wuxiappteccampus.zhiye.com"
+    name = "zhiye-wuxiapptec-2027"
+    host = "wuxiapptec.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    page_size = 100
+    scope_description = "药明康德现用北森 Category=2 校招目录；仅 2027 届，未公开逐岗法人名称"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "药明康德目录混入非校招类别")
+        return text(row.get("JobAdName")).startswith("2027届")
+
+
+class WeichaiPower2027(Zhiye):
+    name = "zhiye-weichai-power-2027"
+    host = "weichai.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = (
+        "潍柴动力2027招聘入口北森 Category=2 全目录；多个 OrgId 无公开法人名，单位留空"
+    )
+
+
+class Ctf2027(Zhiye):
+    name = "zhiye-ctf-2027"
+    host = "hr.ctf.com.cn"
+    listing_complete = True
+    regular_only = True
+    scope_description = "周大福2027校招北森 Category=2 全目录；无逐岗法人名称，单位留空"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(
+            str(row.get("OrgId")) == "34100" and "周大福" in text(row.get("JobAdName")),
+            "周大福校招组织或品牌改变",
+        )
+        return True
 
 
 class Gotion(Zhiye):
@@ -682,7 +744,67 @@ class Cinda2027(Zhiye):
         return published[:10] >= "2026-10-09"
 
 
+class Vanchen2027(Zhiye):
+    name = "zhiye-vanchen-2027"
+    host = "vanchen1.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "万辰集团 2027 校招北森 Category=2 全目录；总部与好想来原文保留"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "万辰校招目录混入非校招类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "万辰校招岗位类型改变")
+        return True
+
+
+class TongkunCampus(Zhiye):
+    name = "zhiye-tongkun-campus"
+    host = "hr-zjtkjt.zhiye.com"
+    path = "/campus"
+    listing_complete = True
+    regular_only = True
+    scope_description = "桐昆集团北森 Category=2 公开校招全目录；列表完整正文、未知单位原样留空"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "桐昆校招目录混入其他招聘类别")
+        return True
+
+
+class CcccGroupCampus(Zhiye):
+    name = "zhiye-cccc-group-campus"
+    host = "zhaopin.ccccltd.cn"
+    listing_complete = True
+    regular_only = True
+    scope_description = "中国交建集团北森 Category=2 校招全目录；保留实际单位，缺失时留空"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "中国交建校招目录混入其他类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "中国交建岗位性质变化")
+        return True
+
+
+class SinosigGroupCampus(Zhiye):
+    name = "zhiye-sinosig-group-campus"
+    host = "sinosigcampus.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "阳光保险集团 Category=2 校招全目录；保留逐岗来源内容，不猜招聘法人"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "阳光保险校招目录混入其他类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "阳光保险岗位性质变化")
+        return True
+
+
 TENANTS = (
+    Vanchen2027,
+    TongkunCampus,
+    CcccGroupCampus,
+    SinosigGroupCampus,
+    Mxbc2027,
+    GenertecCampus,
+    Sph2027,
+    Zhenshi2027,
     Cinda2027,
     CmhkParent,
     YuntianhuaParent,

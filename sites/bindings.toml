@@ -708,5 +708,205 @@ adapter = "grcbank-campus"
 version = "1"
 
 [sources.COM0085]
-adapter = "hotjob-sinomach-headquarters"
+adapter = "hotjob-sinomach-group"
+version = "3"
+
+[sources.COM0262]
+adapter = "moka-trinasolar-2027"
+version = "1"
+
+[sources.COM0231]
+adapter = "moka-anta-2027"
+version = "1"
+
+[sources.COM0423]
+adapter = "zhiye-mxbc-2027"
+version = "1"
+
+[sources.COM0206]
+adapter = "zhaopin-longfor-2027"
+version = "1"
+
+[sources.COM0341]
+adapter = "inovance-campus"
+version = "1"
+
+[sources.COM0082]
+adapter = "zhiye-genertec-campus"
+version = "1"
+
+[sources.COM0276]
+adapter = "ctrip-2027-campus"
+version = "1"
+
+[sources.COM0137]
+adapter = "boe-2027-campus"
+version = "1"
+
+[sources.COM0096]
+adapter = "zhiye-sph-2027"
+version = "1"
+
+[sources.COM0299]
+adapter = "sdicpower-campus"
+version = "1"
+
+[sources.COM0454]
+adapter = "zhaopin-tuopu-campus"
+version = "1"
+
+[sources.COM0263]
+adapter = "zhiye-zhenshi-2027"
+version = "1"
+
+[sources.COM0275]
+adapter = "feishu-nine-dragons"
+version = "1"
+
+[sources.COM0028]
+adapter = "hotjob-minmetals-group"
+version = "1"
+
+[sources.COM0038]
+adapter = "chinatelecom-campus"
+version = "1"
+
+[sources.COM0130]
+adapter = "hotjob-gwm-listed"
+version = "1"
+
+[sources.COM0095]
+adapter = "hotjob-crrc-group"
+version = "1"
+
+[sources.COM0051]
+adapter = "iguopin-chinalco-2027"
+version = "1"
+
+[sources.COM0435]
+adapter = "moka-hengrui"
+version = "1"
+
+[sources.COM0023]
+adapter = "zhaopin-cnooc-2027"
+version = "1"
+
+[sources.COM0126]
+adapter = "zhiye-weichai-power-2027"
+version = "1"
+
+[sources.COM0219]
+adapter = "zhiye-ctf-2027"
+version = "1"
+
+[sources.COM0285]
+adapter = "xfusion-campus"
+version = "1"
+
+[sources.COM0063]
+adapter = "itg-holding-campus"
+version = "1"
+
+[sources.COM0068]
+adapter = "iguopin-spic-2027"
+version = "1"
+
+[sources.COM0059]
+adapter = "iguopin-ceec-2027"
+version = "1"
+
+[sources.COM0060]
+adapter = "iguopin-cosco-2027"
+version = "1"
+
+[sources.COM0110]
+adapter = "cec-campus"
+version = "1"
+
+[sources.COM0337]
+adapter = "zhiye-wuxiapptec-2027"
+version = "1"
+
+[sources.COM0353]
+adapter = "moka-sunnyoptical-campus"
+version = "1"
+
+[sources.COM0036]
+adapter = "saic-group-campus"
+version = "1"
+
+[sources.COM0091]
+adapter = "iguopin-cnbm-2027"
+version = "1"
+
+[sources.COM0220]
+adapter = "zhaopin-yuexiu-property-2027"
+version = "1"
+
+[sources.COM0298]
+adapter = "moka-seazen-2027"
+version = "1"
+
+[sources.COM0307]
+adapter = "zhiye-vanchen-2027"
+version = "1"
+
+[sources.COM0050]
+adapter = "hotjob-hengyi-group"
+version = "1"
+
+[sources.COM0152]
+adapter = "gree-campus"
+version = "1"
+
+[sources.COM0148]
+adapter = "zhaopin-fosun-2027"
+version = "1"
+
+[sources.COM0211]
+adapter = "zhiye-tongkun-campus"
+version = "1"
+
+[sources.COM0018]
+adapter = "zhiye-cccc-group-campus"
+version = "1"
+
+[sources.COM0209]
+adapter = "zhiye-sinosig-group-campus"
+version = "1"
+
+[sources.COM0163]
+adapter = "coapi-cimc-2027"
+version = "1"
+
+[sources.COM0071]
+adapter = "cib-2027-campus"
+version = "1"
+
+[sources.COM0229]
+adapter = "zjci-campus"
+version = "1"
+
+[sources.COM0360]
+adapter = "moka-longcheer-2027"
+version = "1"
+
+[sources.COM0075]
+adapter = "zjjt-2027-campus"
+version = "1"
+
+[sources.COM0067]
+adapter = "hbisco-group-campus"
+version = "1"
+
+[sources.COM0329]
+adapter = "zjamp-2027-announcement"
+version = "1"
+
+[sources.COM0235]
+adapter = "zhaopin-dongfang-2027"
+version = "1"
+
+[sources.COM0457]
+adapter = "xingfa-2027-notice"
 version = "1"

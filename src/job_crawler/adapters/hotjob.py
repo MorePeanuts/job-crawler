@@ -656,47 +656,57 @@ class Zoomlion2027(Hotjob):
         return super()._job(row, listing, evidence, locations, location_evidence)
 
 
-class SinomachHeadquarters(Hotjob):
-    name = "hotjob-sinomach-headquarters"
+class SinomachGroup(Hotjob):
+    name = "hotjob-sinomach-group"
+    version = "3"
     host = "zhaopin.sinomach.com.cn"
     suite = "SU64b60d25bef57c7e363ff1a3"
     path = f"/{suite}/mc/position/campus"
     mobile_mode = True
-    scope_description = "国机集团2027届校招全目录；仅国机集团总部 0/2688 分支"
-    headquarters_expected = 0
+    scope_description = "国机集团2027届校招门户全目录，含总部及成员企业；实际招聘单位保留在 unit"
+    tree_expected = 0
+    org_codes: set[str]
 
     async def harvest(self) -> None:
         await super().harvest()
         scope = self.result.scopes[0]
         check(
-            scope.unique - scope.skipped_out_of_scope == self.headquarters_expected,
-            "国机集团总部岗位数与机构树不一致",
+            scope.expected == self.tree_expected and scope.unique == self.tree_expected,
+            "国机集团校招目录与机构树岗位数不一致",
         )
 
     def validate_terms(self, data: dict[str, Any]) -> None:
         orgs = data.get("orgList")
         if not isinstance(orgs, list):
             raise CrawlError("schema_changed", "国机集团机构树缺失")
-        headquarters = [
-            org for org in orgs if isinstance(org, dict) and str(org.get("code")) == "0/2688"
-        ]
-        check(
-            len(headquarters) == 1
-            and text(headquarters[0].get("nameCh")) == "国机集团总部"
-            and int(headquarters[0].get("positionsNum", 0)) > 0,
-            "国机集团总部机构分支改变或为空",
-        )
-        self.headquarters_expected = int(headquarters[0]["positionsNum"])
+        self.org_codes = set()
+        self.tree_expected = 0
+
+        def add_node(node: dict[str, Any]) -> None:
+            code = text(node.get("code"))
+            check(bool(code) and code not in self.org_codes, "国机集团机构编码缺失或重复")
+            self.org_codes.add(code)
+            children = node.get("childNodes", [])
+            check(isinstance(children, list), "国机集团机构子节点结构变化")
+            for child in children:
+                check(isinstance(child, dict), "国机集团机构子节点结构变化")
+                add_node(child)
+
+        for root in orgs:
+            check(isinstance(root, dict), "国机集团顶层机构结构变化")
+            code = text(root.get("code"))
+            check(code.startswith("0/") and code.count("/") == 1, "国机集团顶层机构编码变化")
+            check(bool(text(root.get("nameCh"))), "国机集团顶层机构名称缺失")
+            count = int(root.get("positionsNum", -1))
+            check(count >= 0, "国机集团顶层机构岗位数无效")
+            self.tree_expected += count
+            add_node(root)
+        check(bool(orgs) and self.tree_expected > 0, "国机集团机构树为空")
 
     def include_listing(self, row: dict[str, Any]) -> bool:
-        company = text(row.get("company"))
-        org_code = text(row.get("orgCode"))
-        is_headquarters = company == "国机集团总部"
-        check(
-            is_headquarters == org_code.startswith("0/2688/"),
-            "国机集团列表机构名称与编码不一致",
-        )
-        return is_headquarters
+        check(bool(text(row.get("company"))), "国机集团岗位缺少实际招聘单位")
+        check(text(row.get("orgCode")) in self.org_codes, "国机集团岗位机构超出门户机构树")
+        return True
 
     def _job(
         self,
@@ -710,12 +720,115 @@ class SinomachHeadquarters(Hotjob):
             check(
                 str(row.get("postId")) == str(listing.get("postId"))
                 and text(row.get("postName")) == text(listing.get("postName"))
-                and text(row.get("company")) == "国机集团总部"
+                and text(row.get("company")) == text(listing.get("company"))
                 and text(row.get("orgCode")) == text(listing.get("orgCode"))
                 and text(row.get("projectName")) == text(listing.get("projectName")),
-                "国机集团总部详情与列表或机构不符",
+                "国机集团详情与列表或招聘单位不符",
             )
-        return super()._job(row, listing, evidence, locations, location_evidence)
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        company = text(row.get("company") or listing.get("company"))
+        department = text(row.get("orgName"))
+        job.unit = f"{company} / {department}" if department and department != company else company
+        job.field_sources["unit"] = "listPosition.company + listPositionDetail.orgName"
+        project = text(row.get("projectName") or listing.get("projectName"))
+        work_type = text(row.get("workTypeStr") or listing.get("workTypeStr"))
+        job.work_type = (
+            "实习"
+            if "实习" in project or "见习" in project or "实习" in work_type
+            else "兼职"
+            if "兼职" in work_type
+            else "校招"
+        )
+        job.field_sources["work_type"] = "listPosition.projectName + workTypeStr"
+        return job
+
+
+class MinmetalsGroup(SinomachGroup):
+    name = "hotjob-minmetals-group"
+    version = "1"
+    host = "wecruit.hotjob.cn"
+    suite = "SU62f37858bef57c29ead8adab"
+    path = f"/{suite}/pb/school.html"
+    mobile_mode = False
+    scope_description = "中国五矿集团2027届校招门户全目录，含总部及成员企业；逐岗保留实际招聘单位"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(bool(text(row.get("company"))), "中国五矿岗位缺少实际招聘单位")
+        code = text(row.get("orgCode"))
+        root = "/".join(code.split("/")[:2])
+        check(root in self.org_codes, "中国五矿岗位不属于招聘门户顶层机构")
+        return True
+
+
+class HengyiGroup(SinomachGroup):
+    name = "hotjob-hengyi-group"
+    version = "1"
+    host = "wecruit.hotjob.cn"
+    suite = "SU64a650e3bef57c3af72089fb"
+    path = f"/{suite}/mc/position/campus"
+    mobile_mode = True
+    scope_description = "恒逸集团2027届校招完整目录，含集团本部及成员企业；保留实际招聘单位"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        super().validate_terms(data)
+        roots = {text(row.get("code")): text(row.get("nameCh")) for row in data["orgList"]}
+        check(
+            roots == {"0/3": "浙江恒逸集团有限公司", "0/4": "恒逸石化股份有限公司"},
+            "恒逸集团机构树顶层法人变化",
+        )
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        project = (str(row.get("projectId")), text(row.get("projectName")))
+        check(
+            project
+            in {
+                ("100901", "2027届校园招聘"),
+                ("100001", "校园招聘"),
+                ("100701", "新疆项目"),
+                ("101801", "文莱二期项目"),
+                ("0", "日常招聘"),
+            },
+            "恒逸集团校招项目变化",
+        )
+        return super().include_listing(row) and project != ("0", "日常招聘")
+
+
+class CrrcGroup(MinmetalsGroup):
+    name = "hotjob-crrc-group"
+    version = "1"
+    host = "crrc.hotjob.cn"
+    suite = "SU64d47c466202cc36e27a52d4"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "中国中车集团2027届校招门户全目录，含55个顶层招聘机构；逐岗保留实际单位"
+
+
+class GwmListed(MinmetalsGroup):
+    name = "hotjob-gwm-listed"
+    version = "1"
+    host = "zhaopin.gwm.cn"
+    suite = "SU692d37b4ea11b01b6c54e0e5"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "长城汽车集团门户完整校招目录；仅提取机构树 0/14 上市主体岗位"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        super().validate_terms(data)
+        roots = data["orgList"]
+        check(
+            any(
+                text(row.get("code")) == "0/14"
+                and text(row.get("nameCh")) == "长城汽车股份有限公司"
+                and int(row.get("positionsNum", 0)) > 0
+                for row in roots
+            ),
+            "长城汽车上市主体机构树缺失",
+        )
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(bool(text(row.get("company"))), "长城汽车岗位缺少实际招聘单位")
+        code = text(row.get("orgCode"))
+        root = "/".join(code.split("/")[:2])
+        check(root in self.org_codes, "长城汽车岗位超出机构树")
+        return root == "0/14"
 
 
 class Wanhua2027(Hotjob):
@@ -757,7 +870,11 @@ class Wanhua2027(Hotjob):
 
 
 TENANTS = (
-    SinomachHeadquarters,
+    SinomachGroup,
+    MinmetalsGroup,
+    HengyiGroup,
+    CrrcGroup,
+    GwmListed,
     Wanhua2027,
     Zoomlion2027,
     EveEnergy,

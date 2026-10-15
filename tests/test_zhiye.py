@@ -8,21 +8,30 @@ import pytest
 
 from job_crawler.adapters.zhiye import (
     TENANTS,
+    CcccGroupCampus,
     Chery,
     ChinaLifeGroup,
     Cinda2027,
     CmhkParent,
+    GenertecCampus,
     Haid,
     Huafeng,
     Infore,
     LuzhouLaojiao,
     Mindray,
+    Mxbc2027,
     PICCGroup,
     Seres,
     Shenzhou,
     Shrcb,
+    SinosigGroupCampus,
+    Sph2027,
+    TongkunCampus,
+    Vanchen2027,
     Xiangyu,
     YuntianhuaParent,
+    Zhenshi2027,
+    Zhiye,
     date_text,
 )
 from job_crawler.config import load_bindings
@@ -151,6 +160,113 @@ async def test_zhiye_verified_zero(now: datetime) -> None:
     assert not replay.details and len(replay.opens) == 1
 
 
+@pytest.mark.parametrize(
+    "adapter,source_id,company,url",
+    [
+        (Mxbc2027, "COM0423", "蜜雪冰城股份有限公司", "https://careers.mxbc.com/campus/jobs"),
+        (
+            GenertecCampus,
+            "COM0082",
+            "中国通用技术（集团）控股有限责任公司",
+            "https://genertec.zhiye.com/campus/jobs",
+        ),
+        (
+            Zhenshi2027,
+            "COM0263",
+            "振石控股集团有限公司",
+            "https://zhenshigroup.zhiye.com/campus/jobs",
+        ),
+    ],
+)
+async def test_group_complete_listing_keeps_unknown_unit(
+    now: datetime, adapter: type[Zhiye], source_id: str, company: str, url: str
+) -> None:
+    class MxbcReplay(Replay):
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            assert payload is not None and not detail
+            page = int(payload["PageIndex"])
+            self.pages.append(page)
+            start = page * 20
+            return {
+                "Code": 200,
+                "Count": 21,
+                "Data": [
+                    {
+                        "Id": str(i),
+                        "CategoryId": "2",
+                        "JobAdName": f"2027届校招岗位{i}",
+                        "Kind": "全职",
+                        "OrgId": 3620417,
+                        "Org": None,
+                        "Duty": "负责生产管理",
+                        "Require": "本科及以上",
+                        "PostDate": "2026-10-13T00:00:00",
+                        "EndTime": "0001-01-01T00:00:00",
+                        "LocNames": ["河南省·郑州市"],
+                    }
+                    for i in range(start, min(start + 20, 21))
+                ],
+            }
+
+    replay = MxbcReplay()
+    result = await adapter(
+        Source(
+            source_id=source_id,
+            company_id=source_id,
+            company=company,
+            url=url,
+        ),
+        replay,
+        now,
+    ).collect()
+    assert result.coverage_issues() == []
+    assert len(result.jobs) == 21 and replay.pages == [0, 1]
+    assert all(job.unit == "" for job in result.jobs)
+    assert result.jobs[0].duties == "负责生产管理"
+    assert result.jobs[0].requirements == "本科及以上"
+
+
+async def test_sph_listing_retains_actual_unit_and_unset_date(now: datetime) -> None:
+    class SphReplay(Replay):
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            assert payload is not None and not detail
+            return {
+                "Code": 200,
+                "Count": 1,
+                "Data": [
+                    {
+                        "Id": "sph-one",
+                        "CategoryId": "2",
+                        "JobAdName": "2027研发工程师",
+                        "Org": "上药控股广东有限公司",
+                        "Duty": "负责研发",
+                        "Require": "硕士研究生及以上",
+                        "PostDate": "0001-01-01T00:00:00",
+                        "EndTime": "0001-01-01T00:00:00",
+                    }
+                ],
+            }
+
+    result = await Sph2027(
+        Source(
+            source_id="COM0096",
+            company_id="COM0096",
+            company="上海医药集团股份有限公司",
+            url="https://sph.zhiye.com/campus/jobs",
+        ),
+        SphReplay(),
+        now,
+    ).collect()
+    assert not result.coverage_issues()
+    assert len(result.jobs) == 1
+    assert result.jobs[0].unit == "上药控股广东有限公司"
+    assert result.jobs[0].published == result.jobs[0].deadline == ""
+
+
 async def test_zhiye_stops_queued_details_after_access_denied(now: datetime) -> None:
     class Denied(Replay):
         async def request(
@@ -193,6 +309,9 @@ def test_zhiye_unset_dates(value: Any, expected: str) -> None:
         ("COM0461", "ovt-omnivision.zhiye.com"),
         ("COM0468", "cmhk.zhiye.com"),
         ("COM0484", "juhua.zhiye.com"),
+        ("COM0211", "hr-zjtkjt.zhiye.com"),
+        ("COM0018", "zhaopin.ccccltd.cn"),
+        ("COM0209", "sinosigcampus.zhiye.com"),
     ],
 )
 def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> None:
@@ -745,3 +864,158 @@ async def test_cinda_2027_all_pages_uses_institution_and_excludes_old(now: datet
 async def test_cinda_2027_rejects_foreign_institution(now: datetime) -> None:
     result = await Cinda2027(cinda_source(), CindaReplay(foreign_unit=True), now).collect()
     assert result.coverage_issues()
+
+
+class VanchenReplay:
+    last_evidence = "vanchen-list.json"
+
+    def __init__(self, *, wrong_category: bool = False, wrong_kind: bool = False):
+        self.wrong_category = wrong_category
+        self.wrong_kind = wrong_kind
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://vanchen1.zhiye.com/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        return {
+            "url": "https://vanchen1.zhiye.com/api/Jobad/GetJobAdPageList",
+            "post_data": json.dumps(
+                {"PageIndex": 0, "PageSize": 20, "Category": ["2"], "KeyWords": ""}
+            ),
+        }
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        assert payload is not None and payload["PageIndex"] == 0 and not detail
+        return {
+            "Code": 200,
+            "Count": 2,
+            "Data": [
+                {
+                    "Id": str(index),
+                    "CategoryId": "1" if self.wrong_category and index else "2",
+                    "Kind": "兼职" if self.wrong_kind and index else "全职",
+                    "JobAdName": f"万辰管培生{index}",
+                    "Duty": "轮岗学习",
+                    "Require": "本科及以上",
+                    "LocNames": ["江苏省·南京市"],
+                    "Org": None,
+                    "PostDate": "0001-01-01T00:00:00",
+                    "EndTime": "0001-01-01T00:00:00",
+                }
+                for index in range(2)
+            ],
+        }
+
+
+def vanchen_source() -> Source:
+    return Source(
+        source_id="COM0307",
+        company_id="COM0307",
+        company="福建万辰食品集团股份有限公司",
+        url="https://vanchen1.zhiye.com/campus/jobs",
+    )
+
+
+async def test_vanchen_full_campus_listing_keeps_unknown_unit_and_date(now: datetime) -> None:
+    result = await Vanchen2027(vanchen_source(), VanchenReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
+    assert all(job.unit == job.published == job.deadline == "" for job in result.jobs)
+    assert all(job.duties == "轮岗学习" and job.requirements == "本科及以上" for job in result.jobs)
+
+
+@pytest.mark.parametrize("fault", ["category", "kind"])
+async def test_vanchen_rejects_changed_scope(fault: str, now: datetime) -> None:
+    result = await Vanchen2027(
+        vanchen_source(),
+        VanchenReplay(wrong_category=fault == "category", wrong_kind=fault == "kind"),
+        now,
+    ).collect()
+    assert result.coverage_issues()
+
+
+class TongkunReplay(VanchenReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://hr-zjtkjt.zhiye.com/campus"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = "https://hr-zjtkjt.zhiye.com/api/Jobad/GetJobAdPageList"
+        return response
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        response = await super().request(url, payload=payload, detail=detail)
+        response["Data"][0]["JobAdName"] = "桐昆研发工程师"
+        response["Data"][1]["JobAdName"] = "桐昆实习生"
+        return response
+
+
+async def test_tongkun_campus_listing_and_internship(now: datetime) -> None:
+    source = Source(
+        source_id="COM0211",
+        company_id="COM0211",
+        company="桐昆集团股份有限公司",
+        url="https://hr-zjtkjt.zhiye.com/campus",
+    )
+    result = await TongkunCampus(source, TongkunReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
+    assert [job.work_type for job in result.jobs] == ["校招", "实习"]
+    assert all(job.published == "" and job.unit == "" for job in result.jobs)
+
+
+class CcccReplay(VanchenReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://zhaopin.ccccltd.cn/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = "https://zhaopin.ccccltd.cn/api/Jobad/GetJobAdPageList"
+        return response
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        response = await super().request(url, payload=payload, detail=detail)
+        response["Data"][0]["JobAdName"] = "2027届校招工程岗"
+        response["Data"][1]["JobAdName"] = "2027届校招实习岗"
+        return response
+
+
+async def test_cccc_group_campus_listing_and_internship(now: datetime) -> None:
+    source = Source(
+        source_id="COM0018",
+        company_id="COM0018",
+        company="中国交通建设集团有限公司",
+        url="https://zhaopin.ccccltd.cn/campus/jobs",
+    )
+    result = await CcccGroupCampus(source, CcccReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
+    assert [job.work_type for job in result.jobs] == ["校招", "实习"]
+
+
+class SinosigReplay(CcccReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://sinosigcampus.zhiye.com/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = "https://sinosigcampus.zhiye.com/api/Jobad/GetJobAdPageList"
+        return response
+
+
+async def test_sinosig_group_campus_listing(now: datetime) -> None:
+    source = Source(
+        source_id="COM0209",
+        company_id="COM0209",
+        company="阳光保险集团股份有限公司",
+        url="https://sinosigcampus.zhiye.com/campus/jobs",
+    )
+    result = await SinosigGroupCampus(source, SinosigReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2

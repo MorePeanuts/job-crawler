@@ -13,16 +13,22 @@ from job_crawler.adapters.moka import (
     CATL,
     HFSP,
     STO,
+    Anta2027,
     Dasenlin,
     Digiloong,
     EastchinaPharm,
     Fehorizon,
+    Hengrui,
     Huaqin,
     Jinko,
+    Longcheer2027,
     Lygend,
     Moka,
     Sanhua,
+    Seazen2027,
     Sungrow,
+    SunnyOptical,
+    TrinaSolar,
     Yadea,
     ZhongAn,
     decode,
@@ -133,6 +139,64 @@ class Replay:
         )
 
 
+class SunnyReplay(Replay):
+    def __init__(self, *, bad_commitment: bool = False):
+        super().__init__("sunnyoptical", 45602)
+        self.bad_commitment = bad_commitment
+
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        row["commitment"] = "全职"
+        return row
+
+    async def observed_path(self, needle: str) -> dict[str, Any]:
+        if needle == "/api/outer/ats-apply/website/jobs/module":
+            return {
+                "url": "https://campus.sunnyoptical.cn/api/outer/ats-apply/website/jobs/module",
+                "post_data": json.dumps(
+                    {
+                        "orgId": "sunnyoptical",
+                        "siteId": 45602,
+                        "moduleId": "0477326749",
+                        "commitments": ["实习"] if self.bad_commitment else ["全职"],
+                        "needGroupType": "zhineng",
+                        "keyword": "",
+                        "departmentIds": [],
+                        "limit": 2,
+                        "offset": 0,
+                    }
+                ),
+            }
+        return await super().observed_path(needle)
+
+
+async def test_sunny_module_catalog(now: datetime) -> None:
+    source = Source(
+        source_id="COM0353",
+        company_id="COM0353",
+        company="舜宇光学科技（集团）有限公司",
+        url="https://campus.sunnyoptical.cn/campus-recruitment/sunnyoptical/45602/#/",
+    )
+    replay = SunnyReplay()
+    result = await SunnyOptical(source, replay, now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].unique == result.scopes[0].details == 3
+    assert [call["offset"] for call in replay.calls if "offset" in call] == [0, 2]
+    assert all(job.work_type == "校招" for job in result.jobs)
+    assert all(job.source_url.startswith("https://campus.sunnyoptical.cn/") for job in result.jobs)
+
+
+async def test_sunny_rejects_internship_module(now: datetime) -> None:
+    source = Source(
+        source_id="COM0353",
+        company_id="COM0353",
+        company="舜宇光学科技（集团）有限公司",
+        url="https://campus.sunnyoptical.cn/campus-recruitment/sunnyoptical/45602/#/",
+    )
+    result = await SunnyOptical(source, SunnyReplay(bad_commitment=True), now).collect()
+    assert result.coverage_issues()
+
+
 @pytest.mark.parametrize(
     "adapter",
     [
@@ -149,6 +213,10 @@ class Replay:
         Yadea,
         Fehorizon,
         Dasenlin,
+        TrinaSolar,
+        Anta2027,
+        Hengrui,
+        Seazen2027,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:
@@ -182,6 +250,30 @@ async def test_moka_rejects_duplicate_page(now: datetime) -> None:
     )
     result = await CATL(source, Replay("catlhr", 142020, duplicate=True), now).collect()
     assert "duplicate_page" in {issue.code for issue in result.coverage_issues()}
+
+
+class SeazenTitleMismatch(Replay):
+    def __init__(self) -> None:
+        super().__init__("seazen", 168436)
+
+    async def observed_path(self, needle: str) -> dict[str, Any]:
+        response = await super().observed_path(needle)
+        if needle == "/api/outer/ats-apply/website/job":
+            row = self._row("a")
+            row["title"] = "错误详情标题"
+            response["body"] = json.dumps(encrypted({"code": 0, "data": row}))
+        return response
+
+
+async def test_seazen_rejects_detail_title_mismatch(now: datetime) -> None:
+    source = Source(
+        source_id="COM0298",
+        company_id="COM0298",
+        company="新城发展控股有限公司",
+        url="https://app.mokahr.com/campus-recruitment/seazen/168436#/jobs",
+    )
+    result = await Seazen2027(source, SeazenTitleMismatch(), now).collect()
+    assert result.coverage_issues()
 
 
 async def test_moka_keeps_job_with_missing_description(now: datetime) -> None:
@@ -251,3 +343,21 @@ async def test_zhongan_excludes_non_jobs_and_detects_unknown_project(now: dateti
 
     unknown = await ZhongAn(source, ZhongAnReplay(unknown=True), now).collect()
     assert unknown.coverage_issues()
+
+
+async def test_longcheer_campus_apply_site_uses_full_unfiltered_directory(now: datetime) -> None:
+    source = Source(
+        source_id="COM0360",
+        company_id="COM0360",
+        company="上海龙旗科技股份有限公司",
+        url="https://app.mokahr.com/campus_apply/longcheer/166561#/jobs",
+    )
+    session = Replay("longcheer", 166561)
+    result = await Longcheer2027(source, session, now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert session.calls[0]["orgId"] == "longcheer"
+    assert session.calls[0]["siteId"] == "166561"
+    assert session.calls[0]["site"] == "campus"
+    assert session.calls[-1]["jobId"] == "c"
+    assert all("campus_apply/longcheer/166561" in job.source_url for job in result.jobs)

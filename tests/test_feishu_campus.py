@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from job_crawler.adapters.feishu import Innolight, Jtexpress, Xiaomi
+from job_crawler.adapters.feishu import Innolight, Jtexpress, NineDragons, Xiaomi
 from job_crawler.models import Source
 
 
@@ -129,4 +129,35 @@ async def test_innolight_group_portal_detail_route(tmp_path: Path, now: datetime
     assert (
         result.jobs[0].source_url
         == "https://zj-innolight.jobs.feishu.cn/300308/position/123/detail"
+    )
+
+
+class NineDragonsSession(XiaomiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://ninedragonspaper.jobs.feishu.cn/502309/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "xiaomi.jobs.f.mioffice.cn", "ninedragonspaper.jobs.feishu.cn"
+        )
+        payload = json.loads(response["body"])
+        payload["data"]["job_post_list"][0]["job_subject"] = None
+        response["body"] = json.dumps(payload)
+        return response
+
+
+async def test_nine_dragons_campus_route_and_formal_type(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0275",
+        company_id="COM0275",
+        company="玖龙纸业（控股）有限公司",
+        url="https://ninedragonspaper.jobs.feishu.cn/502309/position/list",
+    )
+    result = await NineDragons(source, NineDragonsSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert (
+        result.jobs[0].source_url
+        == "https://ninedragonspaper.jobs.feishu.cn/502309/position/123/detail"
     )
