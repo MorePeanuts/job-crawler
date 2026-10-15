@@ -760,6 +760,39 @@ class MinmetalsGroup(SinomachGroup):
         return True
 
 
+class HengyiGroup(SinomachGroup):
+    name = "hotjob-hengyi-group"
+    version = "1"
+    host = "wecruit.hotjob.cn"
+    suite = "SU64a650e3bef57c3af72089fb"
+    path = f"/{suite}/mc/position/campus"
+    mobile_mode = True
+    scope_description = "恒逸集团2027届校招完整目录，含集团本部及成员企业；保留实际招聘单位"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        super().validate_terms(data)
+        roots = {text(row.get("code")): text(row.get("nameCh")) for row in data["orgList"]}
+        check(
+            roots == {"0/3": "浙江恒逸集团有限公司", "0/4": "恒逸石化股份有限公司"},
+            "恒逸集团机构树顶层法人变化",
+        )
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        project = (str(row.get("projectId")), text(row.get("projectName")))
+        check(
+            project
+            in {
+                ("100901", "2027届校园招聘"),
+                ("100001", "校园招聘"),
+                ("100701", "新疆项目"),
+                ("101801", "文莱二期项目"),
+                ("0", "日常招聘"),
+            },
+            "恒逸集团校招项目变化",
+        )
+        return super().include_listing(row) and project != ("0", "日常招聘")
+
+
 class CrrcGroup(MinmetalsGroup):
     name = "hotjob-crrc-group"
     version = "1"
@@ -839,6 +872,7 @@ class Wanhua2027(Hotjob):
 TENANTS = (
     SinomachGroup,
     MinmetalsGroup,
+    HengyiGroup,
     CrrcGroup,
     GwmListed,
     Wanhua2027,

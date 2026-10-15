@@ -850,3 +850,7 @@ version = "1"
 [sources.COM0307]
 adapter = "zhiye-vanchen-2027"
 version = "1"
+
+[sources.COM0050]
+adapter = "hotjob-hengyi-group"
+version = "1"
