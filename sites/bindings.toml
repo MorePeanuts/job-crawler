@@ -878,3 +878,7 @@ version = "1"
 [sources.COM0163]
 adapter = "coapi-cimc-2027"
 version = "1"
+
+[sources.COM0071]
+adapter = "cib-2027-campus"
+version = "1"
