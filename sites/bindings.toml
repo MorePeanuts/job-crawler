@@ -898,3 +898,7 @@ version = "1"
 [sources.COM0067]
 adapter = "hbisco-group-campus"
 version = "1"
+
+[sources.COM0329]
+adapter = "zjamp-2027-announcement"
+version = "1"
