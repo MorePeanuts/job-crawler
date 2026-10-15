@@ -810,3 +810,11 @@ version = "1"
 [sources.COM0068]
 adapter = "iguopin-spic-2027"
 version = "1"
+
+[sources.COM0059]
+adapter = "iguopin-ceec-2027"
+version = "1"
+
+[sources.COM0060]
+adapter = "iguopin-cosco-2027"
+version = "1"
