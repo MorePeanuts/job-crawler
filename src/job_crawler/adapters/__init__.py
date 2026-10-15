@@ -55,6 +55,7 @@ from job_crawler.adapters.sunwoda import SunwodaCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.wtmec import Wtmec
+from job_crawler.adapters.xfusion import XfusionCampus
 from job_crawler.adapters.xmwy import XiamenTungsten2027
 from job_crawler.adapters.yili import YiliHeadquarters
 from job_crawler.adapters.yingte import YingteCampus
@@ -80,6 +81,7 @@ REGISTRY = {
         CtripCampus,
         Alibaba,
         Wtmec,
+        XfusionCampus,
         XiamenTungsten2027,
         ZttCampus,
         HzbankCampus,
