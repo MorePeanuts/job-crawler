@@ -882,3 +882,7 @@ version = "1"
 [sources.COM0071]
 adapter = "cib-2027-campus"
 version = "1"
+
+[sources.COM0229]
+adapter = "zjci-campus"
+version = "1"

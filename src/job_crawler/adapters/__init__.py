@@ -70,6 +70,7 @@ from job_crawler.adapters.yuexiu2027 import YuexiuProperty2027
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhaopin import Cnooc2027
 from job_crawler.adapters.zhiye import TENANTS, Ctf2027, WeichaiPower2027
+from job_crawler.adapters.zjci import ZjciCampus
 from job_crawler.adapters.ztt import ZttCampus
 
 REGISTRY = {
@@ -85,6 +86,7 @@ REGISTRY = {
         CNPC,
         ChinaTelecomCampus,
         Cib2027,
+        ZjciCampus,
         Cnooc2027,
         Chinalco2027,
         CtgDutyFreeCampus,
