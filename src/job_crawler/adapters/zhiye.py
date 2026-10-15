@@ -757,8 +757,22 @@ class Vanchen2027(Zhiye):
         return True
 
 
+class TongkunCampus(Zhiye):
+    name = "zhiye-tongkun-campus"
+    host = "hr-zjtkjt.zhiye.com"
+    path = "/campus"
+    listing_complete = True
+    regular_only = True
+    scope_description = "桐昆集团北森 Category=2 公开校招全目录；列表完整正文、未知单位原样留空"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "桐昆校招目录混入其他招聘类别")
+        return True
+
+
 TENANTS = (
     Vanchen2027,
+    TongkunCampus,
     Mxbc2027,
     GenertecCampus,
     Sph2027,

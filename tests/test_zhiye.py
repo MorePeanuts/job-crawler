@@ -24,6 +24,7 @@ from job_crawler.adapters.zhiye import (
     Shenzhou,
     Shrcb,
     Sph2027,
+    TongkunCampus,
     Vanchen2027,
     Xiangyu,
     YuntianhuaParent,
@@ -306,6 +307,7 @@ def test_zhiye_unset_dates(value: Any, expected: str) -> None:
         ("COM0461", "ovt-omnivision.zhiye.com"),
         ("COM0468", "cmhk.zhiye.com"),
         ("COM0484", "juhua.zhiye.com"),
+        ("COM0211", "hr-zjtkjt.zhiye.com"),
     ],
 )
 def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> None:
@@ -928,3 +930,35 @@ async def test_vanchen_rejects_changed_scope(fault: str, now: datetime) -> None:
         now,
     ).collect()
     assert result.coverage_issues()
+
+
+class TongkunReplay(VanchenReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://hr-zjtkjt.zhiye.com/campus"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = "https://hr-zjtkjt.zhiye.com/api/Jobad/GetJobAdPageList"
+        return response
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        response = await super().request(url, payload=payload, detail=detail)
+        response["Data"][0]["JobAdName"] = "桐昆研发工程师"
+        response["Data"][1]["JobAdName"] = "桐昆实习生"
+        return response
+
+
+async def test_tongkun_campus_listing_and_internship(now: datetime) -> None:
+    source = Source(
+        source_id="COM0211",
+        company_id="COM0211",
+        company="桐昆集团股份有限公司",
+        url="https://hr-zjtkjt.zhiye.com/campus",
+    )
+    result = await TongkunCampus(source, TongkunReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
+    assert [job.work_type for job in result.jobs] == ["校招", "实习"]
+    assert all(job.published == "" and job.unit == "" for job in result.jobs)

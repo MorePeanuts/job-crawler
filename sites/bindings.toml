@@ -862,3 +862,7 @@ version = "1"
 [sources.COM0148]
 adapter = "zhaopin-fosun-2027"
 version = "1"
+
+[sources.COM0211]
+adapter = "zhiye-tongkun-campus"
+version = "1"
