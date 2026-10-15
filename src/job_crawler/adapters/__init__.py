@@ -30,6 +30,7 @@ from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
 from job_crawler.adapters.gree import GreeCampus
 from job_crawler.adapters.greentown import GreentownCampus
 from job_crawler.adapters.haier import HaierCampus
+from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
@@ -137,6 +138,7 @@ REGISTRY = {
         ChinaTowerCampus,
         JacCampus,
         HaierCampus,
+        HbiscoCampus,
         NciCampus,
         NingboBank2027,
         SunwodaCampus,

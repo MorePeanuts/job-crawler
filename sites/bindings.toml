@@ -894,3 +894,7 @@ version = "1"
 [sources.COM0075]
 adapter = "zjjt-2027-campus"
 version = "1"
+
+[sources.COM0067]
+adapter = "hbisco-group-campus"
+version = "1"
