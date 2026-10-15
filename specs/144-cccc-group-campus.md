@@ -19,3 +19,7 @@
 3. Ruff、ty、pytest 通过，实站数量和字段限制记入验收。
 
 对应测试：`tests/test_zhiye.py` 中国交建租户测试。
+
+## 实站验收
+
+2026-10-15 13:43 上海时间，`outputs/dev-20261015-COM0018/report.json` 记录 `expected=listed=unique=details=951`、`coverage=complete`，正式岗位选中/信息表/待补全均为 951，严格导入 0。源站部分岗位未公开逐岗招聘单位和学历，保持空值；站点验收禁用模型。完整门禁 597 项测试通过。
