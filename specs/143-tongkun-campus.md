@@ -19,3 +19,7 @@
 3. Ruff、ty、pytest 通过，并记录当前站点日期与严格导出限制。
 
 对应测试：`tests/test_zhiye.py` 桐昆租户用例及北森公共分页测试。
+
+## 实站验收
+
+2026-10-15 13:38 上海时间，`outputs/dev-20261015-COM0211/report.json` 记录 `expected=listed=unique=details=27`、`coverage=complete`，正式岗位选中/信息表/待补全 27，严格导入 0。源站列表大量缺少公开发布时间和实际法人，保持空值；本站验收禁用模型。完整门禁 595 项测试通过。
