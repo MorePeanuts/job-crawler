@@ -21,6 +21,7 @@ from job_crawler.adapters.moka import (
     Hengrui,
     Huaqin,
     Jinko,
+    Longcheer2027,
     Lygend,
     Moka,
     Sanhua,
@@ -342,3 +343,21 @@ async def test_zhongan_excludes_non_jobs_and_detects_unknown_project(now: dateti
 
     unknown = await ZhongAn(source, ZhongAnReplay(unknown=True), now).collect()
     assert unknown.coverage_issues()
+
+
+async def test_longcheer_campus_apply_site_uses_full_unfiltered_directory(now: datetime) -> None:
+    source = Source(
+        source_id="COM0360",
+        company_id="COM0360",
+        company="上海龙旗科技股份有限公司",
+        url="https://app.mokahr.com/campus_apply/longcheer/166561#/jobs",
+    )
+    session = Replay("longcheer", 166561)
+    result = await Longcheer2027(source, session, now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert session.calls[0]["orgId"] == "longcheer"
+    assert session.calls[0]["siteId"] == "166561"
+    assert session.calls[0]["site"] == "campus"
+    assert session.calls[-1]["jobId"] == "c"
+    assert all("campus_apply/longcheer/166561" in job.source_url for job in result.jobs)

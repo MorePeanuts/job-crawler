@@ -18,4 +18,8 @@
 2. 实站 `expected=listed=unique`，逐岗详情/明确跳过数闭合、`coverage=complete`，有效正式校招岗位大于零。
 3. Ruff、ty、pytest 通过，记录采集时刻和导入字段限制。
 
-对应测试：`tests/test_moka.py` 及 `tests/test_longcheer_moka.py`。
+对应测试：`tests/test_moka.py`。
+
+## 2026-10-15 真实验收
+
+`outputs/dev-20261015-COM0360` 用 `--window all` 实采，Moka 校园站 125 个职位通过五页无筛选目录及逐岗详情验证，`expected=listed=unique=details=125`、`coverage=complete`。公共层排除 1 个非正式校招职位，选中及信息表 124 条；严格导入 0、待补全 124 条。部门沿用源站原文，不推断法律主体。

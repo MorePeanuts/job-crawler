@@ -627,7 +627,17 @@ class Seazen2027(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "新城详情标题不匹配")
 
 
+class Longcheer2027(Moka):
+    name = "moka-longcheer-2027"
+    org = "longcheer"
+    site_id = 166561
+    route = "campus_apply"
+    path = f"/{route}/{org}/{site_id}#/jobs"
+    scope_description = "龙旗科技2027公开 Moka 校园站国内及海外校招无筛选全目录"
+
+
 TENANTS = (
+    Longcheer2027,
     Seazen2027,
     SunnyOptical,
     Hengrui,
