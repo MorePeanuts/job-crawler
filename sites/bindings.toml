@@ -786,3 +786,11 @@ version = "1"
 [sources.COM0435]
 adapter = "moka-hengrui"
 version = "1"
+
+[sources.COM0023]
+adapter = "zhaopin-cnooc-2027"
+version = "1"
+
+[sources.COM0126]
+adapter = "zhiye-weichai-power-2027"
+version = "1"
