@@ -4,6 +4,7 @@ from typing import Any
 
 from job_crawler.adapters.zhaopin import (
     ChinaPost2027,
+    Dongfang2027,
     Fosun2027,
     Longfor2027,
     Unicom,
@@ -207,6 +208,86 @@ async def test_fosun_removes_default_tag_and_marks_internships(now: datetime) ->
     assert result.scopes[0].expected == result.scopes[0].unique == 3
     assert [job.work_type for job in result.jobs] == ["校招", "校招", "实习"]
     assert [job.unit for job in result.jobs] == ["单位0"] * 3
+
+
+class DongfangReplay:
+    last_evidence = "dongfang-aggregation.json"
+
+    def __init__(self, *, foreign_unit: bool = False):
+        self.foreign_unit = foreign_unit
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://dongfang2027.zhaopin.com/jobs/index.html"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        assert "get-search-aggregation" in needle
+        units = [
+            {
+                "name": f"N{i}",
+                "count": 2 if i == 0 else 0,
+                "extend": {
+                    "campusOrgName": f"东方单位{i}",
+                    "companyInfo": json.dumps(
+                        {"campusOrgName": f"东方单位{i}", "rootOrgId": 101340}
+                    ),
+                },
+            }
+            for i in range(15)
+        ]
+        return {
+            "post_data": json.dumps(
+                {"orgNumber": "101340", "jobSource": 2, "facetFields": ["SOU_COMPANY_ID"]}
+            ),
+            "body": json.dumps({"code": 200, "data": {"itemMap": {"SOU_COMPANY_ID": units}}}),
+        }
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        assert url.endswith("search-job-list") and payload is not None
+        assert payload["orgNumbers"] == "101340" and payload["jobSource"] == 2
+        assert payload["campusParentDepartmentIds"] == ""
+        assert payload["pageIndex"] == 1 and payload["pageSize"] == 50
+        rows = [
+            {
+                "company": {
+                    "companyId": 101340,
+                    "companyNumber": "BAD" if self.foreign_unit and i == 1 else "N0",
+                    "campusOrgName": "东方单位0",
+                    "slaveDisplayOrgName": "中国东方电气集团有限公司",
+                },
+                "job": {
+                    "jobNumber": f"D{i}",
+                    "positionSourceType": 2,
+                    "title": f"工程师{i}",
+                    "detail": "岗位职责：设计设备\n任职要求：本科",
+                },
+            }
+            for i in range(2)
+        ]
+        return {
+            "code": 200,
+            "data": {
+                "jobList": rows,
+                "pageInfo": {"pageIndex": 1, "pageSize": 50, "totalNum": 2, "totalPage": 1},
+            },
+        }
+
+
+async def test_dongfang_clears_unit_filter_and_checks_all_units(now: datetime) -> None:
+    source = Source(
+        source_id="COM0235",
+        company_id="COM0235",
+        company="东方电气股份有限公司",
+        url="https://dongfang2027.zhaopin.com/jobs/index.html",
+    )
+    result = await Dongfang2027(source, DongfangReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].details == 2
+    assert [job.unit for job in result.jobs] == ["东方单位0", "东方单位0"]
+    failed = await Dongfang2027(source, DongfangReplay(foreign_unit=True), now).collect()
+    assert failed.coverage_issues()
+    assert len(failed.jobs) == 1
 
 
 class LongforReplay:

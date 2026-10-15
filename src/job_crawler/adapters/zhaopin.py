@@ -323,6 +323,66 @@ class Fosun2027(Zhaopin):
         )
 
 
+class Dongfang2027(Zhaopin):
+    name = "zhaopin-dongfang-2027"
+    host = "dongfang2027.zhaopin.com"
+    path = "/jobs/index.html"
+    org_number = "101340"
+    ready_endpoints = ("https://fe.zhaopin.com/grace/api/dsc/get-search-aggregation",)
+    scope_description = "东方电气集团 2027 届校招门户，15 个招聘单位无筛选全目录；逐岗保留实际单位"
+
+    async def harvest(self) -> None:
+        observed = await self.session.observed("/grace/api/dsc/get-search-aggregation")
+        initial = json.loads(observed["post_data"])
+        check(
+            str(initial.get("orgNumber")) == self.org_number
+            and initial.get("jobSource") == 2
+            and initial.get("facetFields") == ["SOU_COMPANY_ID"],
+            "东方电气 2027 单位聚合初始范围变化",
+        )
+        response = json.loads(observed["body"])
+        check(response.get("code") == 200, "东方电气单位聚合失败")
+        units = response["data"]["itemMap"]["SOU_COMPANY_ID"]
+        check(isinstance(units, list) and len(units) == 15, "东方电气招聘单位数量变化")
+        self._units: dict[str, str] = {}
+        expected = 0
+        for unit in units:
+            number = str(unit["name"])
+            name = text(unit["extend"]["campusOrgName"])
+            info = json.loads(unit["extend"]["companyInfo"])
+            check(
+                number not in self._units
+                and bool(name)
+                and text(info.get("campusOrgName")) == name
+                and str(info.get("rootOrgId")) == self.org_number,
+                "东方电气聚合单位身份变化",
+            )
+            self._units[number] = name
+            expected += int(unit["count"])
+        aggregation_evidence = self.session.last_evidence
+        # The observed unit-click request uses these fields. Clear its department
+        # filter to collect every unit in the same 2027 portal.
+        payload: dict[str, Any] = {
+            "orgNumbers": self.org_number,
+            "jobSource": 2,
+            "pageIndex": 1,
+            "pageSize": 12,
+            **{key: ([] if key == "orgDepartmentIds" else "") for key in FILTERS},
+        }
+        await self.collect_catalog(payload)
+        scope = self.result.scopes[0]
+        scope.evidence.append(aggregation_evidence)
+        check(scope.expected == expected, "东方电气聚合单位计数与全目录不符")
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "中国东方电气集团有限公司"
+            and self._units.get(str(company_data.get("companyNumber")))
+            == text(company_data.get("campusOrgName")),
+            "东方电气岗位单位不在 2027 门户聚合目录",
+        )
+
+
 class TuopuCampus(Zhaopin):
     name = "zhaopin-tuopu-campus"
     host = "tuopu.zhaopin.com"
@@ -454,6 +514,7 @@ class ChinaPost2027(Zhaopin):
 TENANTS = (
     Longfor2027,
     Fosun2027,
+    Dongfang2027,
     ChinaPost2027,
     Hadian,
     Unicom,

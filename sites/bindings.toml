@@ -902,3 +902,11 @@ version = "1"
 [sources.COM0329]
 adapter = "zjamp-2027-announcement"
 version = "1"
+
+[sources.COM0235]
+adapter = "zhaopin-dongfang-2027"
+version = "1"
+
+[sources.COM0457]
+adapter = "xingfa-2027-notice"
+version = "1"
