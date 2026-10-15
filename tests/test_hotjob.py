@@ -18,6 +18,7 @@ from job_crawler.adapters.hotjob import (
     JinTian,
     LiuGong,
     Luxshare,
+    MinmetalsGroup,
     Minth,
     SinomachGroup,
     Skyworth,
@@ -279,6 +280,64 @@ async def test_sinomach_internship_project_is_not_regular_campus(now: datetime) 
     result = await SinomachGroup(source, SinomachReplay(internship=True), now).collect()
     assert result.coverage_issues() == []
     assert [job.work_type for job in result.jobs] == ["校招", "校招", "实习"]
+
+
+class MinmetalsReplay(SinomachReplay):
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        if "listSearchTerm" in needle:
+            terms = json.loads(response["body"])
+            terms["data"]["orgList"] = [
+                {
+                    "code": "0/1",
+                    "nameCh": "集团总部",
+                    "positionsNum": 2,
+                    "childNodes": [],
+                },
+                {
+                    "code": "0/496",
+                    "nameCh": "中国冶金科工股份有限公司",
+                    "positionsNum": 1,
+                    "childNodes": [{"code": "0/496/612", "childNodes": []}],
+                },
+            ]
+            response["body"] = json.dumps(terms, ensure_ascii=False)
+        elif "listPositionDetail" not in needle:
+            response["post_data"] = "isFrompb=true&recruitType=1&pageSize=2&currentPage=1"
+        return response
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = Replay._listing(self, post_id)
+        row.update(
+            {
+                "company": "中国冶金科工股份有限公司" if post_id == "b" else "中国五矿集团总部",
+                "orgCode": "0/496/612" if post_id == "b" else "0/1/491/190",
+                "projectName": "2027届校园招聘",
+            }
+        )
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        detail = Replay._detail(self, post_id)
+        detail["data"].update(self._listing(post_id))
+        return detail
+
+
+async def test_minmetals_group_directory_and_member_units(now: datetime) -> None:
+    source = Source(
+        source_id="COM0028",
+        company_id="COM0028",
+        company="中国五矿集团有限公司",
+        url=f"https://wecruit.hotjob.cn/{MinmetalsGroup.suite}/pb/school.html",
+    )
+    result = await MinmetalsGroup(source, MinmetalsReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert [job.unit for job in result.jobs] == [
+        "中国五矿集团总部 / 某业务单位",
+        "中国冶金科工股份有限公司 / 某业务单位",
+        "中国五矿集团总部 / 某业务单位",
+    ]
 
 
 @pytest.mark.parametrize("adapter", [HuaXia, JinTian, GF, LiuGong, HaiTian, Minth])

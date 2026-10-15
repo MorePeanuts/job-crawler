@@ -191,4 +191,13 @@ class Innolight(Desaysv):
     scope_description = "中际旭创官方 2027 校园门户公开全目录；实习由公共筛选排除"
 
 
-TENANTS = (Desaysv, Xpeng, Nio, Jtexpress, Xiaomi, Aac, Innolight)
+class NineDragons(Desaysv):
+    name = "feishu-nine-dragons"
+    host = "ninedragonspaper.jobs.feishu.cn"
+    path = "/502309/position/list"
+    detail_prefix = "/502309/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "玖龙纸业飞书校招 portal_type=6 无筛选全目录；实习由公共筛选排除"
+
+
+TENANTS = (Desaysv, Xpeng, Nio, Jtexpress, Xiaomi, Aac, Innolight, NineDragons)

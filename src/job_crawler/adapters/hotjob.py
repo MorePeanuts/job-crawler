@@ -743,6 +743,23 @@ class SinomachGroup(Hotjob):
         return job
 
 
+class MinmetalsGroup(SinomachGroup):
+    name = "hotjob-minmetals-group"
+    version = "1"
+    host = "wecruit.hotjob.cn"
+    suite = "SU62f37858bef57c29ead8adab"
+    path = f"/{suite}/pb/school.html"
+    mobile_mode = False
+    scope_description = "中国五矿集团2027届校招门户全目录，含总部及成员企业；逐岗保留实际招聘单位"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(bool(text(row.get("company"))), "中国五矿岗位缺少实际招聘单位")
+        code = text(row.get("orgCode"))
+        root = "/".join(code.split("/")[:2])
+        check(root in self.org_codes, "中国五矿岗位不属于招聘门户顶层机构")
+        return True
+
+
 class Wanhua2027(Hotjob):
     name = "hotjob-wanhua-2027"
     suite = "SU6a7ad69c43154813049755d7"
@@ -783,6 +800,7 @@ class Wanhua2027(Hotjob):
 
 TENANTS = (
     SinomachGroup,
+    MinmetalsGroup,
     Wanhua2027,
     Zoomlion2027,
     EveEnergy,
