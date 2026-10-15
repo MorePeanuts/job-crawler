@@ -806,3 +806,7 @@ version = "1"
 [sources.COM0063]
 adapter = "itg-holding-campus"
 version = "1"
+
+[sources.COM0068]
+adapter = "iguopin-spic-2027"
+version = "1"
