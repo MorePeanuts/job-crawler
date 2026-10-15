@@ -794,3 +794,7 @@ version = "1"
 [sources.COM0126]
 adapter = "zhiye-weichai-power-2027"
 version = "1"
+
+[sources.COM0219]
+adapter = "zhiye-ctf-2027"
+version = "1"
