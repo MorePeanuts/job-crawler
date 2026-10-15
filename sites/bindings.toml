@@ -854,3 +854,7 @@ version = "1"
 [sources.COM0050]
 adapter = "hotjob-hengyi-group"
 version = "1"
+
+[sources.COM0152]
+adapter = "gree-campus"
+version = "1"

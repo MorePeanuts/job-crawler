@@ -26,6 +26,7 @@ from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
 from job_crawler.adapters.fuyao import FuyaoHeadquarters
 from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
+from job_crawler.adapters.gree import GreeCampus
 from job_crawler.adapters.greentown import GreentownCampus
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
@@ -74,6 +75,7 @@ REGISTRY = {
     adapter.name: adapter
     for adapter in (
         AnkerCampus,
+        GreeCampus,
         SinopharmCampus,
         *STATIC_TENANTS,
         *BANK_TENANTS,
