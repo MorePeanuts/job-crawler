@@ -822,3 +822,7 @@ version = "1"
 [sources.COM0110]
 adapter = "cec-campus"
 version = "1"
+
+[sources.COM0337]
+adapter = "zhiye-wuxiapptec-2027"
+version = "1"

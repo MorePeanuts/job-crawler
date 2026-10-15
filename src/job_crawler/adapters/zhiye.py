@@ -432,8 +432,16 @@ class Vital(Zhiye):
 
 
 class WuxiApptec(Zhiye):
-    name = "zhiye-wuxiapptec"
-    host = "wuxiappteccampus.zhiye.com"
+    name = "zhiye-wuxiapptec-2027"
+    host = "wuxiapptec.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    page_size = 100
+    scope_description = "药明康德现用北森 Category=2 校招目录；仅 2027 届，未公开逐岗法人名称"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "药明康德目录混入非校招类别")
+        return text(row.get("JobAdName")).startswith("2027届")
 
 
 class WeichaiPower2027(Zhiye):
