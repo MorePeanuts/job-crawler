@@ -446,6 +446,21 @@ class WeichaiPower2027(Zhiye):
     )
 
 
+class Ctf2027(Zhiye):
+    name = "zhiye-ctf-2027"
+    host = "hr.ctf.com.cn"
+    listing_complete = True
+    regular_only = True
+    scope_description = "周大福2027校招北森 Category=2 全目录；无逐岗法人名称，单位留空"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(
+            str(row.get("OrgId")) == "34100" and "周大福" in text(row.get("JobAdName")),
+            "周大福校招组织或品牌改变",
+        )
+        return True
+
+
 class Gotion(Zhiye):
     name = "zhiye-gotion"
     host = "gotion.zhiye.com"
