@@ -30,6 +30,7 @@ from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
+from job_crawler.adapters.iguopin_projects import Ceec2027, Cosco2027
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
 from job_crawler.adapters.inovance import InovanceCampus
 from job_crawler.adapters.itg_holding import ItgHoldingCampus
@@ -89,6 +90,8 @@ REGISTRY = {
         HzbankCampus,
         CmbcCampus,
         Hzsteel,
+        Ceec2027,
+        Cosco2027,
         Ansteel,
         Lenovo,
         LiAutoCampus,
