@@ -573,7 +573,21 @@ class ZhongAn(Moka):
         )
 
 
+class Hengrui(Moka):
+    name = "moka-hengrui"
+    org = "hengrui"
+    site_id = 145997
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(
+            text(detail.get("title")) == text(listing.get("title")),
+            "恒瑞医药详情与列表标题不一致",
+        )
+
+
 TENANTS = (
+    Hengrui,
     Anta2027,
     TrinaSolar,
     ZhongAn,

@@ -18,6 +18,7 @@ from job_crawler.adapters.moka import (
     Digiloong,
     EastchinaPharm,
     Fehorizon,
+    Hengrui,
     Huaqin,
     Jinko,
     Lygend,
@@ -153,6 +154,7 @@ class Replay:
         Dasenlin,
         TrinaSolar,
         Anta2027,
+        Hengrui,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:
