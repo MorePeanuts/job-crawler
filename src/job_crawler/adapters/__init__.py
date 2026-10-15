@@ -12,6 +12,7 @@ from job_crawler.adapters.campaign51 import TENANTS as CAMPAIGN51_TENANTS
 from job_crawler.adapters.cdkj import Cdkj
 from job_crawler.adapters.cdrcb import Cdrcb2027
 from job_crawler.adapters.ceair import Ceair2027
+from job_crawler.adapters.cec import CecCampus
 from job_crawler.adapters.chinalco import Chinalco2027
 from job_crawler.adapters.chinatelecom import ChinaTelecomCampus
 from job_crawler.adapters.chinatower import ChinaTowerCampus, JacCampus
@@ -116,6 +117,7 @@ REGISTRY = {
         Bohai2027,
         BYDCampus,
         Cdkj,
+        CecCampus,
         Ceair2027,
         Cdrcb2027,
         Chnenergy,
