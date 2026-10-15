@@ -798,3 +798,7 @@ version = "1"
 [sources.COM0219]
 adapter = "zhiye-ctf-2027"
 version = "1"
+
+[sources.COM0285]
+adapter = "xfusion-campus"
+version = "1"
