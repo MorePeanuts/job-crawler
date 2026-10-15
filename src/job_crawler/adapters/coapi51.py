@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import re
 from typing import Any, cast
 from urllib.parse import parse_qs, urlsplit
 
@@ -11,7 +12,7 @@ from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.campaign51 import apply_id, split_jobinfo
 from job_crawler.adapters.platforms import check
 from job_crawler.filtering import select
-from job_crawler.models import Job, Scope
+from job_crawler.models import Issue, Job, Scope
 from job_crawler.storage import write_json
 from job_crawler.transport import BrowserSession
 
@@ -506,4 +507,105 @@ class Cqrcb2027(Coapi):
         scope.terminal = True
 
 
-TENANTS = (Nbhx, Wanxiang, Cofco, Scg, Cqrcb2027)
+class Cimc2027(Coapi):
+    name = "coapi-cimc-2027"
+    host = "campus.51job.com"
+    path = "/cimc/post.html"
+    ctmid = "7973180"
+    scope_description = "中集集团 2027 届官方专题全部业务板块、无筛选 COAPI 目录及逐岗详情"
+
+    async def harvest(self) -> None:
+        session = cast(BrowserSession, self.session)
+        check(session.page is not None, "中集 2027 职位页不存在")
+        assert session.page is not None
+        await session.page.locator("#job-list tr[rel]").first.wait_for(timeout=20000)
+        document = BeautifulSoup(await session.page.content(), "html.parser")
+        cards = [str(item["rel"]) for item in document.select("#job-list tr[rel]")]
+        check(len(cards) == 10 and len(set(cards)) == 10, "中集首屏十条岗位卡片不完整")
+        inline = "\n".join(item.get_text() for item in document.select("script:not([src])"))
+        match = re.search(r"var coid\s*=\s*(\{.*?\})\s*;", inline, re.DOTALL)
+        check(match is not None, "中集页面单位映射缺失")
+        assert match is not None
+        units = dict(re.findall(r'"([A-Z][0-9]*)"\s*:\s*"([^"]+)"', match.group(1)))
+        check(isinstance(units, dict) and units.get("Z") == "中集集团总部", "中集单位映射改变")
+        session.consume_request()
+        response = await session.page.evaluate(
+            LIST_JS,
+            {
+                "ctmid": self.ctmid,
+                "pagesize": 2000,
+                "pagenum": 1,
+                "poscode": "",
+                "divid": "",
+                "jobarea": "",
+                "sort": "poscode",
+                "sequence": 1,
+            },
+        )
+        check(
+            isinstance(response, dict) and isinstance(response.get("resultbody"), dict),
+            "中集岗位目录回调结构改变",
+        )
+        body = response["resultbody"]
+        expected = int(body["totalnum"])
+        rows = body["joblist"]
+        check(
+            0 < expected <= 2000 and isinstance(rows, list) and len(rows) == expected,
+            "中集无筛选目录不完整",
+        )
+        check([str(row["jobid"]) for row in rows[:10]] == cards, "中集首屏与目录 ID 不符")
+        missing_unit_codes = {text(row.get("poscode")) for row in rows} - set(units) - {""}
+        if missing_unit_codes:
+            self.result.warnings.append(
+                Issue(
+                    code="unit_not_published",
+                    source_id=self.source.source_id,
+                    url=self.source.url,
+                    message=f"页面单位映射缺少编码 {sorted(missing_unit_codes)}；对应岗位单位保留空值",
+                )
+            )
+        evidence = session.output / "coapi-list.json"
+        write_json(evidence, {"response": response, "units": units, "first_page_ids": cards})
+        session.last_evidence = str(evidence)
+        scope = Scope(name="cimc-2027-all-businesses", expected=expected)
+        self.result.scopes.append(scope)
+        seen: set[str] = set()
+        self.add_page(scope, rows, seen, lambda row: str(row["jobid"]))
+        for row in rows:
+            key = str(row["jobid"])
+            try:
+                check(str(row.get("ctmid")) == self.ctmid, "中集目录混入其他租户")
+                check(text(row.get("term")) == "全职", "中集校招目录混入非全职岗位")
+                code = text(row.get("poscode"))
+                listing = self.listing_job(key, row)
+                listing.unit = text(units.get(code)) if code else text(row.get("coname"))
+                resolved = self.before_detail(
+                    f"job:{key}", row, scope, listing, evidence=str(evidence)
+                )
+                if resolved is not None:
+                    self.result.jobs.extend(resolved)
+                    continue
+                detail, detail_evidence = await self.detail(key)
+                check(text(detail.get("term")) == "全职", "中集详情混入非全职岗位")
+                check(text(detail.get("poscode")) == code, "中集详情单位编码与目录不符")
+                if str(detail["jobinfo"]).startswith("岗位介绍"):
+                    detail = dict(detail)
+                    detail["jobinfo"] = str(detail["jobinfo"]).replace("岗位介绍", "岗位职责", 1)
+                job = self.complete_job(key, row, detail, detail_evidence, str(evidence))
+                job.unit = listing.unit
+                job.field_sources["unit"] = (
+                    "中集专题页面 coid 映射 + 列表 poscode"
+                    if code in units
+                    else "source_missing:页面单位编码未映射"
+                    if code
+                    else "列表 coname 原文；未给出具体岗位单位"
+                )
+                self.result.jobs.append(job)
+                scope.details += 1
+                self.remember(f"job:{key}", row, [job])
+            except Exception as exc:
+                self.error(exc, key)
+        scope.terminal = True
+
+
+TENANTS = (Nbhx, Wanxiang, Cofco, Scg, Cqrcb2027, Cimc2027)

@@ -874,3 +874,7 @@ version = "1"
 [sources.COM0209]
 adapter = "zhiye-sinosig-group-campus"
 version = "1"
+
+[sources.COM0163]
+adapter = "coapi-cimc-2027"
+version = "1"
