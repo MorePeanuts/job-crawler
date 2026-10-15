@@ -19,3 +19,7 @@
 3. Ruff、ty、pytest 通过，记录导入字段限制。
 
 对应测试：`tests/test_zjci.py`。
+
+## 2026-10-15 真实验收
+
+`outputs/dev-20261015-COM0229` 于北京时间 14:22 完成 `--window all` 实采。官网 Category 2 无筛选目录 `expected=listed=unique=details=67`，`coverage=complete`；67 条正式校招进入信息表，严格导入 0 条、待补全 67 条。源站没有明确发布时间，保留空值；工作地点只给区域级原文，仍需补全。Ruff、ty、pytest 全部通过（605 个测试）。
