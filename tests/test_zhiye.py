@@ -8,6 +8,7 @@ import pytest
 
 from job_crawler.adapters.zhiye import (
     TENANTS,
+    CcccGroupCampus,
     Chery,
     ChinaLifeGroup,
     Cinda2027,
@@ -308,6 +309,7 @@ def test_zhiye_unset_dates(value: Any, expected: str) -> None:
         ("COM0468", "cmhk.zhiye.com"),
         ("COM0484", "juhua.zhiye.com"),
         ("COM0211", "hr-zjtkjt.zhiye.com"),
+        ("COM0018", "zhaopin.ccccltd.cn"),
     ],
 )
 def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> None:
@@ -962,3 +964,34 @@ async def test_tongkun_campus_listing_and_internship(now: datetime) -> None:
     assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
     assert [job.work_type for job in result.jobs] == ["校招", "实习"]
     assert all(job.published == "" and job.unit == "" for job in result.jobs)
+
+
+class CcccReplay(VanchenReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://zhaopin.ccccltd.cn/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = "https://zhaopin.ccccltd.cn/api/Jobad/GetJobAdPageList"
+        return response
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        response = await super().request(url, payload=payload, detail=detail)
+        response["Data"][0]["JobAdName"] = "2027届校招工程岗"
+        response["Data"][1]["JobAdName"] = "2027届校招实习岗"
+        return response
+
+
+async def test_cccc_group_campus_listing_and_internship(now: datetime) -> None:
+    source = Source(
+        source_id="COM0018",
+        company_id="COM0018",
+        company="中国交通建设集团有限公司",
+        url="https://zhaopin.ccccltd.cn/campus/jobs",
+    )
+    result = await CcccGroupCampus(source, CcccReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
+    assert [job.work_type for job in result.jobs] == ["校招", "实习"]

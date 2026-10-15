@@ -770,9 +770,23 @@ class TongkunCampus(Zhiye):
         return True
 
 
+class CcccGroupCampus(Zhiye):
+    name = "zhiye-cccc-group-campus"
+    host = "zhaopin.ccccltd.cn"
+    listing_complete = True
+    regular_only = True
+    scope_description = "中国交建集团北森 Category=2 校招全目录；保留实际单位，缺失时留空"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "中国交建校招目录混入其他类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "中国交建岗位性质变化")
+        return True
+
+
 TENANTS = (
     Vanchen2027,
     TongkunCampus,
+    CcccGroupCampus,
     Mxbc2027,
     GenertecCampus,
     Sph2027,

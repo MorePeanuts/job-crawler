@@ -866,3 +866,7 @@ version = "1"
 [sources.COM0211]
 adapter = "zhiye-tongkun-campus"
 version = "1"
+
+[sources.COM0018]
+adapter = "zhiye-cccc-group-campus"
+version = "1"
