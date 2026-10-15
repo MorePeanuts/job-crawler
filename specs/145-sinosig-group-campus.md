@@ -19,3 +19,7 @@
 3. Ruff、ty、pytest 通过，记录岗位数量和导入字段限制。
 
 对应测试：`tests/test_zhiye.py` 阳光保险租户测试。
+
+## 2026-10-15 真实验收
+
+`outputs/dev-20261015-COM0209` 于北京时间 13:47 完成 `--window all` 实采。Category=2 的 `expected=listed=unique=details=243`，末页闭合、`coverage=complete`；12 条实习岗位按公共筛选排除，231 条正式校招进入信息表，严格导入 0 条、待补全 231 条（模型补全尚未运行）。`uv sync --locked`、Ruff、ty 和 pytest 全部通过（599 个测试）。
