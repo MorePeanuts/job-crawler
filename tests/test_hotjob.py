@@ -19,6 +19,7 @@ from job_crawler.adapters.hotjob import (
     LiuGong,
     Luxshare,
     Minth,
+    SinomachHeadquarters,
     Skyworth,
     Tbea,
     TclIndustries,
@@ -144,6 +145,107 @@ class Replay:
                 }
             },
         }
+
+
+class SinomachReplay(Replay):
+    def __init__(
+        self,
+        *,
+        wrong_detail: bool = False,
+        wrong_tree: bool = False,
+        wrong_listing: bool = False,
+        wrong_count: bool = False,
+    ):
+        super().__init__()
+        self.wrong_detail = wrong_detail
+        self.wrong_tree = wrong_tree
+        self.wrong_listing = wrong_listing
+        self.wrong_count = wrong_count
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        if "listSearchTerm" in needle:
+            terms = json.loads(response["body"])
+            terms["data"]["orgList"] = [
+                {
+                    "code": "0/2688" if not self.wrong_tree else "0/9999",
+                    "nameCh": "国机集团总部",
+                    "positionsNum": 3 if self.wrong_count else 2,
+                }
+            ]
+            response["body"] = json.dumps(terms, ensure_ascii=False)
+        elif "listPositionDetail" not in needle:
+            response["post_data"] = (
+                "recruitType=1&currentPage=1&pageSize=2&coordinateLat=&coordinateLng="
+            )
+        return response
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row.update(
+            {
+                "company": "中国机械设备工程股份有限公司" if post_id == "b" else "国机集团总部",
+                "orgCode": "0/1289/2693" if post_id == "b" else "0/2688/1317",
+                "projectName": "2027届青蓝计划",
+            }
+        )
+        if self.wrong_listing and post_id == "c":
+            row["orgCode"] = "0/1289/2693"
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        detail = super()._detail(post_id)
+        if self.wrong_detail and post_id == "c":
+            detail["data"]["orgCode"] = "0/1289/2693"
+        return detail
+
+
+@pytest.mark.parametrize(
+    "wrong_detail,wrong_tree,wrong_listing,wrong_count",
+    [
+        (False, False, False, False),
+        (True, False, False, False),
+        (False, True, False, False),
+        (False, False, True, False),
+        (False, False, False, True),
+    ],
+)
+async def test_sinomach_headquarters_boundary(
+    wrong_detail: bool,
+    wrong_tree: bool,
+    wrong_listing: bool,
+    wrong_count: bool,
+    now: datetime,
+) -> None:
+    replay = SinomachReplay(
+        wrong_detail=wrong_detail,
+        wrong_tree=wrong_tree,
+        wrong_listing=wrong_listing,
+        wrong_count=wrong_count,
+    )
+    source = Source(
+        source_id="COM0085",
+        company_id="COM0085",
+        company="中国机械工业集团有限公司",
+        url=("https://zhaopin.sinomach.com.cn/SU64b60d25bef57c7e363ff1a3/mc/position/campus"),
+    )
+    result = await SinomachHeadquarters(source, replay, now).collect()
+    if wrong_tree:
+        assert result.coverage_issues()
+        assert result.jobs == []
+    elif wrong_detail or wrong_listing:
+        assert result.coverage_issues()
+        assert [job.source_key for job in result.jobs] == ["a"]
+    elif wrong_count:
+        assert result.coverage_issues()
+        assert [job.source_key for job in result.jobs] == ["a", "c"]
+    else:
+        assert result.coverage_issues() == []
+        assert [job.source_key for job in result.jobs] == ["a", "c"]
+        assert result.scopes[0].skipped_out_of_scope == 1
+        assert result.scopes[0].details == 2
+        assert all(job.unit == "某业务单位" for job in result.jobs)
+        assert all(job.published == "2026-10-10 09:00:00" for job in result.jobs)
 
 
 @pytest.mark.parametrize("adapter", [HuaXia, JinTian, GF, LiuGong, HaiTian, Minth])

@@ -706,3 +706,7 @@ version = "1"
 [sources.COM0390]
 adapter = "grcbank-campus"
 version = "1"
+
+[sources.COM0085]
+adapter = "hotjob-sinomach-headquarters"
+version = "1"

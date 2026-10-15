@@ -656,6 +656,68 @@ class Zoomlion2027(Hotjob):
         return super()._job(row, listing, evidence, locations, location_evidence)
 
 
+class SinomachHeadquarters(Hotjob):
+    name = "hotjob-sinomach-headquarters"
+    host = "zhaopin.sinomach.com.cn"
+    suite = "SU64b60d25bef57c7e363ff1a3"
+    path = f"/{suite}/mc/position/campus"
+    mobile_mode = True
+    scope_description = "国机集团2027届校招全目录；仅国机集团总部 0/2688 分支"
+    headquarters_expected = 0
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        scope = self.result.scopes[0]
+        check(
+            scope.unique - scope.skipped_out_of_scope == self.headquarters_expected,
+            "国机集团总部岗位数与机构树不一致",
+        )
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        orgs = data.get("orgList")
+        if not isinstance(orgs, list):
+            raise CrawlError("schema_changed", "国机集团机构树缺失")
+        headquarters = [
+            org for org in orgs if isinstance(org, dict) and str(org.get("code")) == "0/2688"
+        ]
+        check(
+            len(headquarters) == 1
+            and text(headquarters[0].get("nameCh")) == "国机集团总部"
+            and int(headquarters[0].get("positionsNum", 0)) > 0,
+            "国机集团总部机构分支改变或为空",
+        )
+        self.headquarters_expected = int(headquarters[0]["positionsNum"])
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        company = text(row.get("company"))
+        org_code = text(row.get("orgCode"))
+        is_headquarters = company == "国机集团总部"
+        check(
+            is_headquarters == org_code.startswith("0/2688/"),
+            "国机集团列表机构名称与编码不一致",
+        )
+        return is_headquarters
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                str(row.get("postId")) == str(listing.get("postId"))
+                and text(row.get("postName")) == text(listing.get("postName"))
+                and text(row.get("company")) == "国机集团总部"
+                and text(row.get("orgCode")) == text(listing.get("orgCode"))
+                and text(row.get("projectName")) == text(listing.get("projectName")),
+                "国机集团总部详情与列表或机构不符",
+            )
+        return super()._job(row, listing, evidence, locations, location_evidence)
+
+
 class Wanhua2027(Hotjob):
     name = "hotjob-wanhua-2027"
     suite = "SU6a7ad69c43154813049755d7"
@@ -695,6 +757,7 @@ class Wanhua2027(Hotjob):
 
 
 TENANTS = (
+    SinomachHeadquarters,
     Wanhua2027,
     Zoomlion2027,
     EveEnergy,
