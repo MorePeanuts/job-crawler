@@ -19,3 +19,7 @@
 3. 通过 Ruff、ty、pytest 与真实采集验收，更新本批进度和可复现入口。
 
 对应测试：`tests/test_gree.py`。
+
+## 实站验收
+
+2026-10-15 13:27 上海时间，`outputs/dev-20261015-COM0152/report.json` 记录 `expected=listed=unique=details=53`、`coverage=complete`，正式岗位选中/信息表/待补全均为 53，严格导入 0。本轮站点验证禁用模型，缺少完整地点格式、分类等导入字段须后续补全。完整门禁 592 项测试通过。
