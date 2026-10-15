@@ -842,3 +842,7 @@ version = "1"
 [sources.COM0220]
 adapter = "zhaopin-yuexiu-property-2027"
 version = "1"
+
+[sources.COM0298]
+adapter = "moka-seazen-2027"
+version = "1"

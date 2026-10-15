@@ -616,7 +616,19 @@ class SunnyOptical(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "舜宇详情标题不匹配")
 
 
+class Seazen2027(Moka):
+    name = "moka-seazen-2027"
+    org = "seazen"
+    site_id = 168436
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "新城集团 2027 新睿校园招聘 Moka 站点完整公开职位目录"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "新城详情标题不匹配")
+
+
 TENANTS = (
+    Seazen2027,
     SunnyOptical,
     Hengrui,
     Anta2027,

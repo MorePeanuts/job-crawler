@@ -24,6 +24,7 @@ from job_crawler.adapters.moka import (
     Lygend,
     Moka,
     Sanhua,
+    Seazen2027,
     Sungrow,
     SunnyOptical,
     TrinaSolar,
@@ -214,6 +215,7 @@ async def test_sunny_rejects_internship_module(now: datetime) -> None:
         TrinaSolar,
         Anta2027,
         Hengrui,
+        Seazen2027,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:
@@ -247,6 +249,30 @@ async def test_moka_rejects_duplicate_page(now: datetime) -> None:
     )
     result = await CATL(source, Replay("catlhr", 142020, duplicate=True), now).collect()
     assert "duplicate_page" in {issue.code for issue in result.coverage_issues()}
+
+
+class SeazenTitleMismatch(Replay):
+    def __init__(self) -> None:
+        super().__init__("seazen", 168436)
+
+    async def observed_path(self, needle: str) -> dict[str, Any]:
+        response = await super().observed_path(needle)
+        if needle == "/api/outer/ats-apply/website/job":
+            row = self._row("a")
+            row["title"] = "错误详情标题"
+            response["body"] = json.dumps(encrypted({"code": 0, "data": row}))
+        return response
+
+
+async def test_seazen_rejects_detail_title_mismatch(now: datetime) -> None:
+    source = Source(
+        source_id="COM0298",
+        company_id="COM0298",
+        company="新城发展控股有限公司",
+        url="https://app.mokahr.com/campus-recruitment/seazen/168436#/jobs",
+    )
+    result = await Seazen2027(source, SeazenTitleMismatch(), now).collect()
+    assert result.coverage_issues()
 
 
 async def test_moka_keeps_job_with_missing_description(now: datetime) -> None:
