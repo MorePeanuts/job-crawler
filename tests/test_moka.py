@@ -25,6 +25,7 @@ from job_crawler.adapters.moka import (
     Moka,
     Sanhua,
     Sungrow,
+    SunnyOptical,
     TrinaSolar,
     Yadea,
     ZhongAn,
@@ -134,6 +135,64 @@ class Replay:
                 },
             }
         )
+
+
+class SunnyReplay(Replay):
+    def __init__(self, *, bad_commitment: bool = False):
+        super().__init__("sunnyoptical", 45602)
+        self.bad_commitment = bad_commitment
+
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        row["commitment"] = "全职"
+        return row
+
+    async def observed_path(self, needle: str) -> dict[str, Any]:
+        if needle == "/api/outer/ats-apply/website/jobs/module":
+            return {
+                "url": "https://campus.sunnyoptical.cn/api/outer/ats-apply/website/jobs/module",
+                "post_data": json.dumps(
+                    {
+                        "orgId": "sunnyoptical",
+                        "siteId": 45602,
+                        "moduleId": "0477326749",
+                        "commitments": ["实习"] if self.bad_commitment else ["全职"],
+                        "needGroupType": "zhineng",
+                        "keyword": "",
+                        "departmentIds": [],
+                        "limit": 2,
+                        "offset": 0,
+                    }
+                ),
+            }
+        return await super().observed_path(needle)
+
+
+async def test_sunny_module_catalog(now: datetime) -> None:
+    source = Source(
+        source_id="COM0353",
+        company_id="COM0353",
+        company="舜宇光学科技（集团）有限公司",
+        url="https://campus.sunnyoptical.cn/campus-recruitment/sunnyoptical/45602/#/",
+    )
+    replay = SunnyReplay()
+    result = await SunnyOptical(source, replay, now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].unique == result.scopes[0].details == 3
+    assert [call["offset"] for call in replay.calls if "offset" in call] == [0, 2]
+    assert all(job.work_type == "校招" for job in result.jobs)
+    assert all(job.source_url.startswith("https://campus.sunnyoptical.cn/") for job in result.jobs)
+
+
+async def test_sunny_rejects_internship_module(now: datetime) -> None:
+    source = Source(
+        source_id="COM0353",
+        company_id="COM0353",
+        company="舜宇光学科技（集团）有限公司",
+        url="https://campus.sunnyoptical.cn/campus-recruitment/sunnyoptical/45602/#/",
+    )
+    result = await SunnyOptical(source, SunnyReplay(bad_commitment=True), now).collect()
+    assert result.coverage_issues()
 
 
 @pytest.mark.parametrize(

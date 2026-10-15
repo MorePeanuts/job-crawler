@@ -826,3 +826,15 @@ version = "1"
 [sources.COM0337]
 adapter = "zhiye-wuxiapptec-2027"
 version = "1"
+
+[sources.COM0353]
+adapter = "moka-sunnyoptical-campus"
+version = "1"
+
+[sources.COM0036]
+adapter = "saic-group-campus"
+version = "1"
+
+[sources.COM0091]
+adapter = "iguopin-cnbm-2027"
+version = "1"

@@ -19,6 +19,7 @@ class GuopinProjectCampus(Adapter):
     project_id = ""
     nav_title = ""
     nature_codes: tuple[str, ...] = ()
+    company_filter = False
 
     async def harvest(self) -> None:
         session = cast(BrowserSession, self.session)
@@ -35,7 +36,7 @@ class GuopinProjectCampus(Adapter):
         nav = json.loads(campaign["content"])["params"]["nav"]
         check(
             any(
-                item.get("route") == "/job"
+                item.get("route") == self.path
                 and item.get("title") == self.nav_title
                 and str(item.get("props", {}).get("projectId")) == self.project_id
                 for item in nav
@@ -84,6 +85,7 @@ class GuopinProjectCampus(Adapter):
         }
         if self.nature_codes:
             payload["nature"] = list(self.nature_codes)
+        if self.nature_codes or self.company_filter:
             payload["company_id_with_sub"] = self.campaign_company_id
         check(json.loads(observed["post_data"]) == payload, f"{self.name} 目录含未知筛选")
         scope = Scope(name=f"{self.campaign_key}-2027-project-all")
@@ -188,3 +190,16 @@ class Cosco2027(GuopinProjectCampus):
     nav_title = "校园招聘"
     nature_codes = ("115xW5oQ", "11bTac9", "114Fay7E")
     scope_description = "中远海运集团国聘 2027 校招项目，全集团公开机构树与岗位目录"
+
+
+class Cnbm2027(GuopinProjectCampus):
+    name = "iguopin-cnbm-2027"
+    host = "cnbmjob.iguopin.com"
+    path = "/job-campus"
+    campaign_key = "cnbmjob"
+    campaign_company = "中国建材集团有限公司"
+    campaign_company_id = "10685287317794121"
+    project_id = "220514553295799224"
+    nav_title = "校园招聘"
+    company_filter = True
+    scope_description = "中国建材集团国聘 2027 校招专站，完整项目机构树及公开岗位目录"

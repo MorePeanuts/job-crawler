@@ -1,10 +1,15 @@
-"""Replay the two independently scoped Guopin campus project tenants."""
+"""Replay independently scoped Guopin campus project tenants."""
 
 import json
 from datetime import datetime
 from typing import Any
 
-from job_crawler.adapters.iguopin_projects import Ceec2027, Cosco2027, GuopinProjectCampus
+from job_crawler.adapters.iguopin_projects import (
+    Ceec2027,
+    Cnbm2027,
+    Cosco2027,
+    GuopinProjectCampus,
+)
 from job_crawler.models import Source
 
 
@@ -20,7 +25,7 @@ class Replay:
         self.pages: list[int] = []
 
     async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
-        assert url == f"https://{self.tenant.host}/job"
+        assert url == f"https://{self.tenant.host}{self.tenant.path}"
         assert ready_endpoints == ("https://gp-api.iguopin.com/api/jobs/v1/project-job",)
 
     async def observed(self, needle: str) -> dict[str, Any]:
@@ -42,7 +47,7 @@ class Replay:
                                     "params": {
                                         "nav": [
                                             {
-                                                "route": "/job",
+                                                "route": tenant.path,
                                                 "title": tenant.nav_title,
                                                 "props": {"projectId": tenant.project_id},
                                             }
@@ -85,6 +90,7 @@ class Replay:
         }
         if tenant.nature_codes:
             payload["nature"] = list(tenant.nature_codes)
+        if tenant.nature_codes or tenant.company_filter:
             payload["company_id_with_sub"] = tenant.campaign_company_id
         if self.filtered:
             payload["keyword"] = "仅部分岗位"
@@ -136,18 +142,22 @@ class Replay:
 
 
 def source(tenant: type[GuopinProjectCampus]) -> Source:
-    source_id, company = (
-        ("COM0059", "中国能源建设集团有限公司")
-        if tenant is Ceec2027
-        else ("COM0060", "中国远洋海运集团有限公司")
-    )
+    if tenant is Ceec2027:
+        source_id, company = "COM0059", "中国能源建设集团有限公司"
+    elif tenant is Cosco2027:
+        source_id, company = "COM0060", "中国远洋海运集团有限公司"
+    else:
+        source_id, company = "COM0091", "中国建材集团有限公司"
     return Source(
-        source_id=source_id, company_id=source_id, company=company, url=f"https://{tenant.host}/job"
+        source_id=source_id,
+        company_id=source_id,
+        company=company,
+        url=f"https://{tenant.host}{tenant.path}",
     )
 
 
 async def test_iguopin_project_tenants_close_all_pages(now: datetime) -> None:
-    for tenant in (Ceec2027, Cosco2027):
+    for tenant in (Ceec2027, Cosco2027, Cnbm2027):
         replay = Replay(tenant)
         result = await tenant(source(tenant), replay, now).collect()
         assert not result.coverage_issues()

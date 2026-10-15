@@ -31,7 +31,7 @@ from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
-from job_crawler.adapters.iguopin_projects import Ceec2027, Cosco2027
+from job_crawler.adapters.iguopin_projects import Ceec2027, Cnbm2027, Cosco2027
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
 from job_crawler.adapters.inovance import InovanceCampus
 from job_crawler.adapters.itg_holding import ItgHoldingCampus
@@ -47,6 +47,7 @@ from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
+from job_crawler.adapters.saic import SaicCampus
 from job_crawler.adapters.sdicpower import SdicPowerCampus
 from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
@@ -92,6 +93,7 @@ REGISTRY = {
         CmbcCampus,
         Hzsteel,
         Ceec2027,
+        Cnbm2027,
         Cosco2027,
         Ansteel,
         Lenovo,
@@ -108,6 +110,7 @@ REGISTRY = {
         Tencent,
         SF,
         SdicPowerCampus,
+        SaicCampus,
         ShccigHeadquartersTrainees,
         ShougangCampus,
         BankComm,

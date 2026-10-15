@@ -79,6 +79,7 @@ class Moka(Adapter):
     org = ""
     site_id = 0
     route = "campus-recruitment"
+    module_id = ""
     path = ""
     ready_endpoints = ("/api/outer/ats-apply/website/jobs/v2",)
     scope_description = (
@@ -99,11 +100,21 @@ class Moka(Adapter):
         iv = await page.evaluate("() => window.TurboApply?.data?.aesIv")
         check(isinstance(iv, str) and len(iv.encode()) == 16, "Moka 页面 IV 无效")
         observer = cast(ExactObserver, self.session)
-        observed = await observer.observed_path("/api/outer/ats-apply/website/jobs/v2")
+        catalog_path = (
+            "/api/outer/ats-apply/website/jobs/module"
+            if self.module_id
+            else "/api/outer/ats-apply/website/jobs/v2"
+        )
+        observed = await observer.observed_path(catalog_path)
         payload = json.loads(observed["post_data"])
         check(payload.get("orgId") == self.org, "Moka 组织不匹配")
         check(str(payload.get("siteId")) == str(self.site_id), "Moka 站点不匹配")
-        check(payload.get("site") == "campus", "Moka 入口不是校园站点")
+        if self.module_id:
+            check(str(payload.get("moduleId")) == self.module_id, "Moka 招聘模块不匹配")
+            check(payload.get("commitments") == ["全职"], "Moka 招聘模块不是正式岗位")
+            check(payload.get("needGroupType") == "zhineng", "Moka 招聘模块类别改变")
+        else:
+            check(payload.get("site") == "campus", "Moka 入口不是校园站点")
         check(int(payload.get("offset", -1)) == 0, "Moka 列表不是第一页")
         check(
             not payload.get("jobIdTopList") and not payload.get("customFields"), "Moka 目录带有筛选"
@@ -112,7 +123,12 @@ class Moka(Adapter):
             check(not payload.get(key), f"Moka 目录带有筛选 {key}")
         limit = int(payload["limit"])
         check(0 < limit <= 100, "Moka 分页大小异常")
-        scope = Scope(name=f"campus-site-{self.site_id}")
+        if self.module_id:
+            limit = 100
+        scope = Scope(
+            name=f"campus-site-{self.site_id}"
+            + (f"-module-{self.module_id}" if self.module_id else "")
+        )
         self.result.scopes.append(scope)
         seen: set[str] = set()
         offset = 0
@@ -586,7 +602,22 @@ class Hengrui(Moka):
         )
 
 
+class SunnyOptical(Moka):
+    name = "moka-sunnyoptical-campus"
+    host = "campus.sunnyoptical.cn"
+    org = "sunnyoptical"
+    site_id = 45602
+    module_id = "0477326749"
+    path = f"/campus-recruitment/{org}/{site_id}/#/"
+    ready_endpoints = ("/api/outer/ats-apply/website/jobs/module",)
+    scope_description = "舜宇光学官方 Moka 校园招聘全职模块 99 岗全目录"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "舜宇详情标题不匹配")
+
+
 TENANTS = (
+    SunnyOptical,
     Hengrui,
     Anta2027,
     TrinaSolar,
