@@ -51,6 +51,7 @@ from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
 from job_crawler.adapters.shougang import ShougangCampus
 from job_crawler.adapters.sinopharm import SinopharmCampus
 from job_crawler.adapters.smic import SmicCampus
+from job_crawler.adapters.spic2027 import Spic2027
 from job_crawler.adapters.static_campus import TENANTS as STATIC_TENANTS
 from job_crawler.adapters.sunwoda import SunwodaCampus
 from job_crawler.adapters.tcl import TCLCampus
@@ -129,6 +130,7 @@ REGISTRY = {
         YingteCampus,
         YiliHeadquarters,
         SmicCampus,
+        Spic2027,
         TCLCampus,
         *CAMPAIGN51_TENANTS,
         *COAPI51_TENANTS,
