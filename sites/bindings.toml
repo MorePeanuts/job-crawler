@@ -858,3 +858,7 @@ version = "1"
 [sources.COM0152]
 adapter = "gree-campus"
 version = "1"
+
+[sources.COM0148]
+adapter = "zhaopin-fosun-2027"
+version = "1"

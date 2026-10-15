@@ -39,6 +39,7 @@ class Zhaopin(Adapter):
     request_org_number = ""
     job_source = 2
     required_custom_tag = ""
+    observed_custom_tag = ""
     page_size = 50
     scope_description = (
         "智联招聘公开校园招聘 jobSource=2 无部门/地区/标签筛选全目录；列表包含完整岗位正文"
@@ -53,6 +54,9 @@ class Zhaopin(Adapter):
 
     def unit_name(self, company_data: dict[str, Any]) -> str:
         return text(company_data.get("campusOrgName"))
+
+    def work_type(self, job_data: dict[str, Any]) -> str:
+        return "校招"
 
     async def harvest(self) -> None:
         observed = await self.session.observed(API)
@@ -69,7 +73,8 @@ class Zhaopin(Adapter):
         )
         check(payload.get("jobSource") == self.job_source, "智联目录来源码与租户契约不符")
         check(
-            text(payload.get("customTags")) == self.required_custom_tag,
+            text(payload.get("customTags"))
+            == (self.observed_custom_tag or self.required_custom_tag),
             "智联目录校招标签与租户契约不符",
         )
         check(payload.get("pageIndex") == 1, "智联目录不是第一页")
@@ -137,6 +142,7 @@ class Zhaopin(Adapter):
                     category_raw=text(job_data.get("jobTypeName")),
                     duties=duties,
                     requirements=requirements,
+                    work_type=self.work_type(job_data),
                     field_sources={
                         "duties": (
                             "search-job-list.data.jobList[].job.detail"
@@ -250,6 +256,70 @@ class Cnooc2027(Zhaopin):
             and self._units.get(str(company_data.get("companyNumber")))
             == text(company_data.get("campusOrgName")),
             "中国海油岗位招聘单位不在聚合目录内",
+        )
+
+
+class Fosun2027(Zhaopin):
+    name = "zhaopin-fosun-2027"
+    host = "fosun.zhaopin.com"
+    path = "/job/index.html"
+    org_number = "102124"
+    observed_custom_tag = "复星财富"
+    page_size = 50
+    scope_description = "复星2027集团校招 10 单位 191 岗全目录；清除默认子项目标签，实习明确排除"
+
+    async def harvest(self) -> None:
+        response = await self.session.request(
+            "https://fe.zhaopin.com/grace/api/dsc/get-search-aggregation",
+            payload={
+                "orgNumber": self.org_number,
+                "jobSource": 2,
+                "facetFields": ["SOU_COMPANY_ID"],
+                "orgName": "",
+                "sortType": 1,
+                "pageIndex": 1,
+                "pageSize": 21,
+            },
+        )
+        check(response.get("code") == 200, "复星单位聚合接口失败")
+        units = response["data"]["itemMap"]["SOU_COMPANY_ID"]
+        check(isinstance(units, list) and len(units) == 10, "复星招聘单位数量变化")
+        self._units: dict[str, str] = {}
+        self._aggregate_total = 0
+        for unit in units:
+            number = str(unit["name"])
+            name = text(unit["extend"]["campusOrgName"])
+            info = json.loads(unit["extend"]["companyInfo"])
+            check(
+                number not in self._units
+                and bool(name)
+                and text(info.get("campusOrgName")) == name
+                and str(info.get("rootOrgId")) == self.org_number,
+                "复星招聘单位身份变化",
+            )
+            self._units[number] = name
+            self._aggregate_total += int(unit["count"])
+        aggregation_evidence = self.session.last_evidence
+        await super().harvest()
+        scope = self.result.scopes[0]
+        scope.evidence.append(aggregation_evidence)
+        check(scope.expected == self._aggregate_total, "复星单位聚合与完整岗位目录计数不符")
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "上海复星高科技（集团）有限公司"
+            and self._units.get(str(company_data.get("companyNumber")))
+            == text(company_data.get("campusOrgName")),
+            "复星岗位单位不在集团聚合目录",
+        )
+
+    def work_type(self, job_data: dict[str, Any]) -> str:
+        tags = job_data.get("jobCategories") or []
+        check(isinstance(tags, list), "复星岗位标签结构变化")
+        return (
+            "实习"
+            if "实习" in text(job_data.get("title")) or any("实习" in text(tag) for tag in tags)
+            else "校招"
         )
 
 
@@ -383,6 +453,7 @@ class ChinaPost2027(Zhaopin):
 
 TENANTS = (
     Longfor2027,
+    Fosun2027,
     ChinaPost2027,
     Hadian,
     Unicom,
