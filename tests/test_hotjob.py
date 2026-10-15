@@ -8,8 +8,10 @@ import pytest
 
 from job_crawler.adapters.hotjob import (
     GF,
+    CrrcGroup,
     EveEnergy,
     Goertek,
+    GwmListed,
     HaiTian,
     Hotjob,
     Huatai,
@@ -338,6 +340,67 @@ async def test_minmetals_group_directory_and_member_units(now: datetime) -> None
         "中国冶金科工股份有限公司 / 某业务单位",
         "中国五矿集团总部 / 某业务单位",
     ]
+
+
+class CrrcReplay(MinmetalsReplay):
+    def _url(self, endpoint: str) -> str:
+        return super()._url(endpoint).replace("wecruit.hotjob.cn", "crrc.hotjob.cn")
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row["company"] = "中车齐齐哈尔车辆有限公司" if post_id == "b" else "中车集团总部"
+        return row
+
+
+async def test_crrc_group_directory_and_detail_identity(now: datetime) -> None:
+    source = Source(
+        source_id="COM0095",
+        company_id="COM0095",
+        company="中国中车集团有限公司",
+        url=f"https://crrc.hotjob.cn/{CrrcGroup.suite}/pb/school.html",
+    )
+    result = await CrrcGroup(source, CrrcReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert [job.unit for job in result.jobs] == [
+        "中车集团总部 / 某业务单位",
+        "中车齐齐哈尔车辆有限公司 / 某业务单位",
+        "中车集团总部 / 某业务单位",
+    ]
+
+
+class GwmListedReplay(MinmetalsReplay):
+    def _url(self, endpoint: str) -> str:
+        return super()._url(endpoint).replace("wecruit.hotjob.cn", "zhaopin.gwm.cn")
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        if "listSearchTerm" in needle:
+            terms = json.loads(response["body"])
+            terms["data"]["orgList"][0]["code"] = "0/14"
+            terms["data"]["orgList"][0]["nameCh"] = "长城汽车股份有限公司"
+            response["body"] = json.dumps(terms, ensure_ascii=False)
+        return response
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row["company"] = "曼德电子电器有限公司" if post_id == "b" else "长城汽车股份有限公司"
+        row["orgCode"] = "0/496/612" if post_id == "b" else "0/14/22"
+        return row
+
+
+async def test_gwm_listed_entity_filters_other_group_units(now: datetime) -> None:
+    source = Source(
+        source_id="COM0130",
+        company_id="COM0130",
+        company="长城汽车股份有限公司",
+        url=f"https://zhaopin.gwm.cn/{GwmListed.suite}/pb/school.html",
+    )
+    result = await GwmListed(source, GwmListedReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert result.scopes[0].skipped_out_of_scope == 1
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
 
 
 @pytest.mark.parametrize("adapter", [HuaXia, JinTian, GF, LiuGong, HaiTian, Minth])

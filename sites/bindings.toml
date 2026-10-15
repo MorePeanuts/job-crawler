@@ -770,3 +770,11 @@ version = "1"
 [sources.COM0038]
 adapter = "chinatelecom-campus"
 version = "1"
+
+[sources.COM0130]
+adapter = "hotjob-gwm-listed"
+version = "1"
+
+[sources.COM0095]
+adapter = "hotjob-crrc-group"
+version = "1"

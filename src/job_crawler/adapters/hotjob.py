@@ -760,6 +760,44 @@ class MinmetalsGroup(SinomachGroup):
         return True
 
 
+class CrrcGroup(MinmetalsGroup):
+    name = "hotjob-crrc-group"
+    version = "1"
+    host = "crrc.hotjob.cn"
+    suite = "SU64d47c466202cc36e27a52d4"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "中国中车集团2027届校招门户全目录，含55个顶层招聘机构；逐岗保留实际单位"
+
+
+class GwmListed(MinmetalsGroup):
+    name = "hotjob-gwm-listed"
+    version = "1"
+    host = "zhaopin.gwm.cn"
+    suite = "SU692d37b4ea11b01b6c54e0e5"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "长城汽车集团门户完整校招目录；仅提取机构树 0/14 上市主体岗位"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        super().validate_terms(data)
+        roots = data["orgList"]
+        check(
+            any(
+                text(row.get("code")) == "0/14"
+                and text(row.get("nameCh")) == "长城汽车股份有限公司"
+                and int(row.get("positionsNum", 0)) > 0
+                for row in roots
+            ),
+            "长城汽车上市主体机构树缺失",
+        )
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(bool(text(row.get("company"))), "长城汽车岗位缺少实际招聘单位")
+        code = text(row.get("orgCode"))
+        root = "/".join(code.split("/")[:2])
+        check(root in self.org_codes, "长城汽车岗位超出机构树")
+        return root == "0/14"
+
+
 class Wanhua2027(Hotjob):
     name = "hotjob-wanhua-2027"
     suite = "SU6a7ad69c43154813049755d7"
@@ -801,6 +839,8 @@ class Wanhua2027(Hotjob):
 TENANTS = (
     SinomachGroup,
     MinmetalsGroup,
+    CrrcGroup,
+    GwmListed,
     Wanhua2027,
     Zoomlion2027,
     EveEnergy,
