@@ -200,6 +200,59 @@ class Longfor2027(Zhaopin):
         return " / ".join(names)
 
 
+class Cnooc2027(Zhaopin):
+    name = "zhaopin-cnooc-2027"
+    host = "cnooc.zhaopin.com"
+    path = "/job/index.html"
+    org_number = "105147"
+    page_size = 100
+    scope_description = (
+        "中国海油2027集团校招 16 个招聘单位；清除页面默认首单位筛选后遍历根组织全目录"
+    )
+
+    async def harvest(self) -> None:
+        observed = await self.session.observed("/get-search-aggregation")
+        payload = json.loads(observed["post_data"])
+        check(
+            str(payload.get("orgNumber")) == self.org_number
+            and payload.get("jobSource") == 2
+            and payload.get("facetFields") == ["SOU_COMPANY_ID"],
+            "中国海油聚合目录组织或校招来源改变",
+        )
+        result = json.loads(observed["body"])
+        check(result.get("code") == 200, "中国海油单位聚合接口失败")
+        units = result["data"]["itemMap"]["SOU_COMPANY_ID"]
+        check(isinstance(units, list) and len(units) >= 16, "中国海油招聘单位树缺失")
+        self._units: dict[str, str] = {}
+        self._aggregate_total = 0
+        for unit in units:
+            company_number = str(unit["name"])
+            company_name = text(unit["extend"]["campusOrgName"])
+            company_info = json.loads(unit["extend"]["companyInfo"])
+            check(
+                company_number not in self._units
+                and bool(company_name)
+                and company_info.get("campusOrgName") == company_name
+                and str(company_info.get("rootOrgId")) == self.org_number,
+                "中国海油招聘单位身份改变",
+            )
+            self._units[company_number] = company_name
+            self._aggregate_total += int(unit["count"])
+        await super().harvest()
+        check(
+            self.result.scopes[0].expected == self._aggregate_total,
+            "中国海油根目录总数与招聘单位聚合不一致",
+        )
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(
+            text(company_data.get("slaveDisplayOrgName")) == "中国海油"
+            and self._units.get(str(company_data.get("companyNumber")))
+            == text(company_data.get("campusOrgName")),
+            "中国海油岗位招聘单位不在聚合目录内",
+        )
+
+
 class TuopuCampus(Zhaopin):
     name = "zhaopin-tuopu-campus"
     host = "tuopu.zhaopin.com"

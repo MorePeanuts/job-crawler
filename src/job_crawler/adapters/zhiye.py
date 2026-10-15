@@ -436,6 +436,16 @@ class WuxiApptec(Zhiye):
     host = "wuxiappteccampus.zhiye.com"
 
 
+class WeichaiPower2027(Zhiye):
+    name = "zhiye-weichai-power-2027"
+    host = "weichai.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = (
+        "潍柴动力2027招聘入口北森 Category=2 全目录；多个 OrgId 无公开法人名，单位留空"
+    )
+
+
 class Gotion(Zhiye):
     name = "zhiye-gotion"
     host = "gotion.zhiye.com"
