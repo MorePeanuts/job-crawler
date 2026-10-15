@@ -256,6 +256,14 @@ class Sph2027(Zhiye):
     scope_description = "上海医药2027秋季校园招聘 Category=2 全目录；保留逐岗实际招聘单位"
 
 
+class Zhenshi2027(Zhiye):
+    name = "zhiye-zhenshi-2027"
+    host = "zhenshigroup.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "振石控股集团2027届公开校园招聘 Category=2 全目录；源未给实际招聘法人时留空"
+
+
 class Xiangyu(Zhiye):
     name = "zhiye-xiangyu"
     host = "xiangyu.zhiye.com"
@@ -707,6 +715,7 @@ TENANTS = (
     Mxbc2027,
     GenertecCampus,
     Sph2027,
+    Zhenshi2027,
     Cinda2027,
     CmhkParent,
     YuntianhuaParent,

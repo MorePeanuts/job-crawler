@@ -26,6 +26,7 @@ from job_crawler.adapters.zhiye import (
     Sph2027,
     Xiangyu,
     YuntianhuaParent,
+    Zhenshi2027,
     Zhiye,
     date_text,
 )
@@ -165,6 +166,12 @@ async def test_zhiye_verified_zero(now: datetime) -> None:
             "中国通用技术（集团）控股有限责任公司",
             "https://genertec.zhiye.com/campus/jobs",
         ),
+        (
+            Zhenshi2027,
+            "COM0263",
+            "振石控股集团有限公司",
+            "https://zhenshigroup.zhiye.com/campus/jobs",
+        ),
     ],
 )
 async def test_group_complete_listing_keeps_unknown_unit(
@@ -186,6 +193,7 @@ async def test_group_complete_listing_keeps_unknown_unit(
                         "Id": str(i),
                         "CategoryId": "2",
                         "JobAdName": f"2027届校招岗位{i}",
+                        "Kind": "全职",
                         "OrgId": 3620417,
                         "Org": None,
                         "Duty": "负责生产管理",

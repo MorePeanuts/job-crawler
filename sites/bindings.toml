@@ -750,3 +750,11 @@ version = "1"
 [sources.COM0299]
 adapter = "sdicpower-campus"
 version = "1"
+
+[sources.COM0454]
+adapter = "zhaopin-tuopu-campus"
+version = "1"
+
+[sources.COM0263]
+adapter = "zhiye-zhenshi-2027"
+version = "1"

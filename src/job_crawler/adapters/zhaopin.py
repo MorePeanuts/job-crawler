@@ -11,6 +11,7 @@ from job_crawler.models import Scope
 API = "https://fe.zhaopin.com/grace/api/dsc/search-job-list"
 TREE_API = "https://fe.zhaopin.com/grace/api/dsc/get-sub-company-and-department-list"
 FILTERS = {
+    "orgIds",
     "workExperiences",
     "minSalary",
     "maxSalary",
@@ -35,6 +36,9 @@ def split_detail(value: str) -> tuple[str, str]:
 
 class Zhaopin(Adapter):
     org_number = ""
+    request_org_number = ""
+    job_source = 2
+    required_custom_tag = ""
     page_size = 50
     scope_description = (
         "智联招聘公开校园招聘 jobSource=2 无部门/地区/标签筛选全目录；列表包含完整岗位正文"
@@ -56,22 +60,33 @@ class Zhaopin(Adapter):
         payload = json.loads(observed["post_data"])
         check(isinstance(payload, dict) and set(payload) <= ALLOWED, "智联岗位查询出现未知参数")
         numbers = payload["orgNumbers"]
+        request_org_number = self.request_org_number or self.org_number
         check(
-            [str(number) for number in numbers] == [self.org_number]
+            [str(number) for number in numbers] == [request_org_number]
             if isinstance(numbers, list)
-            else str(numbers) == self.org_number,
+            else str(numbers) == request_org_number,
             "智联岗位查询与租户组织号不符",
         )
-        check(payload.get("jobSource") == 2, "智联目录不是校招 jobSource=2")
+        check(payload.get("jobSource") == self.job_source, "智联目录来源码与租户契约不符")
+        check(
+            text(payload.get("customTags")) == self.required_custom_tag,
+            "智联目录校招标签与租户契约不符",
+        )
         check(payload.get("pageIndex") == 1, "智联目录不是第一页")
         for key in FILTERS:
-            payload[key] = [] if key == "orgDepartmentIds" else ""
+            payload[key] = (
+                self.required_custom_tag
+                if key == "customTags"
+                else []
+                if key == "orgDepartmentIds"
+                else ""
+            )
         await self.collect_catalog(payload)
 
     async def collect_catalog(self, payload: dict[str, Any]) -> None:
         size = self.page_size
         payload["pageSize"] = size
-        scope = Scope(name="campus-job-source-2")
+        scope = Scope(name=f"campus-job-source-{self.job_source}")
         self.result.scopes.append(scope)
         seen: set[str] = set()
         page = 1
@@ -98,7 +113,15 @@ class Zhaopin(Adapter):
                 company_data: dict[str, Any] = row["company"]
                 check(str(company_data["companyId"]) == self.org_number, "岗位混入其他组织")
                 self.validate_company(company_data)
-                check(job_data.get("positionSourceType") == 2, "岗位混入非校招来源")
+                check(
+                    job_data.get("positionSourceType") == self.job_source,
+                    "岗位来源码与租户契约不符",
+                )
+                if self.required_custom_tag:
+                    check(
+                        self.required_custom_tag in job_data.get("jobCategories", []),
+                        "岗位缺少校招标签",
+                    )
                 key = str(job_data["jobNumber"])
                 detail = text(job_data.get("detail"))
                 check(bool(text(job_data.get("title"))) and bool(detail), "岗位标题或正文缺失")
@@ -175,6 +198,20 @@ class Longfor2027(Zhaopin):
                 if name and name not in names:
                     names.append(name)
         return " / ".join(names)
+
+
+class TuopuCampus(Zhaopin):
+    name = "zhaopin-tuopu-campus"
+    host = "tuopu.zhaopin.com"
+    path = "/school/index.html"
+    org_number = "45914881"
+    request_org_number = "CZ459148810"
+    job_source = 1
+    required_custom_tag = "校招"
+    scope_description = "拓普集团官方校招页 jobSource=1 且 customTags=校招的无地区筛选完整目录"
+
+    def validate_company(self, company_data: dict[str, Any]) -> None:
+        check(text(company_data.get("slaveDisplayOrgName")) == "拓普集团", "拓普组织归属变化")
 
 
 class Sipg(Zhaopin):
@@ -291,4 +328,15 @@ class ChinaPost2027(Zhaopin):
         self.result.scopes[0].evidence.append(tree_evidence)
 
 
-TENANTS = (Longfor2027, ChinaPost2027, Hadian, Unicom, Sipg, Cqbank, Lbjt, Zndl, ShenzhenEnergy)
+TENANTS = (
+    Longfor2027,
+    ChinaPost2027,
+    Hadian,
+    Unicom,
+    Sipg,
+    Cqbank,
+    Lbjt,
+    Zndl,
+    ShenzhenEnergy,
+    TuopuCampus,
+)
