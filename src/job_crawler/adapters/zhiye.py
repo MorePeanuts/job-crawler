@@ -783,10 +783,24 @@ class CcccGroupCampus(Zhiye):
         return True
 
 
+class SinosigGroupCampus(Zhiye):
+    name = "zhiye-sinosig-group-campus"
+    host = "sinosigcampus.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "阳光保险集团 Category=2 校招全目录；保留逐岗来源内容，不猜招聘法人"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "阳光保险校招目录混入其他类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "阳光保险岗位性质变化")
+        return True
+
+
 TENANTS = (
     Vanchen2027,
     TongkunCampus,
     CcccGroupCampus,
+    SinosigGroupCampus,
     Mxbc2027,
     GenertecCampus,
     Sph2027,

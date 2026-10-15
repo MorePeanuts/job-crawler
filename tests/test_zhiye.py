@@ -24,6 +24,7 @@ from job_crawler.adapters.zhiye import (
     Seres,
     Shenzhou,
     Shrcb,
+    SinosigGroupCampus,
     Sph2027,
     TongkunCampus,
     Vanchen2027,
@@ -310,6 +311,7 @@ def test_zhiye_unset_dates(value: Any, expected: str) -> None:
         ("COM0484", "juhua.zhiye.com"),
         ("COM0211", "hr-zjtkjt.zhiye.com"),
         ("COM0018", "zhaopin.ccccltd.cn"),
+        ("COM0209", "sinosigcampus.zhiye.com"),
     ],
 )
 def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> None:
@@ -995,3 +997,25 @@ async def test_cccc_group_campus_listing_and_internship(now: datetime) -> None:
     assert result.coverage_issues() == []
     assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
     assert [job.work_type for job in result.jobs] == ["校招", "实习"]
+
+
+class SinosigReplay(CcccReplay):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://sinosigcampus.zhiye.com/campus/jobs"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = "https://sinosigcampus.zhiye.com/api/Jobad/GetJobAdPageList"
+        return response
+
+
+async def test_sinosig_group_campus_listing(now: datetime) -> None:
+    source = Source(
+        source_id="COM0209",
+        company_id="COM0209",
+        company="阳光保险集团股份有限公司",
+        url="https://sinosigcampus.zhiye.com/campus/jobs",
+    )
+    result = await SinosigGroupCampus(source, SinosigReplay(), now).collect()
+    assert result.coverage_issues() == []
+    assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
