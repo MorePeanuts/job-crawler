@@ -1054,3 +1054,7 @@ version = "1"
 [sources.COM0258]
 adapter = "feishu-bluefocus-campus"
 version = "1"
+
+[sources.COM0122]
+adapter = "gig-campus-public-catalog"
+version = "1"
