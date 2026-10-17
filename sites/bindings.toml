@@ -1026,3 +1026,7 @@ version = "1"
 [sources.COM0250]
 adapter = "mysteel-campus"
 version = "1"
+
+[sources.COM0432]
+adapter = "sbp-group-campus"
+version = "1"
