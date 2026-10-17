@@ -1078,3 +1078,7 @@ version = "1"
 [sources.COM0265]
 adapter = "zhiye-busyming-campus"
 version = "1"
+
+[sources.COM0459]
+adapter = "hotjob-dbn-campus"
+version = "1"
