@@ -1034,3 +1034,11 @@ version = "1"
 [sources.COM0161]
 adapter = "jointown-campus-projects"
 version = "1"
+
+[sources.COM0212]
+adapter = "hotjob-bbmg-campus"
+version = "1"
+
+[sources.COM0101]
+adapter = "sihc-iucai-campus"
+version = "1"
