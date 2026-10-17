@@ -1050,3 +1050,7 @@ version = "1"
 [sources.COM0105]
 adapter = "hailiang-campus-portals"
 version = "1"
+
+[sources.COM0258]
+adapter = "feishu-bluefocus-campus"
+version = "1"
