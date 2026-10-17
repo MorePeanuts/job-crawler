@@ -8,7 +8,7 @@
 
 ## 输入输出与观察契约
 
-页面 `/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE` 观察公开网关 recruitmentPosition/pub/getJobPage，JSON {curPage:1,pageSize:10,jobType:"CR",recruitmentType:["FRESH_GRADUATE"]}，status=SUCCESS。data.pageVO 包含 totalRows/totalPages/curPage/pageSize，data.result 当前 71 条父岗位、8 页。
+页面 `/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE` 观察公开网关 recruitmentPosition/pub/getJobPage，JSON {curPage:1,pageSize:10,jobType:"CR",recruitmentType:["FRESH_GRADUATE"]}，status=SUCCESS。公开应用标识 X-HW-ID 必须从观察请求的查询参数与 public_headers 双重核对，并作为请求头传递；还需观察到的公开 X-Jalor-Tenantalias=hcm 请求头；缺失租户别名会返回 missing tenant code。同时保持观察到的 X-Language=zh_CN、X-Referer=https://career.huawei.com/cn、X-ALB-Gray=prod 公开页面上下文。传输层仅追加这些非凭据头到白名单，不采集或重放 CSRF/登录凭据。data.pageVO 包含 totalRows/totalPages/curPage/pageSize，data.result 当前 71 条父岗位、8 页。
 
 根目录 advertisementId/jobId/advertisementsIntegrationId 必须区分。公开详情页面 `/cn/job-details?advertisementId=<advertisementId>` 加载 getRecruitmentPositionDetail（advertisementId）与 getPositionIntentionList（jobId）。详情身份、recruitType=CR/scenarioName=应届生核对，岗位方向数组逐条核对 jobId，positionIntentionId 在父岗位内唯一。
 
