@@ -930,7 +930,14 @@ class Wanhua2027(Hotjob):
         return super()._job(row, listing, evidence, locations, location_evidence)
 
 
+class BbmgCampus(Hotjob):
+    name = "hotjob-bbmg-campus"
+    suite = "SU62d139692f9d2470a6e6e052"
+    path = f"/{suite}/pb/school.html"
+
+
 TENANTS = (
+    BbmgCampus,
     ChanghongListed,
     SinomachGroup,
     MinmetalsGroup,

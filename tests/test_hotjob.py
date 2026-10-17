@@ -8,6 +8,7 @@ import pytest
 
 from job_crawler.adapters.hotjob import (
     GF,
+    BbmgCampus,
     CrrcGroup,
     EveEnergy,
     Goertek,
@@ -757,14 +758,17 @@ async def test_hotjob_rejects_unproven_coverage(
     assert code in {issue.code for issue in result.coverage_issues()}
 
 
-async def test_hotjob_accepts_a_counted_empty_campus_catalog(now: datetime) -> None:
+@pytest.mark.parametrize("tenant", [HuaXia, BbmgCampus])
+async def test_hotjob_accepts_a_counted_empty_campus_catalog(
+    now: datetime, tenant: type[Hotjob]
+) -> None:
     source = Source(
         source_id="SITE",
         company_id="SITE",
         company="企业",
-        url="https://wecruit.hotjob.cn/SU645b0d18bef57c0907e9fbc8/pb/school.html",
+        url=f"https://{tenant.host}{tenant.path}",
     )
-    result = await HuaXia(source, Replay(empty=True), now).collect()
+    result = await tenant(source, Replay(empty=True), now).collect()
 
     assert result.jobs == []
     assert result.coverage_issues() == []
