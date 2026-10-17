@@ -1066,3 +1066,7 @@ version = "1"
 [sources.COM0296]
 adapter = "zhiye-yonghui-campus"
 version = "1"
+
+[sources.COM0273]
+adapter = "zhiye-sunart-campus"
+version = "1"

@@ -1,6 +1,6 @@
 # SPEC-196 高鑫零售官方校园门户
 
-状态：计划，尚未启用；SPEC-156 固定B组 COM0273。
+状态：已实现并通过真实全量验收；SPEC-156 固定B组 COM0273。
 
 ## 目标与范围
 
@@ -21,3 +21,5 @@
 ## 可验证验收
 
 公共分页、详情、历史日期、0001哨兵、实习筛选和失败回放应通过；仅增加租户配置，不重复配置常量测试。完整UV/Ruff/ty/pytest门禁后使用临时绑定全量实采，expected/listed/unique=1且详情覆盖完整，信息表与快照审计一致后才启用。加入固定B组输入，最终离线汇总保留真实采集时刻。
+
+2026-10-18 07:18:03–07:18:17实采collect-sunart：expected/listed/unique/details=1、terminal=true、coverage=complete；1有效/1信息/0严格/1待补全。853项测试及UV/Ruff/ty通过，只读审计通过，启用zhiye-sunart-campus@1并加入固定B组输入。
