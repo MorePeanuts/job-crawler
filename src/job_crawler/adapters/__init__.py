@@ -77,6 +77,7 @@ from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
 from job_crawler.adapters.shenergy import ShenergyListedCampus
 from job_crawler.adapters.shengtun import ShengtunMiningCampus
 from job_crawler.adapters.shougang import ShougangCampus
+from job_crawler.adapters.sihc import SihcCampus
 from job_crawler.adapters.sinopec import SinopecCampus
 from job_crawler.adapters.sinopharm import SinopharmCampus
 from job_crawler.adapters.smic import SmicCampus
@@ -109,6 +110,7 @@ REGISTRY = {
         MysteelCampus,
         SbpCampus,
         JointownCampus,
+        SihcCampus,
         AsusMainlandCampus,
         ZtoCampus,
         GreeCampus,
