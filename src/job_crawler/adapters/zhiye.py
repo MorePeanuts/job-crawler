@@ -231,6 +231,15 @@ class Zhiye(Adapter):
             page += 1
 
 
+class SunartCampus(Zhiye):
+    name = "zhiye-sunart-campus"
+    host = "rt-mart.zhiye.com"
+    regular_only = True
+    scope_description = (
+        "高鑫零售品牌官网统一北森门户Category=2全目录；含全国职位，不以省份卡片代替完整目录"
+    )
+
+
 class YonghuiCampus(Zhiye):
     name = "zhiye-yonghui-campus"
     host = "yhchaoshi.zhiye.com"
@@ -847,6 +856,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    SunartCampus,
     YonghuiCampus,
     GrandtradeCampus,
     MediatekCampus,
