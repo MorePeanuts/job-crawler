@@ -1030,3 +1030,7 @@ version = "1"
 [sources.COM0432]
 adapter = "sbp-group-campus"
 version = "1"
+
+[sources.COM0161]
+adapter = "jointown-campus-projects"
+version = "1"
