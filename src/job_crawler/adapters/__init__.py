@@ -37,6 +37,7 @@ from job_crawler.adapters.fuyao import FuyaoHeadquarters
 from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
 from job_crawler.adapters.gree import GreeCampus
 from job_crawler.adapters.greentown import GreentownCampus
+from job_crawler.adapters.guotai_haitong import GuotaiHaitongCampus
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
@@ -169,6 +170,7 @@ REGISTRY = {
         CpcgCampus,
         BcdhListedCampus,
         KsfCampus,
+        GuotaiHaitongCampus,
         JianlongCampus,
         HaierCampus,
         HbiscoCampus,

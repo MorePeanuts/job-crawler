@@ -998,3 +998,7 @@ version = "1"
 [sources.COM0194]
 adapter = "hotjob-changhong-listed-campus"
 version = "1"
+
+[sources.COM0199]
+adapter = "guotai-haitong-campus"
+version = "1"
