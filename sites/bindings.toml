@@ -1042,3 +1042,7 @@ version = "1"
 [sources.COM0101]
 adapter = "sihc-iucai-campus"
 version = "1"
+
+[sources.COM0083]
+adapter = "chd-campus-notices"
+version = "1"
