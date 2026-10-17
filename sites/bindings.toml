@@ -1006,3 +1006,7 @@ version = "1"
 [sources.COM0070]
 adapter = "huaneng-campus"
 version = "1"
+
+[sources.COM0154]
+adapter = "asus-mainland-campus"
+version = "1"
