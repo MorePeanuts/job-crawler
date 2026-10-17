@@ -231,6 +231,18 @@ class Zhiye(Adapter):
             page += 1
 
 
+class TaikangCampus(Zhiye):
+    name = "zhiye-taikang-campus"
+    host = "jobtaikang.zhiye.com"
+    path = "/custom/campuslist"
+    listing_complete = True
+    regular_only = True
+    scope_description = "泰康集团官方校园招聘 Category=2 全目录；保留实际机构，排除社招和实习"
+
+    def detail_page(self, job_id: str) -> str:
+        return f"https://{self.host}/custom/gddetail?{urlencode({'hideAll': '1', 'jc': '2', 'jobAdId': job_id})}"
+
+
 class WingtechCampus(Zhiye):
     name = "zhiye-wingtech-campus"
     host = "jobs.wingtech.com"
@@ -805,6 +817,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    TaikangCampus,
     WingtechCampus,
     Vanchen2027,
     TongkunCampus,

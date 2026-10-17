@@ -26,6 +26,7 @@ from job_crawler.adapters.zhiye import (
     Shrcb,
     SinosigGroupCampus,
     Sph2027,
+    TaikangCampus,
     TongkunCampus,
     Vanchen2027,
     WingtechCampus,
@@ -178,6 +179,12 @@ async def test_zhiye_verified_zero(now: datetime, adapter: type[Zhiye]) -> None:
             "COM0263",
             "振石控股集团有限公司",
             "https://zhenshigroup.zhiye.com/campus/jobs",
+        ),
+        (
+            TaikangCampus,
+            "COM0072",
+            "泰康保险集团股份有限公司",
+            "https://jobtaikang.zhiye.com/custom/campuslist",
         ),
     ],
 )
@@ -333,15 +340,12 @@ def test_shenergy_binding_uses_verified_listed_company_boundary() -> None:
     assert binding.adapter == "zhiye-shenergy-listed-campus"
 
 
-@pytest.mark.parametrize("adapter", [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid])
+@pytest.mark.parametrize(
+    "adapter", [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid, TaikangCampus]
+)
 async def test_zhiye_inline_body_enumerates_without_detail_request(
     now: datetime,
-    adapter: type[Mindray]
-    | type[Shenzhou]
-    | type[Huafeng]
-    | type[Infore]
-    | type[Shrcb]
-    | type[Haid],
+    adapter: type[Zhiye],
 ) -> None:
     class InlineReplay(Replay):
         async def observed(self, needle: str) -> dict[str, Any]:
@@ -398,6 +402,12 @@ async def test_zhiye_inline_body_enumerates_without_detail_request(
     assert result.jobs[0].duties == "开发" and result.jobs[0].requirements == "本科"
     assert result.jobs[0].published == ""
     assert result.jobs[-1].work_type == "实习"
+    if adapter is TaikangCampus:
+        assert parse_qs(urlsplit(result.jobs[0].source_url).query) == {
+            "hideAll": ["1"],
+            "jc": ["2"],
+            "jobAdId": ["0"],
+        }
 
 
 async def test_luzhou_shared_portal_rejects_other_legal_entity(now: datetime) -> None:

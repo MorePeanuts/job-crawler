@@ -926,3 +926,7 @@ version = "1"
 [sources.COM0412]
 adapter = "isoftstone-campus"
 version = "1"
+
+[sources.COM0072]
+adapter = "zhiye-taikang-campus"
+version = "1"
