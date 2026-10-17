@@ -18,6 +18,7 @@ from job_crawler.adapters.zhiye import (
     Huafeng,
     Infore,
     LuzhouLaojiao,
+    MediatekCampus,
     Mindray,
     Mxbc2027,
     PICCGroup,
@@ -168,6 +169,12 @@ async def test_zhiye_verified_zero(now: datetime, adapter: type[Zhiye]) -> None:
     "adapter,source_id,company,url",
     [
         (Mxbc2027, "COM0423", "蜜雪冰城股份有限公司", "https://careers.mxbc.com/campus/jobs"),
+        (
+            MediatekCampus,
+            "COM0176",
+            "联发科技股份有限公司",
+            "https://mediatek.zhiye.com/campus/jobs",
+        ),
         (
             GenertecCampus,
             "COM0082",
@@ -341,7 +348,7 @@ def test_shenergy_binding_uses_verified_listed_company_boundary() -> None:
 
 
 @pytest.mark.parametrize(
-    "adapter", [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid, TaikangCampus]
+    "adapter", [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid, TaikangCampus, MediatekCampus]
 )
 async def test_zhiye_inline_body_enumerates_without_detail_request(
     now: datetime,

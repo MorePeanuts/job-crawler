@@ -231,6 +231,14 @@ class Zhiye(Adapter):
             page += 1
 
 
+class MediatekCampus(Zhiye):
+    name = "zhiye-mediatek-campus"
+    host = "mediatek.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "联发科技官方大陆校园门户 Category=2 全地区全类别目录；不含社招和实习"
+
+
 class TaikangCampus(Zhiye):
     name = "zhiye-taikang-campus"
     host = "jobtaikang.zhiye.com"
@@ -817,6 +825,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    MediatekCampus,
     TaikangCampus,
     WingtechCampus,
     Vanchen2027,

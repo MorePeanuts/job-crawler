@@ -938,3 +938,7 @@ version = "1"
 [sources.COM0005]
 adapter = "foxconn-campus"
 version = "1"
+
+[sources.COM0176]
+adapter = "zhiye-mediatek-campus"
+version = "1"
