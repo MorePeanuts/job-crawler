@@ -41,6 +41,7 @@ def merge_job(existing: Job, incoming: Job) -> None:
         "source_url",
         "apply_url",
         "batch",
+        "unit",
         "evidence",
         "field_sources",
         "collected_at",
@@ -53,6 +54,9 @@ def merge_job(existing: Job, incoming: Job) -> None:
         "九州通跨项目同ID业务字段冲突",
     )
     existing.batch = "、".join(dict.fromkeys([*existing.batch.split("、"), incoming.batch]))
+    existing.unit = "、".join(
+        dict.fromkeys(part for part in [*existing.unit.split("、"), incoming.unit] if part)
+    )
     existing.evidence = list(dict.fromkeys([*existing.evidence, *incoming.evidence]))
 
 
@@ -127,7 +131,10 @@ class JointownCampus(Adapter):
                         seen[job.source_key] = job
                         self.result.jobs.append(job)
                     else:
-                        merge_job(previous, job)
+                        try:
+                            merge_job(previous, job)
+                        except Exception as exc:
+                            self.error(exc, job.source_key)
             except Exception as exc:
                 self.error(exc, str(project.site_id))
             finally:

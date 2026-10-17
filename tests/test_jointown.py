@@ -36,9 +36,12 @@ def job(now: datetime, site: int) -> Job:
 
 def test_same_global_id_merges_projects_without_duplicating(now: datetime) -> None:
     first, second = job(now, 145419), job(now, 141506)
+    first.unit = "储备中心/1331000967"
+    second.unit = "新疆公司管培生/1331000988"
     merge_job(first, second)
     assert first.batch == "星辰校招生、星九管培生" and first.evidence == ["145419", "141506"]
     assert first.source_key == "uuid"
+    assert first.unit == "储备中心/1331000967、新疆公司管培生/1331000988"
 
 
 @pytest.mark.parametrize(
