@@ -168,10 +168,14 @@ class ChdCampus(Adapter):
         )
         all_notices: set[int] = set()
         all_posts: set[int] = set()
-        for category, label in CATEGORIES.items():
+        for index, (category, label) in enumerate(CATEGORIES.items()):
             await session.open(
                 f"https://{self.host}/w3/#/w3/notice/main_view?class_item_pk={category}"
             )
+            if index:
+                # Hash-only category changes retain the old mounted list.
+                session.consume_request()
+                await session.page.reload(wait_until="domcontentloaded", timeout=60000)
             observed = await session.observed_path(f"/cdata/{category}/ZPNoticeIndex.json")
             headers = TypeAdapter(list[Header]).validate_python(json.loads(observed["body"]))
             check(0 < len(headers) <= 1000, "华电公告索引为空或超出预算")

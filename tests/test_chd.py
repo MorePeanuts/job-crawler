@@ -115,6 +115,8 @@ class Replay:
     def __init__(self, *, broken: bool = False, expired: bool = False):
         self.page = self
         self.current = ""
+        self.mounted_category: int | None = None
+        self.refresh_requests = 0
         self.reads: list[str] = []
         self.data = {key: notice(key) for key in CATEGORIES}
         self.broken = broken
@@ -123,6 +125,14 @@ class Replay:
 
     async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
         self.current = url
+        if self.mounted_category is None and "class_item_pk=" in url:
+            self.mounted_category = int(url.rsplit("=", 1)[1])
+
+    def consume_request(self) -> None:
+        self.refresh_requests += 1
+
+    async def reload(self, **kwargs: object) -> None:
+        self.mounted_category = int(self.current.rsplit("=", 1)[1])
 
     async def content(self) -> str:
         return "中国华电集团有限公司"
@@ -132,6 +142,8 @@ class Replay:
             body = [{"pk": k, "name": v, "b_website_show": True} for k, v in CATEGORIES.items()]
         else:
             category = int(path.split("/")[-2])
+            if category != self.mounted_category:
+                raise CrawlError("api_not_observed", "hash change retained previous category")
             body = [Header.model_validate(self.data[category].model_dump()).model_dump()]
         return {"body": json.dumps(body, ensure_ascii=False)}
 
@@ -161,8 +173,10 @@ def adapter(replay: Replay, now: datetime) -> ChdCampus:
 async def test_both_categories_expand_and_do_not_duplicate_young_portal_entries(
     now: datetime,
 ) -> None:
-    result = await adapter(Replay(), now).collect()
+    replay = Replay()
+    result = await adapter(replay, now).collect()
     assert result.coverage_issues() == [] and len(result.jobs) == 3
+    assert replay.refresh_requests == 1
     campus, *young = result.jobs
     assert campus.title == "电气类" and campus.education == "本科及以上"
     assert all(j.published == "" and j.duties == "" for j in result.jobs)
