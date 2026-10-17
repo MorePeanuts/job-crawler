@@ -936,7 +936,43 @@ class BbmgCampus(Hotjob):
     path = f"/{suite}/pb/school.html"
 
 
+class DbnCampus(Hotjob):
+    name = "hotjob-dbn-campus"
+    suite = "SU66ab37a71c240e2e76256280"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "大北农官网统一校园招聘（应届生）全目录；保留分子公司及区域单位原名"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(
+            bool(text(row.get("company"))) and bool(text(row.get("orgCode"))),
+            "大北农列表缺少招聘单位或组织编码",
+        )
+        return True
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                text(row.get("postName")) == text(listing.get("postName"))
+                and text(row.get("orgCode")) == text(listing.get("orgCode"))
+                and text(row.get("orgName")) == text(listing.get("company"))
+                and text(row.get("company")) == text(listing.get("company")),
+                "大北农详情标题、招聘单位或组织编码与列表不一致",
+            )
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
+        job.field_sources["published"] = "publishFirstDate；缺失保留未知，不使用publishDate更新日期"
+        return job
+
+
 TENANTS = (
+    DbnCampus,
     BbmgCampus,
     ChanghongListed,
     SinomachGroup,

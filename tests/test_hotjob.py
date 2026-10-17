@@ -10,6 +10,7 @@ from job_crawler.adapters.hotjob import (
     GF,
     BbmgCampus,
     CrrcGroup,
+    DbnCampus,
     EveEnergy,
     Goertek,
     GwmListed,
@@ -1093,3 +1094,67 @@ async def test_missing_location_tree_keeps_raw_place(now: datetime) -> None:
     assert result.coverage_issues() == []
     assert all(job.location == "宁波市" for job in result.jobs)
     assert "location_tree_missing" in {warning.code for warning in result.warnings}
+
+
+class DbnReplay(Replay):
+    def __init__(self, conflict: str = "") -> None:
+        super().__init__()
+        self.conflict = conflict
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row.update(
+            company="河南区" if post_id == "c" else "钦州大北农饲料科技有限公司",
+            orgCode="0/209663/278705" if post_id == "c" else "0/198908/198909/218072",
+        )
+        if post_id == "b":
+            row.update(
+                publishFirstDate="2025-12-22 11:48:23",
+                publishDate="2026-10-10 11:29:54",
+                endDate="2026-04-09 23:59:59",
+            )
+        if post_id == "c":
+            row.pop("publishFirstDate")
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        detail = super()._detail(post_id)
+        detail["data"]["orgName"] = self._listing(post_id)["company"]
+        if post_id == "c" and self.conflict:
+            detail["data"][self.conflict] = "不同记录"
+        return detail
+
+
+@pytest.mark.parametrize("conflict", ["", "postName", "orgCode", "orgName", "company"])
+async def test_dbn_first_publication_expiry_and_detail_identity(
+    conflict: str, now: datetime
+) -> None:
+    source = Source(
+        source_id="COM0459",
+        company_id="COM0459",
+        company="北京大北农科技集团股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{DbnCampus.suite}/pb/school.html",
+    )
+    replay = DbnReplay(conflict)
+    result = await DbnCampus(source, replay, now).collect()
+    scope = result.scopes[0]
+    assert scope.expected == scope.listed == scope.unique == 3
+    assert scope.terminal and scope.skipped_expired == 1
+    expired = next(job for job in result.jobs if job.source_key == "b")
+    assert expired.published == "2025-12-22 11:48:23"
+    assert expired.deadline == "2026-04-09 23:59:59"
+    assert expired.detail_mode == "listing_only"
+    assert all(form.get("postId") != "b" for _, form in replay.calls)
+    assert result.jobs[0].unit == "钦州大北农饲料科技有限公司"
+    if conflict:
+        assert result.coverage_issues()
+        assert scope.details == 1
+        assert [job.source_key for job in result.jobs] == ["a", "b"]
+        assert "与列表不一致" in result.issues[0].message
+    else:
+        assert not result.coverage_issues()
+        assert scope.details == 2
+        unknown_date = result.jobs[-1]
+        assert unknown_date.source_key == "c" and unknown_date.published == ""
+        assert unknown_date.unit == "河南区"
+        assert "不使用publishDate" in unknown_date.field_sources["published"]
