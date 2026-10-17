@@ -5,7 +5,7 @@ COM0003,COM0003,中国石油化工集团有限公司,https://job.sinopec.com/,20
 COM0004,COM0004,中国建筑集团有限公司,https://recruit.cscec.com/,校园招聘
 COM0005,COM0005,鸿海精密工业股份有限公司,https://foxconn.hotjob.cn/wt/Foxconn/web/index/CompFoxconnPageindex,富士康2026届校园招聘
 COM0006,COM0006,中国工商银行股份有限公司,https://job.icbc.com.cn/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
-COM0007,COM0007,中国农业银行股份有限公司,,
+COM0007,COM0007,中国农业银行股份有限公司,https://career.abchina.com/build/index.html#/99,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0008,COM0008,中国建设银行股份有限公司,https://job2.ccb.cn/cn/job/plan_index.html?planType=XY,校园招聘列表
 COM0009,COM0009,京东集团股份有限公司,https://campus.jd.com/,校园招聘
 COM0010,COM0010,中国人寿保险（集团）公司,https://chinalife.zhiye.com/custom/campus?hideMenu=1,Category=2 全目录；仅集团公司本级机构编码 3389294
@@ -103,11 +103,11 @@ COM0101,COM0101,深圳市投资控股有限公司,https://jyjpc.iucai.com.cn/#/c
 COM0102,COM0102,山东黄金集团有限公司,https://www.sd-gold.com/cmscontent/5525.html,2026春季校园招聘公告
 COM0103,COM0103,广州市建筑集团有限公司,,
 COM0104,COM0104,文晔科技股份有限公司,https://campus.51job.com/wtmec/job.html,2026校园招聘
-COM0105,COM0105,海亮集团有限公司,https://www.hailiang.com/index.php/recruit/campus_recruit,校园招聘
+COM0105,COM0105,海亮集团有限公司,https://hailiang.jobs.feishu.cn/583086,教育583086及股份campus双校园门户；SPEC-190；固定A组
 COM0106,COM0106,铜陵有色金属集团控股有限公司,,
 COM0107,COM0107,蜀道投资集团有限责任公司,https://sdhr.shudaojt.com/recruit#/index,；SPEC-156：2026-10-18 官网或企业招聘页面核验，目录范围与适配待完成
 COM0108,COM0108,中国民生银行股份有限公司,https://career.cmbc.com.cn/#/app/recruitmentlist/campus/,民生银行公开 campus 全目录；排除五家独立子公司
-COM0109,COM0109,江苏沙钢集团有限公司,,
+COM0109,COM0109,江苏沙钢集团有限公司,http://www.shasteel.cn/rlzy/rczp/rczp_jt/xyzp/index.shtml,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0110,COM0110,中国电子信息产业集团有限公司,https://campus.cec.com.cn/position?positionType=0,中国电子集团官网校园招聘全目录
 COM0111,COM0111,中国大唐集团有限公司,https://zhaopin.china-cdt.com/zpgg_xyzp.html?random=1790467200101,校园招聘公告
 COM0112,COM0112,长江和记实业有限公司,https://www.ckh.com.hk/tc/about/ckh_careers.php,；2026-10-18 核验官方招聘入口

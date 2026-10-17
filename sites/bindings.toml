@@ -1046,3 +1046,7 @@ version = "1"
 [sources.COM0083]
 adapter = "chd-campus-notices"
 version = "1"
+
+[sources.COM0105]
+adapter = "hailiang-campus-portals"
+version = "1"
