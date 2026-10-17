@@ -1002,3 +1002,7 @@ version = "1"
 [sources.COM0199]
 adapter = "guotai-haitong-campus"
 version = "1"
+
+[sources.COM0070]
+adapter = "huaneng-campus"
+version = "1"

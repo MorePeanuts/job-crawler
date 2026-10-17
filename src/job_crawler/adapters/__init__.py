@@ -41,6 +41,7 @@ from job_crawler.adapters.guotai_haitong import GuotaiHaitongCampus
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
+from job_crawler.adapters.huaneng import HuanengCampus
 from job_crawler.adapters.huawei import HuaweiGraduate
 from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
@@ -171,6 +172,7 @@ REGISTRY = {
         BcdhListedCampus,
         KsfCampus,
         GuotaiHaitongCampus,
+        HuanengCampus,
         JianlongCampus,
         HaierCampus,
         HbiscoCampus,
