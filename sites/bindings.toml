@@ -918,3 +918,11 @@ version = "1"
 [sources.COM0471]
 adapter = "zhiye-shenergy-listed-campus"
 version = "1"
+
+[sources.COM0437]
+adapter = "zhiye-wingtech-campus"
+version = "1"
+
+[sources.COM0412]
+adapter = "isoftstone-campus"
+version = "1"

@@ -37,6 +37,7 @@ from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.iguopin_projects import Ceec2027, Cnbm2027, Cosco2027
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
 from job_crawler.adapters.inovance import InovanceCampus
+from job_crawler.adapters.isoftstone import ISoftStoneCampus
 from job_crawler.adapters.itg_holding import ItgHoldingCampus
 from job_crawler.adapters.jd import JD
 from job_crawler.adapters.jxcc import JxccCampus
@@ -118,6 +119,7 @@ REGISTRY = {
         FuyaoHeadquarters,
         *INLINE_TENANTS,
         InovanceCampus,
+        ISoftStoneCampus,
         ItgHoldingCampus,
         *EXTRA_TENANTS,
         JD,

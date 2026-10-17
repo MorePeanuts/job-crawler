@@ -28,6 +28,7 @@ from job_crawler.adapters.zhiye import (
     Sph2027,
     TongkunCampus,
     Vanchen2027,
+    WingtechCampus,
     Xiangyu,
     YuntianhuaParent,
     Zhenshi2027,
@@ -153,9 +154,11 @@ async def test_zhiye_shared_filter_does_not_masquerade_as_full_catalog(now: date
     assert "LocId" in result.issues[0].message
 
 
-async def test_zhiye_verified_zero(now: datetime) -> None:
+@pytest.mark.parametrize("adapter", [Xiangyu, WingtechCampus])
+async def test_zhiye_verified_zero(now: datetime, adapter: type[Zhiye]) -> None:
     replay = Replay(count=0)
-    result = await Xiangyu(source(), replay, now).collect()
+    entry = source().model_copy(update={"url": f"https://{adapter.host}{adapter.path}"})
+    result = await adapter(entry, replay, now).collect()
     assert not result.jobs and not result.coverage_issues()
     assert not replay.details and len(replay.opens) == 1
 

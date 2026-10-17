@@ -231,6 +231,13 @@ class Zhiye(Adapter):
             page += 1
 
 
+class WingtechCampus(Zhiye):
+    name = "zhiye-wingtech-campus"
+    host = "jobs.wingtech.com"
+    regular_only = True
+    scope_description = "闻泰科技官方公开校园招聘 Category=2 无筛选全目录；实习和社招排除"
+
+
 class Poly(Zhiye):
     name = "zhiye-poly"
     host = "polycareer.zhiye.com"
@@ -798,6 +805,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    WingtechCampus,
     Vanchen2027,
     TongkunCampus,
     CcccGroupCampus,
