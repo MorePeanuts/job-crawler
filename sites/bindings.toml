@@ -1070,3 +1070,11 @@ version = "1"
 [sources.COM0273]
 adapter = "zhiye-sunart-campus"
 version = "1"
+
+[sources.COM0472]
+adapter = "tfme-hubei-campus"
+version = "1"
+
+[sources.COM0265]
+adapter = "zhiye-busyming-campus"
+version = "1"

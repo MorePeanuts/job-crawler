@@ -1,6 +1,6 @@
 # SPEC-198 鸣鸣很忙官方校园门户
 
-状态：计划，尚未启用；SPEC-156固定B组COM0265。
+状态：已实现并完成实时零目录验收；SPEC-156固定B组COM0265。
 
 ## 目标、输入和范围
 
@@ -15,3 +15,5 @@
 ## 失败和验收
 
 身份或范围改变、业务失败、局部筛选、计数矛盾、重复页及详情错配明确失败，保留已成功记录。空白页面不等于零目录。公共北森完整目录、零目录、分页与详情回放适用，仅新增配置不复制空壳测试。完整质量门禁后临时绑定全量采集，expected/listed/unique=0、terminal=true、coverage=complete并通过零岗位审计才正式启用、加入固定B组汇总。
+
+2026-10-18 07:29:37–07:29:44实采collect-busyming，expected/listed/unique=0、terminal=true、coverage=complete，零岗位审计通过。868项测试及UV/Ruff/ty通过，启用zhiye-busyming-campus@1并加入固定B组输入。本轮没有非零详情实采样本。
