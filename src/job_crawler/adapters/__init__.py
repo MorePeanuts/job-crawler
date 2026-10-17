@@ -68,6 +68,7 @@ from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.saic import SaicCampus
+from job_crawler.adapters.sbp import SbpCampus
 from job_crawler.adapters.scoped_coapi import BcdhListedCampus, KsfCampus
 from job_crawler.adapters.sdicpower import SdicPowerCampus
 from job_crawler.adapters.sf import SF
@@ -105,6 +106,7 @@ REGISTRY = {
     for adapter in (
         AnkerCampus,
         MysteelCampus,
+        SbpCampus,
         AsusMainlandCampus,
         ZtoCampus,
         GreeCampus,
