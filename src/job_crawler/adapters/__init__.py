@@ -6,6 +6,7 @@ from job_crawler.adapters.asus import AsusMainlandCampus
 from job_crawler.adapters.bank_catalogs import TENANTS as BANK_TENANTS
 from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bilibili import Bilibili
+from job_crawler.adapters.bluefocus import BlueFocus
 from job_crawler.adapters.boe import BoeCampus
 from job_crawler.adapters.bohai import Bohai2027
 from job_crawler.adapters.byd import BYDCampus
@@ -195,6 +196,7 @@ REGISTRY = {
         JianlongCampus,
         HaierCampus,
         HailiangCampus,
+        BlueFocus,
         HbiscoCampus,
         NciCampus,
         NeteaseCampus,
