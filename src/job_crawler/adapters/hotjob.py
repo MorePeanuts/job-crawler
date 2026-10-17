@@ -47,12 +47,14 @@ class Hotjob(Adapter):
     suite = ""
     path = ""
     mobile_mode = False
+    recruit_type = "1"
+    route_type = "campus"
     scope_description = "Hotjob 公开校园招聘 recruitType=1 全目录；逐条读取详情；不含社会招聘"
 
     def detail_page(self, post_id: str) -> str:
         if self.mobile_mode:
             return f"https://{self.host}/{self.suite}/mc/detail?" + urlencode(
-                {"postId": post_id, "recruitType": "campus", "distance": "0"}
+                {"postId": post_id, "recruitType": self.route_type, "distance": "0"}
             )
         return f"https://{self.host}/{self.suite}/pb/posDetail.html?" + urlencode(
             {"postId": post_id, "postType": "campus"}
@@ -63,7 +65,7 @@ class Hotjob(Adapter):
         observed = await self.session.observed("/positionInfo/listPosition/")
         check(f"/{self.suite}?" in observed["url"], "Hotjob 租户与列表接口不一致")
         values = parse_qs(observed.get("post_data") or "", keep_blank_values=True)
-        check(values.get("recruitType") == ["1"], "Hotjob 目录不是校招")
+        check(values.get("recruitType") == [self.recruit_type], "Hotjob 目录不是校招")
         check(values.get("currentPage") == ["1"], "Hotjob 目录不是第一页")
         if self.mobile_mode:
             check(
@@ -99,7 +101,7 @@ class Hotjob(Adapter):
                     url=self.source.url,
                 )
             )
-        scope = Scope(name="campus-recruit-type-1")
+        scope = Scope(name=f"campus-recruit-type-{self.recruit_type}")
         self.result.scopes.append(scope)
         seen: set[str] = set()
         page = 1
@@ -109,7 +111,7 @@ class Hotjob(Adapter):
         first_detail_id = ""
         while True:
             form = {
-                "recruitType": "1",
+                "recruitType": self.recruit_type,
                 "pageSize": str(size),
                 "currentPage": str(page),
             }
@@ -123,6 +125,18 @@ class Hotjob(Adapter):
             expected = int(page_form["dataCount"])
             pages = int(page_form["totalPage"])
             returned_size = int(page_form.get("pageSize", size))
+            if expected == 0:
+                check(
+                    pages == 0
+                    and 0 <= returned_size <= 100
+                    and not page_form["pageData"]
+                    and int(page_form["currentPage"]) in {0, 1},
+                    "Hotjob 空目录计数不一致",
+                )
+                scope.evidence.extend([location_evidence, self.session.last_evidence])
+                scope.expected = 0
+                scope.terminal = True
+                break
             check(0 < returned_size <= 100, "Hotjob 返回的分页大小无效")
             if returned_size != size:
                 check(
@@ -132,16 +146,6 @@ class Hotjob(Adapter):
                 size = returned_size
                 size_corrected = True
                 continue
-            if expected == 0:
-                check(
-                    pages == 0
-                    and not page_form["pageData"]
-                    and int(page_form["currentPage"]) in {0, 1},
-                    "Hotjob 空目录计数不一致",
-                )
-                scope.expected = 0
-                scope.terminal = True
-                break
             check(expected > 0 and pages > 0, "Hotjob 校招目录计数无效")
             check(int(page_form["currentPage"]) == page, "Hotjob 返回了错误页码")
             if scope.expected is None:
@@ -152,7 +156,7 @@ class Hotjob(Adapter):
             for row in rows:
                 post_id = str(row["postId"])
                 try:
-                    check(str(row["recruitType"]) == "1", "Hotjob 混入非校招岗位")
+                    check(str(row["recruitType"]) == self.recruit_type, "Hotjob 混入非校招岗位")
                     if not self.include_listing(row):
                         scope.skipped_out_of_scope += 1
                         continue
@@ -192,14 +196,14 @@ class Hotjob(Adapter):
                         if first_detail is not None and first_detail_id == post_id
                         else await requester.request(
                             detail_api,
-                            form={"postId": post_id, "recruitType": "1"},
+                            form={"postId": post_id, "recruitType": self.recruit_type},
                             detail=True,
                         )
                     )
                     check(detail.get("state") == "200", "Hotjob 详情业务失败")
                     item = detail["data"]
                     check(str(item["postId"]) == post_id, "Hotjob 详情与列表 ID 不一致")
-                    check(str(item["recruitType"]) == "1", "Hotjob 详情不是校招")
+                    check(str(item["recruitType"]) == self.recruit_type, "Hotjob 详情不是校招")
                     check("workContent" in item, "Hotjob 缺少详情正文")
                     job = self._job(
                         item,
@@ -345,6 +349,23 @@ class Yutong(Hotjob):
     name = "hotjob-yutong"
     suite = "SU64e7157a1eb80519a8e4efcf"
     path = f"/{suite}/mc/position/campus"
+    mobile_mode = True
+    scope_description = (
+        "宇通官方移动校园 recruitType=1 与博士 recruitType=12 双目录；不含独立实习目录"
+    )
+
+    async def harvest(self) -> None:
+        for recruit_type, route_type in (("1", "campus"), ("12", "intern")):
+            self.recruit_type = recruit_type
+            self.route_type = route_type
+            try:
+                await self.session.open(
+                    f"https://{self.host}/{self.suite}/mc/position/{route_type}",
+                    ready_endpoints=("/positionInfo/listPosition/",),
+                )
+                await super().harvest()
+            except Exception as exc:
+                self.error(exc, f"recruit-type:{recruit_type}")
 
 
 class ZhengzhouBank(Hotjob):

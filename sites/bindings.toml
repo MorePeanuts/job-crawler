@@ -946,3 +946,15 @@ version = "1"
 [sources.COM0450]
 adapter = "zhaopin-shengtun-mining-campus"
 version = "1"
+
+[sources.COM0190]
+adapter = "netease-campus-projects"
+version = "1"
+
+[sources.COM0333]
+adapter = "zhiye-xaec-campus"
+version = "1"
+
+[sources.COM0362]
+adapter = "hotjob-yutong"
+version = "1"

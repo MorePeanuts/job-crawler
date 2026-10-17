@@ -231,6 +231,14 @@ class Zhiye(Adapter):
             page += 1
 
 
+class XaecCampus(Zhiye):
+    name = "zhiye-xaec-campus"
+    host = "xaec.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "中国航发动力股份有限公司官方校园 Category=2 全目录；不含集团其他门户及实习"
+
+
 class MediatekCampus(Zhiye):
     name = "zhiye-mediatek-campus"
     host = "mediatek.zhiye.com"
@@ -826,6 +834,7 @@ class SinosigGroupCampus(Zhiye):
 
 TENANTS = (
     MediatekCampus,
+    XaecCampus,
     TaikangCampus,
     WingtechCampus,
     Vanchen2027,

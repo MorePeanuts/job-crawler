@@ -31,6 +31,7 @@ from job_crawler.adapters.zhiye import (
     TongkunCampus,
     Vanchen2027,
     WingtechCampus,
+    XaecCampus,
     Xiangyu,
     YuntianhuaParent,
     Zhenshi2027,
@@ -348,7 +349,8 @@ def test_shenergy_binding_uses_verified_listed_company_boundary() -> None:
 
 
 @pytest.mark.parametrize(
-    "adapter", [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid, TaikangCampus, MediatekCampus]
+    "adapter",
+    [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid, TaikangCampus, MediatekCampus, XaecCampus],
 )
 async def test_zhiye_inline_body_enumerates_without_detail_request(
     now: datetime,
