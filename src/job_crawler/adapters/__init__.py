@@ -1,5 +1,6 @@
 """Explicit adapter registration; unknown sites never fall through to guessing."""
 
+from job_crawler.adapters.aisidi import AisidiCampus
 from job_crawler.adapters.anker import AnkerCampus
 from job_crawler.adapters.ansteel import Ansteel
 from job_crawler.adapters.asus import AsusMainlandCampus
@@ -203,6 +204,7 @@ REGISTRY = {
         GigCampus,
         ShkpMainland,
         TfmeCampus,
+        AisidiCampus,
         HbiscoCampus,
         NciCampus,
         NeteaseCampus,
