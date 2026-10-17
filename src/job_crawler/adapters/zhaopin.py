@@ -52,6 +52,9 @@ class Zhaopin(Adapter):
     def validate_company(self, company_data: dict[str, Any]) -> None:
         pass
 
+    def in_scope(self, company_data: dict[str, Any]) -> bool:
+        return True
+
     def unit_name(self, company_data: dict[str, Any]) -> str:
         return text(company_data.get("campusOrgName"))
 
@@ -118,6 +121,9 @@ class Zhaopin(Adapter):
                 company_data: dict[str, Any] = row["company"]
                 check(str(company_data["companyId"]) == self.org_number, "岗位混入其他组织")
                 self.validate_company(company_data)
+                if not self.in_scope(company_data):
+                    scope.skipped_out_of_scope += 1
+                    continue
                 check(
                     job_data.get("positionSourceType") == self.job_source,
                     "岗位来源码与租户契约不符",

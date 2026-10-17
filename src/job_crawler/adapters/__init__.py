@@ -49,6 +49,7 @@ from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
 from job_crawler.adapters.nbcb import NingboBank2027
 from job_crawler.adapters.nci import NciCampus
+from job_crawler.adapters.netease import NeteaseCampus
 from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
@@ -57,6 +58,7 @@ from job_crawler.adapters.sdicpower import SdicPowerCampus
 from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
 from job_crawler.adapters.shenergy import ShenergyListedCampus
+from job_crawler.adapters.shengtun import ShengtunMiningCampus
 from job_crawler.adapters.shougang import ShougangCampus
 from job_crawler.adapters.sinopec import SinopecCampus
 from job_crawler.adapters.sinopharm import SinopharmCampus
@@ -132,6 +134,7 @@ REGISTRY = {
         SaicCampus,
         ShccigHeadquartersTrainees,
         ShenergyListedCampus,
+        ShengtunMiningCampus,
         ShougangCampus,
         SinopecCampus,
         FoxconnCampus,
@@ -152,6 +155,7 @@ REGISTRY = {
         HaierCampus,
         HbiscoCampus,
         NciCampus,
+        NeteaseCampus,
         NingboBank2027,
         SunwodaCampus,
         GreentownCampus,

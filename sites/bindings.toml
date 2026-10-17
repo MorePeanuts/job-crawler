@@ -942,3 +942,7 @@ version = "1"
 [sources.COM0176]
 adapter = "zhiye-mediatek-campus"
 version = "1"
+
+[sources.COM0450]
+adapter = "zhaopin-shengtun-mining-campus"
+version = "1"
