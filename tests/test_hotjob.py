@@ -1119,13 +1119,15 @@ class DbnReplay(Replay):
 
     def _detail(self, post_id: str) -> dict[str, Any]:
         detail = super()._detail(post_id)
-        detail["data"]["orgName"] = self._listing(post_id)["company"]
+        detail["data"]["orgName"] = (
+            "财务综合室" if post_id == "a" else self._listing(post_id)["company"]
+        )
         if post_id == "c" and self.conflict:
             detail["data"][self.conflict] = "不同记录"
         return detail
 
 
-@pytest.mark.parametrize("conflict", ["", "postName", "orgCode", "orgName", "company"])
+@pytest.mark.parametrize("conflict", ["", "postName", "orgCode", "company"])
 async def test_dbn_first_publication_expiry_and_detail_identity(
     conflict: str, now: datetime
 ) -> None:
@@ -1145,7 +1147,7 @@ async def test_dbn_first_publication_expiry_and_detail_identity(
     assert expired.deadline == "2026-04-09 23:59:59"
     assert expired.detail_mode == "listing_only"
     assert all(form.get("postId") != "b" for _, form in replay.calls)
-    assert result.jobs[0].unit == "钦州大北农饲料科技有限公司"
+    assert result.jobs[0].unit == "钦州大北农饲料科技有限公司 / 财务综合室"
     if conflict:
         assert result.coverage_issues()
         assert scope.details == 1

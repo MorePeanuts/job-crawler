@@ -961,11 +961,14 @@ class DbnCampus(Hotjob):
             check(
                 text(row.get("postName")) == text(listing.get("postName"))
                 and text(row.get("orgCode")) == text(listing.get("orgCode"))
-                and text(row.get("orgName")) == text(listing.get("company"))
                 and text(row.get("company")) == text(listing.get("company")),
                 "大北农详情标题、招聘单位或组织编码与列表不一致",
             )
         job = super()._job(row, listing, evidence, locations, location_evidence)
+        company = text(listing.get("company"))
+        department = text(row.get("orgName"))
+        job.unit = f"{company} / {department}" if department and department != company else company
+        job.field_sources["unit"] = "company为招聘公司；不同的orgName作为所属部门一并保留"
         job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
         job.field_sources["published"] = "publishFirstDate；缺失保留未知，不使用publishDate更新日期"
         return job
