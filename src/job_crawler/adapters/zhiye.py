@@ -231,6 +231,12 @@ class Zhiye(Adapter):
             page += 1
 
 
+class YonghuiCampus(Zhiye):
+    name = "zhiye-yonghui-campus"
+    host = "yhchaoshi.zhiye.com"
+    scope_description = "永辉超市官方北森门户Category=2校园全目录；不包含社招或高校独立宣讲简章"
+
+
 class GrandtradeCampus(Zhiye):
     name = "zhiye-grandtrade-campus"
     host = "grandtrade.zhiye.com"
@@ -841,6 +847,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    YonghuiCampus,
     GrandtradeCampus,
     MediatekCampus,
     XaecCampus,
