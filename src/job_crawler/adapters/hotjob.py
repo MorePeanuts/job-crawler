@@ -823,6 +823,46 @@ class CrrcGroup(MinmetalsGroup):
     scope_description = "中国中车集团2027届校招门户全目录，含55个顶层招聘机构；逐岗保留实际单位"
 
 
+class ChanghongListed(MinmetalsGroup):
+    name = "hotjob-changhong-listed-campus"
+    host = "zhaopin.changhong.com"
+    suite = "SU6886eae30287e94ac767de53"
+    path = f"/{suite}/pb/school.html"
+    own_root = "0/100201/103713"
+    scope_description = "长虹官方集团全校招目录，仅四川长虹电器股份有限公司机构树分支及其后代"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        super().validate_terms(data)
+        roots = data["orgList"]
+        check(
+            len(roots) == 1
+            and roots[0]["code"] == "0/100201"
+            and text(roots[0]["nameCh"]) == "四川长虹电子控股集团有限公司",
+            "长虹集团根机构身份变化",
+        )
+        nodes = [node for node in roots[0]["childNodes"] if node["code"] == self.own_root]
+        check(
+            len(nodes) == 1 and text(nodes[0]["nameCh"]) == "四川长虹电器股份有限公司",
+            "四川长虹股份机构树节点缺失或身份变化",
+        )
+        self.own_expected = int(nodes[0]["positionsNum"])
+        check(0 <= self.own_expected <= self.tree_expected, "长虹股份分支岗位数量异常")
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        super().include_listing(row)
+        code = text(row.get("orgCode"))
+        check("/".join(code.split("/")[:3]) in self.org_codes, "长虹岗位所属一级板块未知")
+        return code == self.own_root or code.startswith(self.own_root + "/")
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        scope = self.result.scopes[0]
+        check(
+            scope.skipped_out_of_scope == self.tree_expected - self.own_expected,
+            "长虹股份与集团其他单位的岗位数量未闭合",
+        )
+
+
 class GwmListed(MinmetalsGroup):
     name = "hotjob-gwm-listed"
     version = "1"
@@ -891,6 +931,7 @@ class Wanhua2027(Hotjob):
 
 
 TENANTS = (
+    ChanghongListed,
     SinomachGroup,
     MinmetalsGroup,
     HengyiGroup,
