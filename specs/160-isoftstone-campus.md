@@ -1,6 +1,6 @@
 # SPEC-160 软通动力校园目录
 
-状态：开发中；SPEC-156 A 组 COM0412。
+状态：已实现并通过本轮零正式岗位覆盖验收，详见 docs/remaining-271-acceptance.md；SPEC-156 A 组 COM0412。
 
 ## 目标与非目标
 

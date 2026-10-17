@@ -10,6 +10,8 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | A | COM0308 广东领益智造股份有限公司 | moka-lingyi-2027@1 | 10-18 01:52:50–01:53:46 | 35 / 35 | 35 / 35 / 3 / 32 | collect-lingyi |
 | A | COM0471 申能股份有限公司 | zhiye-shenergy-listed-campus@1 | 10-18 01:55:19–01:55:34 | 149 / 22 | 22 / 22 / 0 / 22 | collect-shenergy |
+| A | COM0437 闻泰科技股份有限公司 | zhiye-wingtech-campus@1 | 10-18 02:00:08–02:00:15 | 0 / 0 | 0 / 0 / 0 / 0 | collect-wingtech |
+| A | COM0412 软通动力信息技术（集团）股份有限公司 | isoftstone-campus@1 | 10-18 02:02:37–02:02:48 | 9 / 0 | 0 / 0 / 0 / 0 | collect-isoftstone |
 
 以上快照路径相对证据根目录。两站 coverage 均 complete；report.status=partial 来自地点未满足严格导入格式，不能擅自缩减多城市或猜测地区。两站均已执行公共 deepseek-flash 分类，全部分类成功；只读 audit_delivery.py 分别以 expected-companies=1 通过。
 
@@ -19,7 +21,9 @@
 
 ## 验证与待办
 
-本阶段 uv sync --locked、Ruff format/check、ty 通过；完整 pytest 631 项通过。平台专项回放覆盖分页、正文、身份、实习类型、单位树范围及异常边界。离线测试和上述实时采集分开统计。
+闻泰：官网无筛选校园目录业务响应 Count=0、Data=[]，可见页面同时显示零岗位，真实零目录覆盖完成；尚无本轮真实非零详情样本。软通动力：两页 6+3 条均标记 hiretype_name=实习，全部计入 skipped_out_of_scope，未将标题中的 27 届冒充正式校招。两家分别通过不设置 expected-companies 的只读审计，结果均为 0 家有岗位；命令行参数拒绝 expected-companies=0，因此未修改验收器来放宽约束。SPEC-159/160。
+
+本阶段 uv sync --locked、Ruff format/check、ty 通过；完整 pytest 639 项通过。平台专项回放覆盖分页、正文、身份、实习类型、单位树范围及异常边界。离线测试和上述实时采集分开统计。
 
 尚需完成其余固定企业的研究、开发及实采，生成 A/B 两份最终汇总、审计、发布归档，更新完整逐家结论。当前已发现 5 个 B 组入口候选（国家电网、中国石化、工商银行、中国移动、华润），正在进一步核验；不得将这些候选计入已适配。
 

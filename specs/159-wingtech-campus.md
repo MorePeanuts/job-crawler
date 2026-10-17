@@ -1,6 +1,6 @@
 # SPEC-159 闻泰校园招聘零目录
 
-状态：开发中，SPEC-156 A 组 COM0437。
+状态：已实现并通过本轮零正式岗位覆盖验收，详见 docs/remaining-271-acceptance.md，SPEC-156 A 组 COM0437。
 
 ## 目标和范围
 
