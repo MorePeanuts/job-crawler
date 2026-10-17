@@ -1018,3 +1018,7 @@ version = "1"
 [sources.COM0392]
 adapter = "gem-2027-campus-announcement"
 version = "1"
+
+[sources.COM0419]
+adapter = "swhy-group-campus"
+version = "1"

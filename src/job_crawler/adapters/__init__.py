@@ -80,6 +80,7 @@ from job_crawler.adapters.smic import SmicCampus
 from job_crawler.adapters.spic2027 import Spic2027
 from job_crawler.adapters.static_campus import TENANTS as STATIC_TENANTS
 from job_crawler.adapters.sunwoda import SunwodaCampus
+from job_crawler.adapters.swhy import SwhyCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.wtmec import Wtmec
@@ -175,6 +176,7 @@ REGISTRY = {
         FawCampus,
         CpcgCampus,
         GemCampus,
+        SwhyCampus,
         BcdhListedCampus,
         KsfCampus,
         GuotaiHaitongCampus,
