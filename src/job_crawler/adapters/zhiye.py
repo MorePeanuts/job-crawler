@@ -231,6 +231,13 @@ class Zhiye(Adapter):
             page += 1
 
 
+class BusyMingCampus(Zhiye):
+    name = "zhiye-busyming-campus"
+    host = "hnlshm4.zhiye.com"
+    regular_only = True
+    scope_description = "鸣鸣很忙集团官网直连北森Category=2完整校园目录；不含社招、实习和内部推荐"
+
+
 class SunartCampus(Zhiye):
     name = "zhiye-sunart-campus"
     host = "rt-mart.zhiye.com"
@@ -856,6 +863,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    BusyMingCampus,
     SunartCampus,
     YonghuiCampus,
     GrandtradeCampus,
