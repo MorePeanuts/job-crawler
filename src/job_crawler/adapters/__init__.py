@@ -38,6 +38,7 @@ from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
 from job_crawler.adapters.foxconn import FoxconnCampus
 from job_crawler.adapters.fuyao import FuyaoHeadquarters
 from job_crawler.adapters.gem import GemCampus
+from job_crawler.adapters.gig import GigCampus
 from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
 from job_crawler.adapters.gree import GreeCampus
 from job_crawler.adapters.greentown import GreentownCampus
@@ -197,6 +198,7 @@ REGISTRY = {
         HaierCampus,
         HailiangCampus,
         BlueFocus,
+        GigCampus,
         HbiscoCampus,
         NciCampus,
         NeteaseCampus,
