@@ -14,6 +14,7 @@ from job_crawler.adapters.cdkj import Cdkj
 from job_crawler.adapters.cdrcb import Cdrcb2027
 from job_crawler.adapters.ceair import Ceair2027
 from job_crawler.adapters.cec import CecCampus
+from job_crawler.adapters.chd import ChdCampus
 from job_crawler.adapters.chinalco import Chinalco2027
 from job_crawler.adapters.chinatelecom import ChinaTelecomCampus
 from job_crawler.adapters.chinatower import (
@@ -111,6 +112,7 @@ REGISTRY = {
         SbpCampus,
         JointownCampus,
         SihcCampus,
+        ChdCampus,
         AsusMainlandCampus,
         ZtoCampus,
         GreeCampus,
