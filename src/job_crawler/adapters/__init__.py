@@ -80,6 +80,7 @@ from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
 from job_crawler.adapters.shenergy import ShenergyListedCampus
 from job_crawler.adapters.shengtun import ShengtunMiningCampus
+from job_crawler.adapters.shkp import ShkpMainland
 from job_crawler.adapters.shougang import ShougangCampus
 from job_crawler.adapters.sihc import SihcCampus
 from job_crawler.adapters.sinopec import SinopecCampus
@@ -199,6 +200,7 @@ REGISTRY = {
         HailiangCampus,
         BlueFocus,
         GigCampus,
+        ShkpMainland,
         HbiscoCampus,
         NciCampus,
         NeteaseCampus,
