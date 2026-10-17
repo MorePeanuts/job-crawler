@@ -1,31 +1,36 @@
 """Read China Tower's public virtualized job table through its normal UI pagination."""
 
 import asyncio
+import json
 import math
+import re
 from typing import Any, cast
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit
 
 from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.moka import sections
 from job_crawler.adapters.platforms import check
+from job_crawler.adapters.shudao_notices import attach_notice_deadlines
 from job_crawler.models import Collection, Job, Scope
 from job_crawler.storage import write_json
 from job_crawler.transport import BrowserSession
 
 # Only job fields used by the public recruitment page, excluding contact/account data.
-PUBLIC_TABLE = """() => {
+PUBLIC_TABLE = """extraFields => {
  const element=document.querySelector('hc-list-new');
  const grid=element && angular.element(element).isolateScope();
  const pagerElement=document.querySelector('[ng-click*=onPagingClick]');
  const p=pagerElement && angular.element(pagerElement).scope().paging;
  if (!grid || !p || !Array.isArray(grid.model.data)) return null;
  const m=grid.model;
- const fields=['status','u_unit','id','name','department_name','u_first_party','u_MainOrgDepart','u_subordinate_unit','job_class','job_property','is_open','job_desc','u_professional','work_city','work_address','address_multi','background','release_date','auto_offline_date'];
+ const fields=['status','u_unit','id','name','department_name','u_first_party','u_MainOrgDepart','u_subordinate_unit','job_class','job_property','is_open','job_desc','u_professional','work_city','work_address','address_multi','background','release_date','auto_offline_date'].concat(extraFields || []);
  return {url:location.href,current:p.current_page,model_page:m.current_page,total:p.total_count,
  pages:p.page_count,size:p.page_size,fetching:p._is_fetching,
  selected_departments:document.querySelectorAll('.selected-department').length,
  deadline_label:m.columns_metas.auto_offline_date?.label,
  education_labels:m.columns_metas.background?.mask,
+ status_labels:m.columns_metas.status?.mask,
+ field_labels:Object.fromEntries((extraFields || []).map(k=>[k,m.columns_metas[k]?.label])),
  rows:m.data.map(r=>Object.fromEntries(fields.map(k=>[k,r[k]??null])))};
 }"""
 
@@ -59,6 +64,7 @@ class ChinaTowerCampus(Adapter):
         "中国铁塔官方公开校园招聘根目录，包含铁塔/智联/能源及各分公司；正常UI分页读取完整表格模型"
     )
 
+    extra_fields: tuple[str, ...] = ()
     deadline_label = "职位申请结束时间"
 
     async def prepare(self, session: BrowserSession) -> None:
@@ -83,7 +89,7 @@ class ChinaTowerCampus(Adapter):
         while True:
             data = None
             for _ in range(80):
-                candidate = await page.evaluate(PUBLIC_TABLE)
+                candidate = await page.evaluate(PUBLIC_TABLE, list(self.extra_fields))
                 if (
                     candidate
                     and candidate["current"] == number
@@ -205,5 +211,127 @@ class JacCampus(ChinaTowerCampus):
                 "education": "background + 页面字典",
                 "published": "release_date",
                 "deadline": "source_missing（自动下线时间不是报名截止）",
+            },
+        )
+
+
+class GuangxinCampus(JacCampus):
+    name = "guangxin-campus"
+    host = "ehr.gdghg.com"
+    path = "/recruit/#/index"
+    scope_description = (
+        "广新集团官方校园应届生全公司目录；完整虚拟表格分页，保留实际招聘状态与发布时间"
+    )
+
+    async def collect(self) -> Collection:
+        return await Adapter.collect(self)
+
+    async def prepare(self, session: BrowserSession) -> None:
+        await session.page.get_by_text("校园招聘", exact=True).first.click(timeout=20000)
+        await session.page.get_by_text("应届生", exact=True).first.click(timeout=20000)
+
+    def parse_job(self, row: dict[str, Any], data: dict[str, Any]) -> Job:
+        labels = data.get("status_labels", {})
+        check(labels.get("1") == "招聘中" and labels.get("2") == "已下线", "广新职位状态字典变化")
+        normalized = dict(row)
+        normalized["job_desc"] = re.sub(
+            r"(?m)^([ \t]*)招聘条件([：:]?[ \t]*)$", r"\1任职要求\2", text(row["job_desc"])
+        )
+        job = super().parse_job(normalized, data)
+        job.field_sources["requirements"] = "公开job_desc：任职要求/招聘条件"
+        return job
+
+
+class ShudaoCampus(ChinaTowerCampus):
+    name = "shudao-campus"
+    host = "sdhr.shudaojt.com"
+    path = "/recruit#/index"
+    deadline_label = "自动下线时间"
+    extra_fields = (
+        "u_out_org",
+        "u_workplace",
+        "professional",
+        "u_serviceCondition",
+        "u_age",
+        "u_release_time",
+        "department",
+        "u_notice",
+    )
+    scope_description = "蜀道集团官方校园根目录全部单位；完整公开表格分页，保留源站工作地与招聘要求"
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        notice_scope = Scope(name="linked-recruitment-announcements", unit="公告")
+        self.result.scopes.append(notice_scope)
+        for name, exc in await attach_notice_deadlines(
+            cast(BrowserSession, self.session), self.result.jobs, notice_scope
+        ):
+            self.error(exc, name)
+
+    async def prepare(self, session: BrowserSession) -> None:
+        prompt = session.page.get_by_text("我已阅读并同意", exact=True)
+        if await prompt.count():
+            await prompt.first.click(timeout=15000)
+        await session.page.get_by_text("校园招聘", exact=True).first.click(timeout=20000)
+
+    def parse_job(self, row: dict[str, Any], data: dict[str, Any]) -> Job:
+        check(
+            {key: data.get("field_labels", {}).get(key) for key in self.extra_fields[:6]}
+            == {
+                "u_out_org": "用人单位",
+                "u_workplace": "工作地",
+                "professional": "专业要求",
+                "u_serviceCondition": "任职要求",
+                "u_age": "年龄要求",
+                "u_release_time": "发布时间",
+            },
+            "蜀道公开岗位字段语义变化",
+        )
+        status = data.get("status_labels", {})
+        check(status.get("1") == "招聘中" and status.get("2") == "已下线", "蜀道职位状态字典变化")
+        check(
+            row["job_class"] == "校园招聘" and row["job_property"] in {"全职", ""},
+            "蜀道混入其他类型",
+        )
+        check(str(row["status"]) in {"1", "2"}, "蜀道职位状态需复核")
+        check(
+            bool(row["name"] and (row["job_desc"] or row["u_serviceCondition"])), "蜀道岗位正文缺失"
+        )
+        education = data["education_labels"].get(str(row["background"]))
+        check(education is not None, "蜀道学历字典缺失")
+        requirements = "\n".join(
+            f"{label}：{text(row.get(key))}"
+            for label, key in (
+                ("任职要求", "u_serviceCondition"),
+                ("专业要求", "professional"),
+                ("年龄要求", "u_age"),
+            )
+            if text(row.get(key))
+        )
+        check(isinstance(row.get("department"), int), "蜀道岗位部门身份缺失")
+        params = {"id": row["id"], "contract_unit": None, "depart_id": row["department"]}
+        detail_url = f"https://{self.host}/recruit#/common_board_view_anonymous?" + urlencode(
+            {"board_category": 40, "params": json.dumps(params, separators=(",", ":"))}
+        )
+        return self.job(
+            str(row["id"]),
+            title=text(row["name"]),
+            batch=text((row.get("u_notice") or {}).get("name")),
+            unit=text(row["u_out_org"] or row["department_name"]),
+            location=text(row["u_workplace"] or row["address_multi"] or row["work_city"]),
+            address=text(row["work_address"]),
+            education=text(education),
+            duties=text(row["job_desc"]),
+            requirements=requirements,
+            source_url=detail_url,
+            published=text(row["u_release_time"]),
+            closed=str(row["status"]) == "2",
+            field_sources={
+                "duties": "公开job_desc",
+                "requirements": "u_serviceCondition + professional + u_age",
+                "location": "页面u_workplace优先",
+                "education": "background + 当前页面字典",
+                "published": "u_release_time（页面发布时间）",
+                "deadline": "source_missing（自动下线不是报名截止）",
             },
         )

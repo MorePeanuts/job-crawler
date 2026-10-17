@@ -15,7 +15,12 @@ from job_crawler.adapters.ceair import Ceair2027
 from job_crawler.adapters.cec import CecCampus
 from job_crawler.adapters.chinalco import Chinalco2027
 from job_crawler.adapters.chinatelecom import ChinaTelecomCampus
-from job_crawler.adapters.chinatower import ChinaTowerCampus, JacCampus
+from job_crawler.adapters.chinatower import (
+    ChinaTowerCampus,
+    GuangxinCampus,
+    JacCampus,
+    ShudaoCampus,
+)
 from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.cib import Cib2027
 from job_crawler.adapters.cmbc import CmbcCampus
@@ -33,6 +38,7 @@ from job_crawler.adapters.greentown import GreentownCampus
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
+from job_crawler.adapters.huawei import HuaweiGraduate
 from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.iguopin_projects import Ceec2027, Cnbm2027, Cosco2027
@@ -41,6 +47,7 @@ from job_crawler.adapters.inovance import InovanceCampus
 from job_crawler.adapters.isoftstone import ISoftStoneCampus
 from job_crawler.adapters.itg_holding import ItgHoldingCampus
 from job_crawler.adapters.jd import JD
+from job_crawler.adapters.jianlong import JianlongCampus
 from job_crawler.adapters.jxcc import JxccCampus
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.lixiang import LiAutoCampus
@@ -152,6 +159,10 @@ REGISTRY = {
         Datang2027,
         ChinaTowerCampus,
         JacCampus,
+        GuangxinCampus,
+        ShudaoCampus,
+        HuaweiGraduate,
+        JianlongCampus,
         HaierCampus,
         HbiscoCampus,
         NciCampus,

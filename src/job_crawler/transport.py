@@ -149,7 +149,15 @@ class BrowserSession:
                         "portal_id": response.request.headers.get("x-portal-id", ""),
                         "public_headers": {
                             key: response.request.headers[key]
-                            for key in ("lang", "datasource", "x-hw-id")
+                            for key in (
+                                "lang",
+                                "datasource",
+                                "x-hw-id",
+                                "x-jalor-tenantalias",
+                                "x-language",
+                                "x-referer",
+                                "x-alb-gray",
+                            )
                             if key in response.request.headers
                         },
                         "status": response.status,
@@ -393,7 +401,16 @@ class BrowserSession:
             raise ValueError("不支持的凭据模式")
         if payload is not None and form is not None:
             raise ValueError("同一次请求不能同时发送 JSON 和表单")
-        if headers and not set(headers) <= {"X-Portal-Id", "lang", "datasource", "X-HW-ID"}:
+        if headers and not set(headers) <= {
+            "X-Portal-Id",
+            "lang",
+            "datasource",
+            "X-HW-ID",
+            "X-Jalor-Tenantalias",
+            "X-Language",
+            "X-Referer",
+            "X-ALB-Gray",
+        }:
             raise ValueError("仅允许已验证的公开站点请求头")
         identity: dict[str, Any] = {"url": url, "payload": payload, "headers": headers}
         if form is not None:

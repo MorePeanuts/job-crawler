@@ -11,7 +11,7 @@ from test_adapters import source
 from test_transport import Page
 
 from job_crawler.adapters.anker import AnkerCampus
-from job_crawler.adapters.chinatower import JacCampus, validate_page
+from job_crawler.adapters.chinatower import GuangxinCampus, JacCampus, ShudaoCampus, validate_page
 from job_crawler.adapters.extra_catalogs import ZhinkCampus
 from job_crawler.adapters.inline_catalogs import CndCampus, MideaCampus
 from job_crawler.adapters.moka import Nongfu
@@ -265,8 +265,11 @@ def test_virtual_table_requires_current_complete_unfiltered_page(mutation: dict[
         validate_page(data, 2, 21)
 
 
-def test_jac_public_flag_is_not_job_status_and_dates_not_invented(now: datetime) -> None:
-    adapter = JacCampus(source(JacCampus.host), Replay({}, {}), now)
+@pytest.mark.parametrize("adapter_type", [JacCampus, GuangxinCampus])
+def test_jac_public_flag_is_not_job_status_and_dates_not_invented(
+    now: datetime, adapter_type: type[JacCampus]
+) -> None:
+    adapter = adapter_type(source(adapter_type.host), Replay({}, {}), now)
     row = {
         "id": 1,
         "name": "工程师",
@@ -274,7 +277,8 @@ def test_jac_public_flag_is_not_job_status_and_dates_not_invented(now: datetime)
         "job_property": "全职",
         "is_open": False,
         "status": 1,
-        "job_desc": "任职要求：\n本科\n岗位描述：\n开发",
+        "job_desc": ("招聘条件：" if adapter_type is GuangxinCampus else "任职要求：")
+        + "\n本科\n岗位描述：\n开发",
         "background": 2,
         "department_name": "技术部",
         "address_multi": ["合肥市"],
@@ -284,12 +288,24 @@ def test_jac_public_flag_is_not_job_status_and_dates_not_invented(now: datetime)
         "auto_offline_date": "2027-01-01",
     }
     job = adapter.parse_job(
-        row, {"education_labels": {"2": "本科及以上"}, "url": "https://example.test"}
+        row,
+        {
+            "education_labels": {"2": "本科及以上"},
+            "status_labels": {"1": "招聘中", "2": "已下线"},
+            "url": "https://example.test",
+        },
     )
     assert not job.closed and job.duties == "开发" and job.requirements == "本科"
     assert job.deadline == "" and job.published == "2026-10-09"
     row["status"] = 2
-    assert adapter.parse_job(row, {"education_labels": {"2": "本科及以上"}, "url": "x"}).closed
+    assert adapter.parse_job(
+        row,
+        {
+            "education_labels": {"2": "本科及以上"},
+            "status_labels": {"1": "招聘中", "2": "已下线"},
+            "url": "x",
+        },
+    ).closed
 
 
 def test_nongfu_requires_detail_company_and_excludes_other_group_companies(now: datetime) -> None:
@@ -588,3 +604,52 @@ async def test_gbk_html_mode_has_distinct_cache_and_decoder(tmp_path: Path, now:
         assert page.calls == 2 and 'TextDecoder("gb18030")' in page.scripts[1]
     finally:
         store.close()
+
+
+def test_shudao_uses_visible_custom_fields_and_own_education_dictionary(now: datetime) -> None:
+    adapter = ShudaoCampus(source(ShudaoCampus.host), Replay({}, {}), now)
+    row = {
+        "id": 54365,
+        "department": 17798554,
+        "u_notice": {"name": "晨星招聘公告"},
+        "name": "组织人事管培生",
+        "job_class": "校园招聘",
+        "job_property": "全职",
+        "status": "1",
+        "is_open": True,
+        "department_name": "蜀道集团",
+        "u_out_org": "蜀道集团及所属企业",
+        "u_workplace": "四川省内",
+        "work_city": "四川省成都市",
+        "address_multi": ["四川省成都市"],
+        "work_address": None,
+        "background": 6,
+        "job_desc": "培养计划",
+        "u_serviceCondition": "应届毕业生",
+        "professional": "人力资源管理",
+        "u_age": "28周岁以内",
+        "release_date": None,
+        "u_release_time": "2026-10-12 20:00",
+        "auto_offline_date": "2026-10-22 23:59:00",
+    }
+    data = {
+        "url": "https://sdhr.shudaojt.com/recruit",
+        "education_labels": {"6": "硕士研究生及以上"},
+        "status_labels": {"1": "招聘中", "2": "已下线"},
+        "field_labels": {
+            "u_out_org": "用人单位",
+            "u_workplace": "工作地",
+            "professional": "专业要求",
+            "u_serviceCondition": "任职要求",
+            "u_age": "年龄要求",
+            "u_release_time": "发布时间",
+        },
+    }
+    job = adapter.parse_job(row, data)
+    assert job.location == "四川省内" and job.unit == "蜀道集团及所属企业"
+    assert job.education == "硕士研究生及以上" and job.published == "2026-10-12 20:00"
+    assert job.deadline == "" and not job.closed
+    assert all(value in job.requirements for value in ["应届毕业生", "人力资源管理", "28周岁以内"])
+    data["field_labels"]["u_release_time"] = "更新时间"
+    with pytest.raises(CrawlError, match="语义"):
+        adapter.parse_job(row, data)

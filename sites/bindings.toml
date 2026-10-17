@@ -958,3 +958,11 @@ version = "1"
 [sources.COM0362]
 adapter = "hotjob-yutong"
 version = "1"
+
+[sources.COM0093]
+adapter = "guangxin-campus"
+version = "1"
+
+[sources.COM0120]
+adapter = "coapi-jianlong-campus"
+version = "1"
