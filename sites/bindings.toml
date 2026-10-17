@@ -1022,3 +1022,7 @@ version = "1"
 [sources.COM0419]
 adapter = "swhy-group-campus"
 version = "1"
+
+[sources.COM0250]
+adapter = "mysteel-campus"
+version = "1"

@@ -60,6 +60,7 @@ from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.longi_legacy import LongiLegacyCampus
 from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
+from job_crawler.adapters.mysteel import MysteelCampus
 from job_crawler.adapters.nbcb import NingboBank2027
 from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.netease import NeteaseCampus
@@ -103,6 +104,7 @@ REGISTRY = {
     adapter.name: adapter
     for adapter in (
         AnkerCampus,
+        MysteelCampus,
         AsusMainlandCampus,
         ZtoCampus,
         GreeCampus,
