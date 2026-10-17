@@ -94,6 +94,7 @@ from job_crawler.adapters.zhiye import TENANTS, Ctf2027, WeichaiPower2027
 from job_crawler.adapters.zjamp import ZjampCampus
 from job_crawler.adapters.zjci import ZjciCampus
 from job_crawler.adapters.zjjt import Zjjt2027
+from job_crawler.adapters.zto import ZtoCampus
 from job_crawler.adapters.ztt import ZttCampus
 
 REGISTRY = {
@@ -101,6 +102,7 @@ REGISTRY = {
     for adapter in (
         AnkerCampus,
         AsusMainlandCampus,
+        ZtoCampus,
         GreeCampus,
         SinopharmCampus,
         *STATIC_TENANTS,
