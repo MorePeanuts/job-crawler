@@ -21,6 +21,7 @@ from job_crawler.adapters.moka import (
     Hengrui,
     Huaqin,
     Jinko,
+    Lingyi2027,
     Longcheer2027,
     Lygend,
     Moka,
@@ -217,6 +218,7 @@ async def test_sunny_rejects_internship_module(now: datetime) -> None:
         Anta2027,
         Hengrui,
         Seazen2027,
+        Lingyi2027,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:
@@ -252,10 +254,7 @@ async def test_moka_rejects_duplicate_page(now: datetime) -> None:
     assert "duplicate_page" in {issue.code for issue in result.coverage_issues()}
 
 
-class SeazenTitleMismatch(Replay):
-    def __init__(self) -> None:
-        super().__init__("seazen", 168436)
-
+class TitleMismatch(Replay):
     async def observed_path(self, needle: str) -> dict[str, Any]:
         response = await super().observed_path(needle)
         if needle == "/api/outer/ats-apply/website/job":
@@ -265,15 +264,18 @@ class SeazenTitleMismatch(Replay):
         return response
 
 
-async def test_seazen_rejects_detail_title_mismatch(now: datetime) -> None:
+@pytest.mark.parametrize("adapter", [Seazen2027, Lingyi2027])
+async def test_moka_rejects_detail_title_mismatch(adapter: type[Moka], now: datetime) -> None:
     source = Source(
-        source_id="COM0298",
-        company_id="COM0298",
-        company="新城发展控股有限公司",
-        url="https://app.mokahr.com/campus-recruitment/seazen/168436#/jobs",
+        source_id="TEST",
+        company_id="TEST",
+        company="企业",
+        url=f"https://{adapter.host}{adapter.path}",
     )
-    result = await Seazen2027(source, SeazenTitleMismatch(), now).collect()
+    result = await adapter(source, TitleMismatch(adapter.org, adapter.site_id), now).collect()
     assert result.coverage_issues()
+    assert "a" not in {job.source_key for job in result.jobs}
+    assert {"b", "c"} == {job.source_key for job in result.jobs}
 
 
 async def test_moka_keeps_job_with_missing_description(now: datetime) -> None:

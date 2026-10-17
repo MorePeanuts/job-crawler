@@ -636,7 +636,19 @@ class Longcheer2027(Moka):
     scope_description = "龙旗科技2027公开 Moka 校园站国内及海外校招无筛选全目录"
 
 
+class Lingyi2027(Moka):
+    name = "moka-lingyi-2027"
+    org = "lingyiitech"
+    site_id = 182049
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "领益智造官方 2027 届本硕博校园站无筛选全部职能及城市目录"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "领益智造详情标题不匹配")
+
+
 TENANTS = (
+    Lingyi2027,
     Longcheer2027,
     Seazen2027,
     SunnyOptical,

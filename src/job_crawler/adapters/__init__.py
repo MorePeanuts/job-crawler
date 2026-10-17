@@ -54,6 +54,7 @@ from job_crawler.adapters.saic import SaicCampus
 from job_crawler.adapters.sdicpower import SdicPowerCampus
 from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
+from job_crawler.adapters.shenergy import ShenergyListedCampus
 from job_crawler.adapters.shougang import ShougangCampus
 from job_crawler.adapters.sinopharm import SinopharmCampus
 from job_crawler.adapters.smic import SmicCampus
@@ -126,6 +127,7 @@ REGISTRY = {
         SdicPowerCampus,
         SaicCampus,
         ShccigHeadquartersTrainees,
+        ShenergyListedCampus,
         ShougangCampus,
         BankComm,
         Meituan,

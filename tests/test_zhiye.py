@@ -324,10 +324,10 @@ def test_new_zhiye_tenant_binding_matches_source(source_id: str, host: str) -> N
     assert bindings[source_id].adapter == adapter.name
 
 
-@pytest.mark.parametrize("source_id", ["COM0471"])
-def test_group_portals_remain_unbound(source_id: str) -> None:
+def test_shenergy_binding_uses_verified_listed_company_boundary() -> None:
     root = Path(__file__).resolve().parents[1]
-    assert source_id not in load_bindings(root / "sites/bindings.toml")
+    binding = load_bindings(root / "sites/bindings.toml")["COM0471"]
+    assert binding.adapter == "zhiye-shenergy-listed-campus"
 
 
 @pytest.mark.parametrize("adapter", [Mindray, Shenzhou, Huafeng, Infore, Shrcb, Haid])

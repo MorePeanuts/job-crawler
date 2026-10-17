@@ -910,3 +910,11 @@ version = "1"
 [sources.COM0457]
 adapter = "xingfa-2027-notice"
 version = "1"
+
+[sources.COM0308]
+adapter = "moka-lingyi-2027"
+version = "1"
+
+[sources.COM0471]
+adapter = "zhiye-shenergy-listed-campus"
+version = "1"

@@ -23,6 +23,7 @@ class Zhiye(Adapter):
     regular_only = False
     listing_complete = False
     listing_unit_field = "Org"
+    category_field = "ClassificationOne"
     expected_org = ""
     page_size = 20
     ready_endpoints = ("/api/Jobad/GetJobAdPageList",)
@@ -108,7 +109,7 @@ class Zhiye(Adapter):
                             location=text(listed.get("LocNames")),
                             education=text(listed.get("Degree")),
                             address=text(listed.get("DetailAddress")),
-                            category_raw=text(listed.get("ClassificationOne")),
+                            category_raw=text(listed.get(self.category_field)),
                             duties=text(listed["Duty"]),
                             requirements=text(listed["Require"]),
                             published=date_text(listed.get("PostDate")),
@@ -164,7 +165,7 @@ class Zhiye(Adapter):
                         education=text(row.get("Degree") or listed.get("Degree")),
                         address=text(row.get("DetailAddress")),
                         category_raw=text(
-                            row.get("ClassificationOne") or listed.get("ClassificationOne")
+                            row.get(self.category_field) or listed.get(self.category_field)
                         ),
                         duties=text(row["Duty"]),
                         requirements=text(row["Require"]),
