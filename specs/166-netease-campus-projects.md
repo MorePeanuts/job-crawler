@@ -12,6 +12,8 @@
 
 雷火 `https://leihuo.163.com/campus/#/full?channel=iSfFmJe` 观察 `https://xiaozhao.leihuo.netease.com/api/apply/job/list/show`，project_id=77/page_size=10/page_number=1/job_name=""；status=200，data.count_number/pages_count/last_page/apply_job_list，当前 30 条/3 页。ehr_project_id、ehr_job_type=1/type_name=全职、target=2027届应届毕业生核对；job_detail_url 指向 campus.163.com 上对应详情。
 
+雷火列表请求须在 leihuo.163.com 页面上下文执行；详情进入 campus.163.com 后，下一页需返回雷火入口，并在新页详情前重新切换到详情页面，避免跨域请求失败。
+
 三个项目均按项目+岗位 ID 稳定去重、详情核对 ID/项目/标题，读取 positionDescription/positionRequirement、workPlaceName、positionTypeName、publishTime。缺失学历交公共补全；缺失地址留空，不用项目名猜测用人部门。目录分类为应届生，任职要求中的可提前实习不自动改为实习岗位。
 
 雷火当前页面明确“10月15日网申截止”，未给年份。保存原截止文本 `10月15日`，交公共日期筛选产生 unparsed_deadline 待核验，不将这批岗位计为已确认有效，也不凭采集年份补造截止日期。互娱和互联网未公开截止则为空。新页面明确完整日期时依源更新规范与解析。
