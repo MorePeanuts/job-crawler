@@ -25,10 +25,12 @@ from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.cib import Cib2027
 from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
+from job_crawler.adapters.cpcg import CpcgCampus
 from job_crawler.adapters.ctg_dutyfree import CtgDutyFreeCampus
 from job_crawler.adapters.ctrip import CtripCampus
 from job_crawler.adapters.datang import Datang2027
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
+from job_crawler.adapters.faw import FawCampus
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
 from job_crawler.adapters.foxconn import FoxconnCampus
 from job_crawler.adapters.fuyao import FuyaoHeadquarters
@@ -61,6 +63,7 @@ from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.saic import SaicCampus
+from job_crawler.adapters.scoped_coapi import BcdhListedCampus, KsfCampus
 from job_crawler.adapters.sdicpower import SdicPowerCampus
 from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
@@ -162,6 +165,10 @@ REGISTRY = {
         GuangxinCampus,
         ShudaoCampus,
         HuaweiGraduate,
+        FawCampus,
+        CpcgCampus,
+        BcdhListedCampus,
+        KsfCampus,
         JianlongCampus,
         HaierCampus,
         HbiscoCampus,

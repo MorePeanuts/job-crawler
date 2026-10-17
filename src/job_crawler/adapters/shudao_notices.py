@@ -1,7 +1,8 @@
 """Explicit application deadlines from Shudao's linked public announcements."""
 
+import hashlib
 import re
-from datetime import date
+from datetime import date, datetime, time
 from urllib.parse import parse_qs, urljoin, urlsplit
 
 from job_crawler.adapters.platforms import check
@@ -9,14 +10,20 @@ from job_crawler.models import Job, Scope
 from job_crawler.transport import BrowserSession
 
 DATE = re.compile(r"(20\d{2})\s*[年./-]\s*(\d{1,2})\s*[月./-]\s*(\d{1,2})日?")
+VERIFIED_IMAGES = {
+    "645": "56adcd4e86796d29ead4ff47614cc8cd2fb170eaa6b8b0a95f0fe3d3d64a42ae",
+    "706": "766c90b997870c1ecb06236a9fe4e0fa744e9c9942bfb99035cacd35223aadd2",
+}
 
 
 def announcement_deadline(body: str) -> str:
     candidates: set[str] = set()
+    mentions = False
     for line in body.splitlines():
         application = re.search(r"报名.{0,12}(?:时间|截止)|截止.{0,12}报名", line)
-        if application is None:
+        if application is None or "年龄" in line[: application.start()]:
             continue
+        mentions = True
         line = line[application.start() :]
         matches = list(DATE.finditer(line))
         if not matches:
@@ -25,7 +32,17 @@ def announcement_deadline(body: str) -> str:
             continue
         dates = [date(*map(int, match.groups())) for match in matches]
         check(dates[-1] >= dates[0], "蜀道报名日期范围倒置")
-        candidates.add(dates[-1].isoformat())
+        clock = re.match(
+            r"\s*(\d{1,2})(?:[:：](\d{2})|时(?:(\d{1,2})分)?)", line[matches[-1].end() :]
+        )
+        if clock:
+            hour = int(clock[1])
+            minute = int(clock[2] or clock[3] or 0)
+            candidates.add(datetime.combine(dates[-1], time(hour, minute)).isoformat(sep=" "))
+        else:
+            candidates.add(dates[-1].isoformat())
+    if not mentions:
+        return ""
     check(len(candidates) == 1, "蜀道公告未给出唯一可核验的完整报名截止日期")
     return next(iter(candidates))
 
@@ -72,11 +89,34 @@ async def attach_notice_deadlines(
             check(name in body, "蜀道公告标题错配")
             deadline = announcement_deadline(body)
             evidence = session.last_evidence
-            scope.evidence.extend([detail_evidence, evidence])
+            image_evidence: list[str] = []
+            images = await session.page.locator(
+                'img[src*="document/loadsourceimage"]'
+            ).evaluate_all("nodes => [...new Set(nodes.map(n=>n.src))]")
+            for image_url in images:
+                image_parts = urlsplit(image_url)
+                check(image_parts.hostname == "sdhr.shudaojt.com", "蜀道公告图片域名变化")
+                session.consume_request()
+                response = await session.page.request.get(image_url, timeout=30000)
+                check(response.status == 200, "蜀道公告图片读取失败")
+                content = await response.body()
+                digest = hashlib.sha256(content).hexdigest()
+                check(
+                    VERIFIED_IMAGES.get(params["id"][0]) == digest,
+                    "蜀道招聘图片内容变化，报名时间需重新核验",
+                )
+                image_path = session.output / f"notice-{params['id'][0]}-{digest[:12]}.png"
+                image_path.write_bytes(content)
+                image_evidence.append(str(image_path))
+            scope.evidence.extend([detail_evidence, evidence, *image_evidence])
             for job in related:
                 job.deadline = deadline
-                job.evidence.extend([detail_evidence, evidence])
-                job.field_sources["deadline"] = f"同名关联招聘公告报名截止：{target}"
+                job.evidence.extend([detail_evidence, evidence, *image_evidence])
+                job.field_sources["deadline"] = (
+                    f"同名关联招聘公告报名截止：{target}"
+                    if deadline
+                    else f"source_missing：关联公告未载明报名截止；已核验文字/固定图片内容：{target}"
+                )
             scope.details += 1
         except Exception as exc:
             failures.append((name, exc))

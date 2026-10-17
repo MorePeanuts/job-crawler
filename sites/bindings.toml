@@ -966,3 +966,31 @@ version = "1"
 [sources.COM0120]
 adapter = "coapi-jianlong-campus"
 version = "1"
+
+[sources.COM0021]
+adapter = "huawei-graduate-intentions"
+version = "1"
+
+[sources.COM0107]
+adapter = "shudao-campus"
+version = "1"
+
+[sources.COM0242]
+adapter = "zhiye-grandtrade-campus"
+version = "1"
+
+[sources.COM0046]
+adapter = "cpcg-campus"
+version = "1"
+
+[sources.COM0234]
+adapter = "coapi-ksf-campus"
+version = "1"
+
+[sources.COM0448]
+adapter = "coapi-bcdh-listed-campus"
+version = "1"
+
+[sources.COM0047]
+adapter = "hotjob-faw-campus"
+version = "1"

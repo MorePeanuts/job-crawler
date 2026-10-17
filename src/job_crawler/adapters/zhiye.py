@@ -231,6 +231,14 @@ class Zhiye(Adapter):
             page += 1
 
 
+class GrandtradeCampus(Zhiye):
+    name = "zhiye-grandtrade-campus"
+    host = "grandtrade.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "远大控股官方校园 Category=2 全目录；保留仍展示岗位的实际历史发布日期"
+
+
 class XaecCampus(Zhiye):
     name = "zhiye-xaec-campus"
     host = "xaec.zhiye.com"
@@ -833,6 +841,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    GrandtradeCampus,
     MediatekCampus,
     XaecCampus,
     TaikangCampus,
