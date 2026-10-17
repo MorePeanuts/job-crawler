@@ -1,10 +1,10 @@
 ﻿来源ID,企业ID,主体名称,招聘官网,备注
-COM0001,COM0001,国家电网有限公司,,
+COM0001,COM0001,国家电网有限公司,https://zhaopin.sgcc.com.cn/sgcchr/static/home.html,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0002,COM0002,中国石油天然气集团有限公司,https://zhaopin.cnpc.com.cn/,高校毕业生招聘平台
-COM0003,COM0003,中国石油化工集团有限公司,,
+COM0003,COM0003,中国石油化工集团有限公司,https://job.sinopec.com/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0004,COM0004,中国建筑集团有限公司,https://recruit.cscec.com/,校园招聘
 COM0005,COM0005,鸿海精密工业股份有限公司,https://foxconn.hotjob.cn/wt/Foxconn/web/index/CompFoxconnPageindex,富士康2026届校园招聘
-COM0006,COM0006,中国工商银行股份有限公司,,
+COM0006,COM0006,中国工商银行股份有限公司,https://job.icbc.com.cn/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0007,COM0007,中国农业银行股份有限公司,,
 COM0008,COM0008,中国建设银行股份有限公司,https://job2.ccb.cn/cn/job/plan_index.html?planType=XY,校园招聘列表
 COM0009,COM0009,京东集团股份有限公司,https://campus.jd.com/,校园招聘
@@ -12,26 +12,26 @@ COM0010,COM0010,中国人寿保险（集团）公司,https://chinalife.zhiye.com
 COM0011,COM0011,中国银行股份有限公司,https://campus.chinahr.com/pages/2027-boc,2027校园招聘
 COM0012,COM0012,中国平安保险（集团）股份有限公司,https://campus.pingan.com/,校园招聘及实习
 COM0013,COM0013,中国铁路工程集团有限公司,https://www.crecg.com/zttzjt/rlzy/zpxx/2026100816145396264/index.html,中铁投资2027校园招聘简章
-COM0014,COM0014,中国移动通信集团有限公司,,
+COM0014,COM0014,中国移动通信集团有限公司,https://job.10086.cn/index.html,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0015,COM0015,阿里巴巴集团控股有限公司,https://campus-talent.alibaba.com/campus/gov,校园招聘
 COM0016,COM0016,中国铁道建筑集团有限公司,,
 COM0017,COM0017,中国中信集团有限公司,,
 COM0018,COM0018,中国交通建设集团有限公司,https://zhaopin.ccccltd.cn/campus/jobs,官方中国交建人才招聘平台 Category=2 全目录
-COM0019,COM0019,中国华润有限公司,,
-COM0020,COM0020,恒力集团有限公司,,
+COM0019,COM0019,中国华润有限公司,https://runjob.crc.com.cn/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
+COM0020,COM0020,恒力集团有限公司,https://jobs.hengli.com/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0021,COM0021,华为投资控股有限公司,https://career.huawei.com/cn/campus-recruitment,校园招聘及实习
-COM0022,COM0022,台湾积体电路制造股份有限公司,,
+COM0022,COM0022,台湾积体电路制造股份有限公司,https://www.tsmc.com/static/schinese/careers/index.htm,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0023,COM0023,中国海洋石油集团有限公司,https://cnooc.zhaopin.com/job/index.html,2027届官方集团校招
-COM0024,COM0024,中国南方电网有限责任公司,,
+COM0024,COM0024,中国南方电网有限责任公司,https://zhaopin.csg.cn/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0025,COM0025,山东能源集团有限公司,https://campus.51job.com/sdny/about2.html,高校毕业生招聘
 COM0026,COM0026,比亚迪股份有限公司,https://job.byd.com/portal/mobile/school-home,校园招聘
 COM0027,COM0027,腾讯控股有限公司,https://join.qq.com/,大陆校园招聘
 COM0028,COM0028,中国五矿集团有限公司,https://wecruit.hotjob.cn/SU62f37858bef57c29ead8adab/pb/school.html,中国五矿公开集团校招
-COM0029,COM0029,中国宝武钢铁集团有限公司,,
+COM0029,COM0029,中国宝武钢铁集团有限公司,https://baowugroup-zhaopin.51job.com/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0030,COM0030,中国电力建设集团有限公司,,
 COM0031,COM0031,国家能源投资集团有限责任公司,https://zhaopin.chnenergy.com.cn/recTypeSerch?kinds=1&schType=2,校园招聘
 COM0032,COM0032,厦门建发集团有限公司,https://campus.chinacnd.com/,建发股份校园招聘
-COM0033,COM0033,浙江荣盛控股集团有限公司,,
+COM0033,COM0033,浙江荣盛控股集团有限公司,https://talent.rong-sheng.com,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0034,COM0034,中国邮政集团有限公司,https://chinapost2027.zhaopin.com/job/index.html?comid=1013109,2027联合校招；总部及30个省级分公司；排除独立子公司
 COM0035,COM0035,中国人民保险集团股份有限公司,https://picc.zhiye.com/custom/campus?hideAll=true,Category=2 全目录；仅集团股份公司本级机构编码 45182
 COM0036,COM0036,上海汽车集团股份有限公司,https://saic-recruit.saicmotor.com/recruit/pc/#/collegeRecruit,上汽集团官方校园招聘目录
@@ -47,10 +47,10 @@ COM0045,COM0045,江西铜业集团有限公司,https://www.jxcc.com/join/xyJoinL
 COM0046,COM0046,太平洋建设集团有限公司,https://www.cpcg.com.cn/index.php/rlzy/xyzp.html,校园招聘
 COM0047,COM0047,中国第一汽车集团有限公司,,
 COM0048,COM0048,交通银行股份有限公司,https://job.bankcomm.com/index.do#/school/main,校园招聘
-COM0049,COM0049,纬创集团,,
+COM0049,COM0049,纬创集团,https://sp.wintalent.cn/wistron/ZS/index2.html,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0050,COM0050,浙江恒逸集团有限公司,https://wecruit.hotjob.cn/SU64a650e3bef57c3af72089fb/mc/position/campus,官网恒逸集团2027校园招聘
 COM0051,COM0051,中国铝业集团有限公司,https://chinalco2027.iguopin.com/job,国聘2027校招专站
-COM0052,COM0052,广达电脑股份有限公司,,
+COM0052,COM0052,广达电脑股份有限公司,https://hr.quantatw.com/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0053,COM0053,中国保利集团有限公司,https://polycareer.zhiye.com/campus/jobs?1=%5B%7B%22id%22%3A%2244%22%2C%22label%22%3A%22%E2%80%9C%E5%90%AF%E8%88%AA%E8%AE%A1%E5%88%92%E2%80%9D%E7%AE%A1%E5%9F%B9%E7%94%9F%22%7D%5D,保利发展启航计划管培生
 COM0054,COM0054,金川集团股份有限公司,,
 COM0055,COM0055,招商银行股份有限公司,https://career.cmbchina.com/detail/school?id=4B58639A-C643-475D-AB57-6B9E980040CD,北京分行2027届校园招聘公告
@@ -70,7 +70,7 @@ COM0068,COM0068,国家电力投资集团有限公司,https://spic2027.iguopin.co
 COM0069,COM0069,中国联合网络通信股份有限公司,https://zglt.zhaopin.com/scjobs/index.html,2027校园招聘
 COM0070,COM0070,中国华能集团有限公司,https://zhaopin.chng.com.cn/CampusRecruit?aId=2000145,校园招聘
 COM0071,COM0071,兴业银行股份有限公司,https://job.cib.com.cn/portal/#/recruit/814456498578608128?recruitType=CR,2027 官网校招总行与分行全目录
-COM0072,COM0072,泰康保险集团股份有限公司,,
+COM0072,COM0072,泰康保险集团股份有限公司,https://jobtaikang.zhiye.com/,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
 COM0073,COM0073,广州汽车工业集团有限公司,https://xyzp.51job.com/gacgroup2027/,2027校园招聘
 COM0074,COM0074,敬业集团有限公司,,
 COM0075,COM0075,浙江省交通投资集团有限公司,https://jt.hzshyy.com/content/82659,
