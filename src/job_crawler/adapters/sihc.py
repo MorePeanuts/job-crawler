@@ -63,7 +63,7 @@ class Record(BaseModel):
     address: str = ""
     lastUpdateDt: str = ""
     endDate: str = ""
-    pubState: str
+    pubState: int
     recruitType: str = ""
     jobResp: str = ""
     jobReq: str = ""
@@ -115,7 +115,7 @@ def validate_detail(data: Detail, listing: Record) -> None:
     check(row.displayName == listing.displayName == data.unit.strip(), "深投控用人单位名称不一致")
     check(row.recruitType in {"1", "2", "3"}, "深投控招聘类型未知")
     check(row.jobType in {"01", "02", "03", "04"}, "深投控聘用类型未知")
-    check(row.pubState in {"0", "1", "-1", "-2", "-3"}, "深投控发布状态未知")
+    check(row.pubState in {0, 1, -1, -2, -3}, "深投控发布状态未知")
 
 
 class SihcCampus(Adapter):
@@ -141,8 +141,8 @@ class SihcCampus(Adapter):
             location=row.workCityDsc,
             address=row.workCityDsc + row.address if row.address else "",
             deadline=row.endDate,
-            visible=row.pubState == "1",
-            closed=row.pubState in {"-1", "-2", "-3"},
+            visible=row.pubState == 1,
+            closed=row.pubState in {-1, -2, -3},
             field_sources={
                 "duties": "public-page.recruitData.jobResp",
                 "requirements": "public-page.recruitData.jobResp/jobReq",

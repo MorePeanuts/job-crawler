@@ -28,7 +28,7 @@ def record(**changes: str) -> Record:
             "displayName": "深圳市高新投集团有限公司",
             "jobType": "01",
             "jobTypeDsc": "全职",
-            "pubState": "1",
+            "pubState": 1,
             "requireEduDsc": "博士研究生",
             "workCityDsc": "福田区",
             "address": "时代科技大厦",
