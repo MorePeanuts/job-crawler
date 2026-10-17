@@ -930,3 +930,11 @@ version = "1"
 [sources.COM0072]
 adapter = "zhiye-taikang-campus"
 version = "1"
+
+[sources.COM0003]
+adapter = "sinopec-campus"
+version = "1"
+
+[sources.COM0005]
+adapter = "foxconn-campus"
+version = "1"

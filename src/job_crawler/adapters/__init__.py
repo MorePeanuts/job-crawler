@@ -25,6 +25,7 @@ from job_crawler.adapters.ctrip import CtripCampus
 from job_crawler.adapters.datang import Datang2027
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
+from job_crawler.adapters.foxconn import FoxconnCampus
 from job_crawler.adapters.fuyao import FuyaoHeadquarters
 from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
 from job_crawler.adapters.gree import GreeCampus
@@ -57,6 +58,7 @@ from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
 from job_crawler.adapters.shenergy import ShenergyListedCampus
 from job_crawler.adapters.shougang import ShougangCampus
+from job_crawler.adapters.sinopec import SinopecCampus
 from job_crawler.adapters.sinopharm import SinopharmCampus
 from job_crawler.adapters.smic import SmicCampus
 from job_crawler.adapters.spic2027 import Spic2027
@@ -131,6 +133,8 @@ REGISTRY = {
         ShccigHeadquartersTrainees,
         ShenergyListedCampus,
         ShougangCampus,
+        SinopecCampus,
+        FoxconnCampus,
         BankComm,
         Meituan,
         Bilibili,
