@@ -1,6 +1,6 @@
 # SPEC-157 领益智造 2027 Moka 校招
 
-状态：待实现与真实验收。属于 SPEC-156 A 组 COM0308。
+状态：已实现并通过实时覆盖验收，详见 docs/remaining-271-acceptance.md。属于 SPEC-156 A 组 COM0308。
 
 ## 目标、范围与依据
 

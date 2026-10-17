@@ -1,6 +1,6 @@
 # SPEC-158 申能股份校园招聘单位树
 
-状态：待实现与真实验收；SPEC-156 A 组 COM0471。
+状态：已实现并通过实时覆盖验收，详见 docs/remaining-271-acceptance.md；SPEC-156 A 组 COM0471。
 
 ## 目标与非目标
 
