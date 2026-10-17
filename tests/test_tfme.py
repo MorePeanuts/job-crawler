@@ -67,7 +67,9 @@ def test_catalog_cannot_hide_missing_or_wrong_scope(change: str) -> None:
         catalog(html)
 
 
-@pytest.mark.parametrize("change", ["identity", "title", "employer", "attachment", "empty"])
+@pytest.mark.parametrize(
+    "change", ["identity", "title", "employer", "attachment", "empty", "loading"]
+)
 def test_detail_identity_and_unhandled_content_fail(change: str) -> None:
     row = catalog(listing())[1][0]
     html = job_page()
@@ -79,6 +81,10 @@ def test_detail_identity_and_unhandled_content_fail(change: str) -> None:
         html = html.replace("410286", "999999")
     elif change == "attachment":
         html = html.replace("开发新工艺。", '<a href="/unparsed.pdf">详细要求</a>')
+    elif change == "loading":
+        start = html.index('<div class="aContent">') + len('<div class="aContent">')
+        end = html.index("</div>", start)
+        html = html[:start] + '<section id="content6793"></section>' + html[end:]
     else:
         html = html.replace("职位详情", "未提供")
     with pytest.raises(CrawlError):
@@ -93,20 +99,25 @@ class Replay:
         self.page = self
         self.fail = fail
         self.reads: list[str] = []
+        self.current = ""
 
     async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
-        assert url == EMPLOYER + "/tab/1"
-
-    async def content(self) -> str:
-        return listing()
-
-    async def request_html(self, url: str, *, detail: bool = False) -> str:
-        assert detail
+        self.current = url
+        if url == EMPLOYER + "/tab/1":
+            return
+        assert url.startswith(ROOT + "/job/view/id/")
         self.reads.append(url)
         if self.fail and url.endswith("/1"):
             raise CrawlError("request_failed", "临时详情失败")
-        self.last_evidence = url
-        return job_page(url.rsplit("/", 1)[-1])
+
+    async def content(self) -> str:
+        if self.current == EMPLOYER + "/tab/1":
+            return listing()
+        return job_page(self.current.rsplit("/", 1)[-1])
+
+    def snapshot(self, label: str, html: str) -> str:
+        self.last_evidence = self.current
+        return self.last_evidence
 
 
 def source() -> Source:

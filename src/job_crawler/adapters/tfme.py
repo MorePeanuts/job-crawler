@@ -125,7 +125,10 @@ class TfmeCampus(Adapter):
                 if reused is not None:
                     self.result.jobs.extend(reused)
                     continue
-                values = detail(await session.request_html(row["url"], detail=True), row)
+                await session.open(row["url"])
+                html = await session.page.content()
+                session.snapshot(f"tfme-job-{row['id']}", html)
+                values = detail(html, row)
                 job = self.job(
                     row["id"],
                     title=row["title"],
