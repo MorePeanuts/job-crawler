@@ -90,6 +90,21 @@ class Detail(BaseModel):
     unit: str
 
 
+async def read_detail(session: BrowserSession, expected_id: str) -> Detail:
+    current = await session.page.evaluate(DETAIL_JS)
+    if current and current.get("row", {}).get("recruitId") != expected_id:
+        # This SPA only loads details on mount. A hash change between job IDs
+        # keeps the previous component alive; a normal reload remounts it.
+        session.consume_request()
+        await session.page.reload(wait_until="domcontentloaded", timeout=60000)
+    await session.page.wait_for_function(
+        "key => {const d=(" + DETAIL_JS + ")();return d?.row.recruitId===key;}",
+        arg=expected_id,
+        timeout=30000,
+    )
+    return Detail.model_validate(await session.page.evaluate(DETAIL_JS))
+
+
 def validate_catalog(data: Catalog, page: int, total: int | None) -> None:
     check(data.companyId == COMPANY and data.companyName == COMPANY_NAME, "深投控企业身份改变")
     check(data.page.pageIndex == page, "深投控页码错位")
@@ -205,8 +220,7 @@ class SihcCampus(Adapter):
                     continue
                 url = f"https://{self.host}/#/jobDetail?recruitId={listing.recruitId}"
                 await session.open(url)
-                await session.page.wait_for_function(DETAIL_JS, timeout=30000)
-                detail = Detail.model_validate(await session.page.evaluate(DETAIL_JS))
+                detail = await read_detail(session, listing.recruitId)
                 validate_detail(detail, listing)
                 detail_evidence = session.snapshot("job-detail", await session.page.content())
                 write_json(session.output / f"detail-{listing.recruitId}.json", detail.model_dump())

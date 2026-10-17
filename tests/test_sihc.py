@@ -11,11 +11,12 @@ from job_crawler.adapters.sihc import (
     Detail,
     Record,
     SihcCampus,
+    read_detail,
     validate_catalog,
     validate_detail,
 )
 from job_crawler.models import Source
-from job_crawler.transport import CrawlError, Session
+from job_crawler.transport import BrowserSession, CrawlError, Session
 
 
 def record(**changes: str) -> Record:
@@ -139,3 +140,30 @@ def test_missing_body_is_not_invented(now: datetime) -> None:
     adapter.collected_at = now
     job = adapter.make_job(record())
     assert job.duties == job.requirements == job.published == ""
+
+
+@pytest.mark.asyncio
+async def test_hash_only_navigation_refreshes_stale_component() -> None:
+    class Replay:
+        reloads = 0
+        requests = 0
+
+        async def evaluate(self, script: str) -> dict[str, object]:
+            row = record(recruitId="expected" if self.reloads else "stale")
+            return {"row": row.model_dump(), "title": row.jobTitle, "unit": row.displayName}
+
+        def consume_request(self) -> None:
+            self.requests += 1
+
+        async def reload(self, **options: object) -> None:
+            self.reloads += 1
+
+        async def wait_for_function(self, script: str, **options: object) -> None:
+            assert options["arg"] == "expected" and self.reloads == 1
+
+    replay = Replay()
+    session = cast(
+        BrowserSession, SimpleNamespace(page=replay, consume_request=replay.consume_request)
+    )
+    detail = await read_detail(session, "expected")
+    assert detail.row.recruitId == "expected" and replay.requests == 1
