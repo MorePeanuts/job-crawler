@@ -1082,3 +1082,7 @@ version = "1"
 [sources.COM0459]
 adapter = "hotjob-dbn-campus"
 version = "1"
+
+[sources.COM0290]
+adapter = "aisidi-retail-campus"
+version = "1"
