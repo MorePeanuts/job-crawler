@@ -54,6 +54,7 @@ from job_crawler.adapters.isoftstone import ISoftStoneCampus
 from job_crawler.adapters.itg_holding import ItgHoldingCampus
 from job_crawler.adapters.jd import JD
 from job_crawler.adapters.jianlong import JianlongCampus
+from job_crawler.adapters.jointown import JointownCampus
 from job_crawler.adapters.jxcc import JxccCampus
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.lixiang import LiAutoCampus
@@ -107,6 +108,7 @@ REGISTRY = {
         AnkerCampus,
         MysteelCampus,
         SbpCampus,
+        JointownCampus,
         AsusMainlandCampus,
         ZtoCampus,
         GreeCampus,
