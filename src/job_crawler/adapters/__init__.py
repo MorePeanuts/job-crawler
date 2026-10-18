@@ -37,6 +37,7 @@ from job_crawler.adapters.cpcg import CpcgCampus
 from job_crawler.adapters.ctg_dutyfree import CtgDutyFreeCampus
 from job_crawler.adapters.ctrip import CtripCampus
 from job_crawler.adapters.datang import Datang2027
+from job_crawler.adapters.dfzq import DfzqCampus
 from job_crawler.adapters.dingsheng import DingshengCampus
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.faw import FawCampus
@@ -234,6 +235,7 @@ REGISTRY = {
         HkexWorkday,
         AiaWorkday,
         BeigeneRecruitment,
+        DfzqCampus,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,
