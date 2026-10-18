@@ -189,8 +189,13 @@ async def test_real_tab_roles_and_question_disclosure(now):
             return Element(self, found, "conditions" if name == "職缺條件" else "faq")
 
         def get_by_text(self, value, *, exact):
-            assert exact
-            return Element(self, self.soup().find(string=lambda s: s and s.strip() == value))
+            elements = self.soup().find_all()
+            found = [
+                e
+                for e in elements
+                if (e.get_text(strip=True) == value if exact else value in e.get_text(strip=True))
+            ]
+            return Element(self, found)
 
         def locator(self, selector):
             return Element(self, self.soup().select(selector))

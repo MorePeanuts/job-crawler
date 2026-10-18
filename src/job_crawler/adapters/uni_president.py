@@ -165,7 +165,7 @@ class UniPresidentCareers(Adapter):
         await session.page.get_by_role("tab", name="應徵Q&A", exact=True).click()
         for question in (Q8, Q5):
             await session.page.get_by_text(question, exact=True).click()
-        await session.page.get_by_text("可以，請您於填寫履歷時說明。", exact=True).wait_for()
+        await session.page.get_by_text("可以，請您於填寫履歷時說明。", exact=False).wait_for()
         faq = await session.page.content()
         evidence.append(session.snapshot("ma-faq", faq))
         await session.open(MATCHING)
