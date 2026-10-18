@@ -283,3 +283,95 @@ def test_fwd_only_known_background_links_are_allowed(now):
     with pytest.raises(Exception, match="日文应届"):
         a.kind("2028新卒採用", "採用情報", "全职")
     assert a.kind("Internal Auditor", "新卒入社時研修", "全职") == "未明确校招"
+
+
+class HkexReplay:
+    last_evidence = "entry"
+
+    def __init__(self):
+        self.samples = [
+            json.loads((FIX / f"hkex-{name}.json").read_text())
+            for name in ["programme", "renamed", "locationless"]
+        ]
+        self.calls = []
+
+    async def open(self, url, *, ready_endpoints=()):
+        assert url == "https://hkex.wd3.myworkdayjobs.com/zh-CN/HKEXCareerPage"
+        assert ready_endpoints == ("/wday/cxs/hkex/HKEXCareerPage/jobs",)
+
+    async def observed(self, endpoint):
+        return {"url": endpoint, "post_data": json.dumps(BASE_QUERY)}
+
+    async def request(self, url, *, payload=None):
+        self.calls.append(url)
+        self.last_evidence = url
+        if url.endswith("/jobs"):
+            assert payload == BASE_QUERY
+            return {"total": 3, "jobPostings": [s["listing"] for s in self.samples]}
+        sample = next(
+            s
+            for s in self.samples
+            if url.endswith("/" + s["detail"]["jobPostingInfo"]["jobPostingId"])
+        )
+        return copy.deepcopy(sample["detail"])
+
+
+@pytest.mark.asyncio
+async def test_hkex_real_programme_updated_title_and_missing_location(now):
+    from job_crawler.adapters.workday import HkexWorkday
+
+    r = HkexReplay()
+    a = HkexWorkday(
+        Source(
+            source_id="COM0486",
+            company_id="COM0486",
+            company="香港交易及结算所有限公司",
+            url=f"https://{HkexWorkday.host}/zh-CN/HKEXCareerPage",
+        ),
+        cast(Session, r),
+        now,
+    )
+    result = await a.collect()
+    assert not result.coverage_issues() and result.scopes[0].expected == 3
+    assert len(result.jobs) == 3 and len(r.calls) == 5
+    programme, renamed, locationless = result.jobs
+    assert programme.source_key == "HKEX-2027-Graduate-Associate-Programme_R004464"
+    assert programme.deadline == "2026-10-25" and programme.work_type == "校招"
+    assert "two career aspiration pathways" in programme.duties
+    assert (
+        "Business Advancement" in programme.duties and "Technology Enablement" in programme.duties
+    )
+    assert "August 2025 to July 2027" in programme.requirements
+    assert "Job Summary:" in programme.duties and "Company Introduction:" not in programme.duties
+    assert "Scheduled Weekly Hours" not in programme.requirements
+    assert "Systems & Testing Engineer" in renamed.title
+    assert "Systems-Analyst" in renamed.source_key and renamed.work_type == "校招"
+    assert locationless.location == "" and locationless.work_type == "未明确校招"
+    assert "/job/Operation-Officer" in locationless.source_url
+
+
+def test_hkex_relaxation_is_tenant_scoped_and_new_media_fails(now):
+    from job_crawler.adapters.workday import HkexWorkday, listing
+
+    sample = json.loads((FIX / "hkex-locationless.json").read_text())
+    with pytest.raises(Exception, match="路径结构"):
+        listing(sample["listing"])
+    assert listing(sample["listing"], allow_locationless=True).endswith("R003528")
+    a = HkexWorkday(
+        Source(
+            source_id="COM0486",
+            company_id="COM0486",
+            company="港交所",
+            url=f"https://{HkexWorkday.host}/zh-CN/HKEXCareerPage",
+        ),
+        cast(Session, HkexReplay()),
+        now,
+    )
+    sample["detail"]["jobPostingInfo"]["country"] = {"changed": "HK"}
+    with pytest.raises(Exception, match="国家字段"):
+        a.parse_detail(sample["detail"], sample["listing"])
+    html = sample["detail"]["jobPostingInfo"]["jobDescription"]
+    with pytest.raises(Exception, match="外链"):
+        a.body(html + '<a href="https://example.test/qualification.pdf">Details</a>')
+    with pytest.raises(Exception, match="媒体"):
+        a.body(html + '<img src="requirements.png">')

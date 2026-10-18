@@ -20,10 +20,11 @@ def words(value: str) -> str:
     return " ".join(value.split())
 
 
-def listing(row: dict[str, Any]) -> str:
+def listing(row: dict[str, Any], *, allow_locationless: bool = False) -> str:
     path = row.get("externalPath", "")
+    pattern = r"/job/(?:[^/?#]+/)?[^/?#]+" if allow_locationless else r"/job/[^/?#]+/[^/?#]+"
     check(
-        isinstance(path, str) and re.fullmatch(r"/job/[^/?#]+/[^/?#]+", path) is not None,
+        isinstance(path, str) and re.fullmatch(pattern, path) is not None,
         "Workday岗位路径结构变化",
     )
     check(isinstance(row.get("title"), str) and bool(row["title"].strip()), "Workday标题缺失")
@@ -85,6 +86,11 @@ class WorkdayPublicJobs(Adapter):
     tenant = ""
     site = ""
     time_types = {"Full time", "Part time"}
+    allow_locationless = False
+    allow_missing_country = False
+
+    def listing_key(self, row: dict[str, Any]) -> str:
+        return listing(row, allow_locationless=self.allow_locationless)
 
     def body(self, html: str) -> tuple[str, str]:
         return description(html)
@@ -100,7 +106,7 @@ class WorkdayPublicJobs(Adapter):
         info = data.get("jobPostingInfo")
         check(isinstance(info, dict), "Workday详情业务对象缺失")
         assert isinstance(info, dict)
-        key = listing(row)
+        key = self.listing_key(row)
         check(
             bool(info.get("id"))
             and info.get("jobPostingId") == key
@@ -128,7 +134,7 @@ class WorkdayPublicJobs(Adapter):
         check(isinstance(raw, str), "Workday正文类型变化")
         assert isinstance(raw, str)
         duties, requirements = self.body(raw)
-        country = info.get("country", {})
+        country = info.get("country", {"descriptor": ""} if self.allow_missing_country else {})
         check(
             isinstance(country, dict) and isinstance(country.get("descriptor"), str),
             "Workday国家字段缺失",
@@ -192,9 +198,9 @@ class WorkdayPublicJobs(Adapter):
             assert isinstance(rows, list)
             evidence = self.session.last_evidence
             if offset == 0:
-                first = [listing(row) for row in rows]
-            for row in self.add_page(scope, rows, seen, listing):
-                key = listing(row)
+                first = [self.listing_key(row) for row in rows]
+            for row in self.add_page(scope, rows, seen, self.listing_key):
+                key = self.listing_key(row)
                 try:
                     reused = self.before_detail("job:" + key, row, scope, evidence=evidence)
                     if reused is not None:
@@ -218,7 +224,8 @@ class WorkdayPublicJobs(Adapter):
                 refreshed = await self.session.request(self.api + "/jobs", payload=BASE_QUERY)
                 check(
                     refreshed.get("total") == scope.expected
-                    and [listing(row) for row in refreshed.get("jobPostings", [])] == first,
+                    and [self.listing_key(row) for row in refreshed.get("jobPostings", [])]
+                    == first,
                     "Workday遍历期间首页或总数变化",
                 )
                 scope.evidence.append(self.session.last_evidence)
@@ -297,3 +304,57 @@ class FwdWorkday(WorkdayPublicJobs):
             return "已录用者登记"
         check("新卒" not in title, "富卫新增日文应届项目需核对")
         return recruitment_type(title, words(requirements), time_type)
+
+
+HKEX_FUNCTIONS = (
+    "https://www.hkexgroup.com/About-HKEX/Organisation/Management?sc_lang=en"
+    "#E5AAA8AE291446B2B49CCFFBA1F68D1A"
+)
+
+
+class HkexWorkday(WorkdayPublicJobs):
+    name = "hkex-workday"
+    allow_locationless = True
+    allow_missing_country = True
+    tenant = "hkex"
+    site = "HKEXCareerPage"
+    host = "hkex.wd3.myworkdayjobs.com"
+    path = "/zh-CN/HKEXCareerPage"
+    ready_endpoints = ("/wday/cxs/hkex/HKEXCareerPage/jobs",)
+    scope_description = (
+        "港交所Workday全部国家/公司公开目录；含明确应届混合岗位及Graduate Associate，排除实习"
+    )
+
+    def body(self, html: str) -> tuple[str, str]:
+        doc = BeautifulSoup(html, "html.parser")
+        check(not doc.select("img,iframe,object,embed,video"), "港交所正文含未展开媒体")
+        check(
+            all(
+                a.get("href") in {HKEX_FUNCTIONS, "mailto:earlycareers@hkex.com.hk"}
+                for a in doc.select("a[href]")
+            ),
+            "港交所新增正文外链需核对",
+        )
+        lines = doc.get_text("\n", strip=True).splitlines()
+        check(len("\n".join(lines)) > 100, "港交所正文为空")
+        starts = [
+            n for n, line in enumerate(lines) if words(line) in {"Job Summary:", "Job Duties:"}
+        ]
+        if starts:
+            lines = lines[min(starts) :]
+        tails = [
+            n
+            for n, line in enumerate(lines)
+            if line.startswith("HKEX is committed as an Equal Opportunity Employer.")
+            or words(line) == "Location:"
+        ]
+        if tails:
+            lines = lines[: min(tails)]
+        for n, line in enumerate(lines):
+            if re.fullmatch(
+                r"(?:Job |Key |Essential )?Requirements?|Qualifications(?: & Experience)?|Required Skills & Experience|Academic and Professional Qualifications Required|We are looking for candidates who",
+                words(line).rstrip(":"),
+                re.I,
+            ):
+                return "\n".join(lines[:n]).strip(), "\n".join(lines[n + 1 :]).strip()
+        return "", "\n".join(lines)

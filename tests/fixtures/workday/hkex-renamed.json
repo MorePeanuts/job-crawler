@@ -1,0 +1,38 @@
+{
+  "listing": {
+    "title": "(Senior) Systems & Testing Engineer - Post-Trade Systems (Derivatives Clearing & New Initiatives) - IT",
+    "externalPath": "/job/HK-TKO-5F/XMLNAME--Senior--Systems-Analyst---Post-Trade-Systems--Derivatives-Clearing----IT_R004268",
+    "locationsText": "2 个地点",
+    "postedOn": "发布于昨天",
+    "bulletFields": [
+      "R004268"
+    ]
+  },
+  "detail": {
+    "jobPostingInfo": {
+      "id": "78734cf32c6b10017a107c1479e60000",
+      "title": "(Senior) Systems & Testing Engineer - Post-Trade Systems (Derivatives Clearing & New Initiatives) - IT",
+      "jobDescription": "<p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><b>Company Introduction:</b></p><p style=\"text-align:left\"><i><span>We’re home to Asia&#39;s most dynamic and vibrant capital markets.<br />Connecting capital, ideas, inspiration and innovation for deeper, more diverse and liquid global capital markets; providing greater choice and opportunity for our customers, each and every day.</span></i><br /><br /><i><span>HKEX is a purpose-driven company. Our commitment to the long-term development of our business and our markets is articulated in our purpose: <span class=\"WMX2\">&#34;To Connect, Promote and Progress our</span> Markets and the Communities they support for the prosperity of all.&#34;</span></i></p><p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><b>Job Summary:</b></p>IT Post-Trade Systems department is looking for an experienced IT professional to develop and maintain its Derivatives Clearing systems.<p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><b>Job Duties:</b></p><p>The (Senior) Systems &amp; Testing Engineer is responsible for developing and supporting technology solutions, including business requirement analysis, functional specification preparation, system design and development, software quality assurance testing, testing tool development, production implementation, and ongoing production support.</p><br /><p><b>Key Responsibilities</b></p><ul><li>Design, develop, and maintain Java-based applications and services for Post-Trade systems.</li><li>Participate in system development activities throughout the Software Development Life Cycle (SDLC), including requirement analysis, technical design, coding, testing, and implementation.</li><li>Develop and maintain automated testing tools.</li><li>Perform unit testing, system integration testing, and support user acceptance testing activities.</li><li>Investigate and resolve application defects, performance issues, and production incidents.</li><li>Collaborate with business users to deliver technology solutions that meet business requirements.</li><li>Prepare and maintain technical documentation, deployment procedures, and support materials.</li><li>Support production releases, system monitoring, and on-call activities when required.</li><li>Contribute to system performance tuning, automation, and continuous improvement initiatives.</li></ul><br /><p> </p><p> </p><p><b>Job Requirements</b></p><ul><li><b>Education:</b> Bachelor’s degree in Computer Science, Information Technology, or a related discipline.</li><li><b>Experience:</b> Fresh graduates or candidates with 1-5 years of experience in IT application development (SDLC), preferably within the financial industry, including a proven track record of participating in medium to large scale projects. Candidates with less experience may be considered for the position of Assistant System Analyst.</li><li><b>Technical Skills:</b> Strong proficiency in Java, Spring Boot, RESTful APIs, JavaScript, Python, object-oriented design principles, and database technologies on Linux platforms. Familiarity with source control and CI/CD tools such as Git, GitLab, Jenkins, Selenium, Cucumber or equivalent technologies/tools.</li><li><b>Communication:</b> Strong command of written and spoken English and Chinese, with the ability to communicate effectively across teams and stakeholders.</li><li><b>Analytical Thinking:</b> Exceptional problem-solving and analytical capabilities, with the ability to interpret complex functional requirements, anticipate challenges, and develop flexible solutions.</li><li><b>Business As Usual Support:</b> Standard office hours with a requirement for occasional day / night shift work and potential for &#34;On-Call&#34; rotation.</li></ul><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><i>HKEX is committed as an Equal Opportunity Employer. Diversity is one of our core values and we look to support, respect diverse perspectives, abilities, culture and experiences within our workplace.</i></p><p></p><p><b>Location:</b></p>HKEX - TKO<p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><b>Shift:</b></p>N/A<p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><b>Scheduled Weekly Hours:</b></p>40<p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><b>Worker Type:</b></p>Permanent",
+      "location": "HK-TKO 5/F",
+      "startDate": "2026-10-16",
+      "timeType": "Full time",
+      "jobReqId": "R004268",
+      "jobPostingId": "XMLNAME--Senior--Systems-Analyst---Post-Trade-Systems--Derivatives-Clearing----IT_R004268",
+      "jobPostingSiteId": "HKEXCareerPage",
+      "country": {
+        "descriptor": "中国香港",
+        "id": "d4afdeb461d446e4babd204bd102dba8"
+      },
+      "canApply": true,
+      "posted": true,
+      "externalUrl": "https://hkex.wd3.myworkdayjobs.com/HKEXCareerPage/job/HK-TKO-5F/XMLNAME--Senior--Systems-Analyst---Post-Trade-Systems--Derivatives-Clearing----IT_R004268",
+      "additionalLocations": [
+        "CN-Shenzhen"
+      ]
+    },
+    "hiringOrganization": {
+      "name": "Hong Kong Exchanges and Clearing Limited",
+      "url": ""
+    }
+  }
+}
