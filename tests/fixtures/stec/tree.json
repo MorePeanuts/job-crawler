@@ -1,0 +1,238 @@
+{
+  "Code": 200,
+  "Data": {
+    "Type": {
+      "TypeCode": 2,
+      "Value": 0,
+      "Text": "公司分类",
+      "Items": [
+        {
+          "TypeCode": 2,
+          "Value": 17,
+          "Text": "城市建设类",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 15,
+              "Text": "上海隧道工程有限公司",
+              "Items": [
+                {
+                  "TypeCode": 2,
+                  "Value": 25,
+                  "Text": "大盾构工程分公司（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 26,
+                  "Text": "轨道交通工程分公司（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 27,
+                  "Text": "盾构工程分公司（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 29,
+                  "Text": "城盾隧安（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 30,
+                  "Text": "广东分公司（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 31,
+                  "Text": "共享中心（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 33,
+                  "Text": "地基有限（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 34,
+                  "Text": "河南分公司（内招专用）",
+                  "Items": []
+                },
+                {
+                  "TypeCode": 2,
+                  "Value": 28,
+                  "Text": "其他单位紧缺岗位（内招专用）",
+                  "Items": []
+                }
+              ]
+            },
+            {
+              "TypeCode": 2,
+              "Value": 12,
+              "Text": "上海城建市政工程（集团）有限公司",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 13,
+              "Text": "上海公路桥梁（集团）有限公司",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 10,
+              "Text": "上海城建国际工程有限公司",
+              "Items": [
+                {
+                  "TypeCode": 2,
+                  "Value": 35,
+                  "Text": "内部招聘（国际化人才）",
+                  "Items": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TypeCode": 2,
+          "Value": 23,
+          "Text": "城市设计类",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 9,
+              "Text": "上海市城市建设设计研究总院（集团）有限公司",
+              "Items": []
+            }
+          ]
+        },
+        {
+          "TypeCode": 2,
+          "Value": 22,
+          "Text": "金融投资类",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 14,
+              "Text": "上海城建投资发展有限公司",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 11,
+              "Text": "上海建元资产管理有限公司",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 5,
+              "Text": "上海建元财务管理有限公司",
+              "Items": []
+            }
+          ]
+        },
+        {
+          "TypeCode": 2,
+          "Value": 21,
+          "Text": "能源与环境类",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 8,
+              "Text": "上海能源建设集团有限公司",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 2,
+              "Text": "上海城市环境集团有限公司",
+              "Items": []
+            }
+          ]
+        },
+        {
+          "TypeCode": 2,
+          "Value": 20,
+          "Text": "智能数字化类",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 6,
+              "Text": "上海城建数字产业集团有限公司",
+              "Items": []
+            }
+          ]
+        },
+        {
+          "TypeCode": 2,
+          "Value": 19,
+          "Text": "城市运营类",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 7,
+              "Text": "上海城建城市运营（集团）有限公司",
+              "Items": []
+            }
+          ]
+        },
+        {
+          "TypeCode": 2,
+          "Value": 18,
+          "Text": "其它类",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 3,
+              "Text": "上海城建物资有限公司",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 4,
+              "Text": "上海市地下空间开发实业有限公司",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 1,
+              "Text": "上海城建（集团）有限公司中原区域总部",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 36,
+              "Text": "上海城建（集团）有限公司长三角区域总部",
+              "Items": []
+            },
+            {
+              "TypeCode": 2,
+              "Value": 32,
+              "Text": "上海城建粤港澳大湾区区域总部",
+              "Items": []
+            }
+          ]
+        },
+        {
+          "TypeCode": 2,
+          "Value": 16,
+          "Text": "集团总部",
+          "Items": [
+            {
+              "TypeCode": 2,
+              "Value": 24,
+              "Text": "集团总部",
+              "Items": []
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
