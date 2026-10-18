@@ -88,6 +88,7 @@ from job_crawler.adapters.nbport import NbportCampus
 from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.netease import NeteaseCampus
 from job_crawler.adapters.newhope import NewHopeCampus
+from job_crawler.adapters.newworld import NewWorldCareers
 from job_crawler.adapters.pccw import PccwGraduate
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
@@ -266,6 +267,7 @@ REGISTRY = {
         GreentownCampus,
         GuangzhouRuralBankCampus,
         NewHopeCampus,
+        NewWorldCareers,
         PddCampus,
         YingteCampus,
         YuexiuProperty2027,
