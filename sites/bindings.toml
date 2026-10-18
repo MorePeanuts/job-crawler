@@ -1142,3 +1142,7 @@ version = "1"
 [sources.COM0310]
 adapter = "mtr-graduate"
 version = "1"
+
+[sources.COM0324]
+adapter = "gdh-mobile-campus"
+version = "1"
