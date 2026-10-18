@@ -34,7 +34,8 @@ def data(
     check(parse_qs(observed.get("post_data") or "") == form, "海底捞接口表单范围不符")
     response = json.loads(observed["body"])
     check(
-        response.get("code") == 200 and isinstance(response.get("data"), list), "海底捞业务响应失败"
+        str(response.get("code")) == "200" and isinstance(response.get("data"), list),
+        "海底捞业务响应失败",
     )
     rows = response["data"]
     check(all(isinstance(row, dict) for row in rows), "海底捞目录数据结构变化")

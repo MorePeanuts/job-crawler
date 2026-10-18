@@ -125,6 +125,16 @@ def test_default_employee_response_and_business_failures_are_not_trainee_data() 
         data(observed, DETAIL, {"configId": ["6"]})
 
 
+@pytest.mark.parametrize("code", [200, "200"])
+def test_success_code_matches_observed_string_contract(code: int | str) -> None:
+    observed = {
+        "url": DETAIL,
+        "post_data": "configId=6",
+        "body": json.dumps({"code": code, "data": modules()}),
+    }
+    assert data(observed, DETAIL, {"configId": ["6"]}) == modules()
+
+
 class Waiting:
     async def __aenter__(self) -> "Waiting":
         return self
