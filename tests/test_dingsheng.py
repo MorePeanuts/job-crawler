@@ -34,9 +34,12 @@ class Replay:
         assert not ready_endpoints
         if url == ROOT + "/channels/31.html":
             self.current = "official-1"
-        else:
-            assert url == UNIVERSITY + EMPLOYER + "/tab/1"
+        elif url == UNIVERSITY + EMPLOYER + "/tab/1":
             self.current = "school"
+        else:
+            assert url.startswith(UNIVERSITY + "/job/view/id/")
+            self.current = url.rsplit("/", 1)[1]
+            self.reads.append(self.current)
         self.last_evidence = self.current
 
     def document(self, key: str) -> str:
@@ -70,6 +73,9 @@ class Replay:
                 return html.replace("全职", "实习")
         return html
 
+    def snapshot(self, name: str, html: str) -> None:
+        assert name == "dingsheng-job-" + self.current and html
+
     async def content(self) -> str:
         return self.document(self.current)
 
@@ -79,7 +85,7 @@ class Replay:
         elif url == UNIVERSITY + FAIR:
             key = "fair"
         else:
-            assert detail
+            assert detail and url.startswith(ROOT + "/contents/31/")
             key = url.rsplit("/", 1)[1].removesuffix(".html")
         self.reads.append(key)
         self.last_evidence = key
