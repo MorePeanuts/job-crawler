@@ -1,6 +1,6 @@
 # SPEC-203 华鲁恒升官方校园门户
 
-状态：计划配置和实采；SPEC-156固定B组COM0441。
+状态：已配置并完成实时零目录验收；SPEC-156固定B组COM0441。
 
 ## 目标、输入和范围
 
@@ -17,3 +17,5 @@
 ## 验收条件
 
 配置独立租户名称和入口，复用Hotjob已存在的分页、零目录及失败回放，不添加只验证常量的测试。完整UV/Ruff/ty/pytest通过后临时绑定实采；expected/listed/unique=0、terminal=true、coverage=complete、只读零岗位审计通过才正式启用。加入B组输入，不计有岗位企业。保留公告归属、实时目录、源报告和采集时刻，更新支持范围与两组阶段表。
+
+2026-10-18 08:19实采collect-hualuhengsheng，expected/listed/unique=0、terminal=true、coverage=complete。零岗位审计与922项测试、UV/Ruff/ty通过，启用hotjob-hualuhengsheng-campus@1，加入原B组快照。地点树缺失警告保留；本轮无非零详情样本。
