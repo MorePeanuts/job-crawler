@@ -44,6 +44,7 @@ from job_crawler.adapters.gig import GigCampus
 from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
 from job_crawler.adapters.gree import GreeCampus
 from job_crawler.adapters.greentown import GreentownCampus
+from job_crawler.adapters.guangwu import GuangwuCampus
 from job_crawler.adapters.guotai_haitong import GuotaiHaitongCampus
 from job_crawler.adapters.haidilao import HaidilaoStoreTrainee
 from job_crawler.adapters.haier import HaierCampus
@@ -209,6 +210,7 @@ REGISTRY = {
         TfmeCampus,
         AisidiCampus,
         HaidilaoStoreTrainee,
+        GuangwuCampus,
         HbiscoCampus,
         NciCampus,
         NeteaseCampus,
