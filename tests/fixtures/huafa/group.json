@@ -1,0 +1,18 @@
+{
+  "url": "https://wecruit.hotjob.cn/wecruit/positionInfo/listPosition/SU67b2e3bb1eb80555b7a457f7?iSaJAx=isAjax&request_locale=zh_CN&t=1792296450830",
+  "post_data": "isFrompb=true&recruitType=1&pageSize=15&currentPage=1",
+  "body": {
+    "data": {
+      "pageForm": {
+        "totalPage": 0,
+        "pageSize": 0,
+        "pageData": [],
+        "currentPage": 0,
+        "dataCount": 0
+      },
+      "positonNum": 0
+    },
+    "state": "200",
+    "type": "success"
+  }
+}
