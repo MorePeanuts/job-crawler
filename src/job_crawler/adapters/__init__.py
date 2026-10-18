@@ -34,6 +34,7 @@ from job_crawler.adapters.cpcg import CpcgCampus
 from job_crawler.adapters.ctg_dutyfree import CtgDutyFreeCampus
 from job_crawler.adapters.ctrip import CtripCampus
 from job_crawler.adapters.datang import Datang2027
+from job_crawler.adapters.dingsheng import DingshengCampus
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.faw import FawCampus
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
@@ -120,6 +121,7 @@ REGISTRY = {
     adapter.name: adapter
     for adapter in (
         AnkerCampus,
+        DingshengCampus,
         MingtaiCampus,
         MysteelCampus,
         SbpCampus,
