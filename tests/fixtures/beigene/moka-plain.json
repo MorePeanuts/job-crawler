@@ -1,0 +1,51 @@
+{
+  "listing": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839348,
+      "name": "Tech Ops and Manufacturing"
+    },
+    "id": "954d1da9-eb8d-4ad7-aa8b-434c60147f50",
+    "jobDescription": "Job Description\n- Responsible for testing stability samples, release samples, and validation samples for clinical products, including protein concentration, DAR, peptide mapping, CEX, moisture content, and other physicochemical assays.\n- Responsible for method qualification, method transfer, and method validation for protein concentration, DAR, peptide mapping, CEX, moisture content, and other physicochemical methods.\n- Responsible for qualification of laboratory equipment.\n- Responsible for coordinating and following up on the maintenance and calibration of relevant equipment in the AST Physicochemical Laboratory.\n- Responsible for sample management activities in the AST Physicochemical Laboratory.\n- Provide technical support for deviations and investigations from the Operations QC team, including OOX investigations and product impact assessments for events potentially related to product quality.\n- Comply with company EHS policies and procedures, fulfill EHS-related responsibilities, and promptly report EHS incidents, hazards, and risks.\n\nQualifications &amp; Competencies\n- Bachelor's degree or above in Pharmaceutical Sciences, Medicinal Chemistry, Pharmacy, Biology, Chemistry, or a related discipline.\n- Good command of English and computer skills; CET-4 (College English Test Band 4) or above.\n- Positive, responsible, and willing to learn and take initiative.\n- Good teamwork, organizational, analytical, and problem-solving skills.\n- Good communication and interpersonal skills.",
+    "locations": [
+      {
+        "cityId": 440100,
+        "cityName": "广州市",
+        "country": "中国",
+        "id": 445482,
+        "provinceId": 440000,
+        "provinceName": "广东"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-09-14T13:39:58",
+    "status": "open",
+    "title": "理化分析师 Physiochemical Analyst"
+  },
+  "detail": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839348,
+      "name": "Tech Ops and Manufacturing"
+    },
+    "id": "954d1da9-eb8d-4ad7-aa8b-434c60147f50",
+    "jobDescription": "Job Description\n- Responsible for testing stability samples, release samples, and validation samples for clinical products, including protein concentration, DAR, peptide mapping, CEX, moisture content, and other physicochemical assays.\n- Responsible for method qualification, method transfer, and method validation for protein concentration, DAR, peptide mapping, CEX, moisture content, and other physicochemical methods.\n- Responsible for qualification of laboratory equipment.\n- Responsible for coordinating and following up on the maintenance and calibration of relevant equipment in the AST Physicochemical Laboratory.\n- Responsible for sample management activities in the AST Physicochemical Laboratory.\n- Provide technical support for deviations and investigations from the Operations QC team, including OOX investigations and product impact assessments for events potentially related to product quality.\n- Comply with company EHS policies and procedures, fulfill EHS-related responsibilities, and promptly report EHS incidents, hazards, and risks.\n\nQualifications &amp; Competencies\n- Bachelor's degree or above in Pharmaceutical Sciences, Medicinal Chemistry, Pharmacy, Biology, Chemistry, or a related discipline.\n- Good command of English and computer skills; CET-4 (College English Test Band 4) or above.\n- Positive, responsible, and willing to learn and take initiative.\n- Good teamwork, organizational, analytical, and problem-solving skills.\n- Good communication and interpersonal skills.",
+    "locations": [
+      {
+        "cityId": 440100,
+        "cityName": "广州市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 445482,
+        "provinceName": "广东"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-09-14T13:39:58",
+    "status": "open",
+    "title": "理化分析师 Physiochemical Analyst",
+    "zhineng": {
+      "name": "其他"
+    }
+  }
+}

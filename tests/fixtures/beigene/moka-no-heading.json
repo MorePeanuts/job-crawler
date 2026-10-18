@@ -1,0 +1,67 @@
+{
+  "listing": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "5fc34f50-f424-4109-83b8-5ff9734ecda6",
+    "jobDescription": "General Description: \n \nThe DMPK Department of BeOne Medicines is seeking a highly motivated individual to be the DMPK function representative to lead DMPK and PK/PD modeling efforts. The successful\ncandidate must have in depth knowledge of DMPK and PK/PD modeling and simulation to provide DMPK expert opinion from hit identification,\nlead optimization, candidate profiling, to IND and beyond.\n \nEssential Functions of the job:\n·       Closely collaborate with project teams to define DMPK screening strategy and TPP\n·       Solve ADME/PK challenges, facilitating the discovery and development of high quality clinical candidates\n·       Provide human PK and dose prediction, DDI risk assessments and input for Phase I clinical design\n·       Conduct comprehensive PK/PD analysis using PK/PD modeling to facilitate PK/PD understanding and clinical translation\n·       Use PBPK modeling to predict human PK and evaluate DDI risk\n·       Provide DMPK and PK/PD expertise and input into related documents such as Investigator Brochures, SOPs, study reports, manuscripts, summaries for regulatory authorities, INDs, NDAs and sNDAs.\n·       Other duties as assigned.",
+    "locations": [
+      {
+        "cityId": 310000,
+        "cityName": "上海市",
+        "country": "中国",
+        "id": 451425,
+        "provinceId": 310000,
+        "provinceName": "上海市"
+      },
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "id": 447457,
+        "provinceId": 110000,
+        "provinceName": "北京市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-09-14T13:39:58",
+    "status": "open",
+    "title": "研究员，药代动力学代表Research Investigator, DMPK representative(博士)"
+  },
+  "detail": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "5fc34f50-f424-4109-83b8-5ff9734ecda6",
+    "jobDescription": "General Description: \n \nThe DMPK Department of BeOne Medicines is seeking a highly motivated individual to be the DMPK function representative to lead DMPK and PK/PD modeling efforts. The successful\ncandidate must have in depth knowledge of DMPK and PK/PD modeling and simulation to provide DMPK expert opinion from hit identification,\nlead optimization, candidate profiling, to IND and beyond.\n \nEssential Functions of the job:\n·       Closely collaborate with project teams to define DMPK screening strategy and TPP\n·       Solve ADME/PK challenges, facilitating the discovery and development of high quality clinical candidates\n·       Provide human PK and dose prediction, DDI risk assessments and input for Phase I clinical design\n·       Conduct comprehensive PK/PD analysis using PK/PD modeling to facilitate PK/PD understanding and clinical translation\n·       Use PBPK modeling to predict human PK and evaluate DDI risk\n·       Provide DMPK and PK/PD expertise and input into related documents such as Investigator Brochures, SOPs, study reports, manuscripts, summaries for regulatory authorities, INDs, NDAs and sNDAs.\n·       Other duties as assigned.",
+    "locations": [
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 447457,
+        "provinceName": "北京市"
+      },
+      {
+        "cityId": 310000,
+        "cityName": "上海市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 451425,
+        "provinceName": "上海市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-09-14T13:39:58",
+    "status": "open",
+    "title": "研究员，药代动力学代表Research Investigator, DMPK representative(博士)",
+    "zhineng": {
+      "name": "其他"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "listing": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "26c7925b-ffe2-4c78-9756-1243b28bf2f4",
+    "jobDescription": "General Description: \n\nThe DMPK Department of BeOne Medicines is seeking a highly motivated individual to join the PK/PD modeling &amp; simulation (M&amp;S) group. The successful candidate will have strong background and expertise in PK/PD and ADME concept, and have hands-on experience on PK/PD M&amp;S. The individual in this position will support pre-clinical project teams as a M&amp;S expert, and provide PK/PD data analysis and M&amp;S support to enable critical decision making. \n\nEducation Required:  \nA Ph.D. degree in pharmacokinetics, pharmacology, or pharmaceutical Sciences with hands-on experience on PK/PD modeling is required\n\nEssential Functions of the job: \n•\tConduct QSP, mechanistic or semi-mechanistic PKPD modeling to understand the mechanism of action, facilitate molecular design and hypothesis testing, as well as build the correlation between PK and PD/efficacy \n•\tPredict maximum absorbable dose (MAD), human PK, and DDI with PBPK modeling\n•\tExplore drug ADME mechanistically with PBPK modeling\n•\tApply PKPD modeling and PBPK modeling into human efficacious dose prediction\n•\tCollaborate with clinical pharmacology to provide a rationale for dose escalation and dose range in phase 1 studies\n•\tEvaluate novel in silico tools and methodology to improve human PK and dose prediction\n•\tProvide DMPK and PK/PD expertise and input into related documents such as Investigator Brochures, SOPs, study reports, manuscripts, summaries for regulatory authorities, INDs, NDAs and sNDAs\n•\tOther duties as assigned",
+    "locations": [
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "id": 447457,
+        "provinceId": 110000,
+        "provinceName": "北京市"
+      },
+      {
+        "cityId": 310000,
+        "cityName": "上海市",
+        "country": "中国",
+        "id": 451425,
+        "provinceId": 310000,
+        "provinceName": "上海市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-09-14T13:39:58",
+    "status": "open",
+    "title": "研究员，药代/药效建模/Research Investigator，PK/PD modeler(博士)"
+  },
+  "detail": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "26c7925b-ffe2-4c78-9756-1243b28bf2f4",
+    "jobDescription": "General Description: \n\nThe DMPK Department of BeOne Medicines is seeking a highly motivated individual to join the PK/PD modeling &amp; simulation (M&amp;S) group. The successful candidate will have strong background and expertise in PK/PD and ADME concept, and have hands-on experience on PK/PD M&amp;S. The individual in this position will support pre-clinical project teams as a M&amp;S expert, and provide PK/PD data analysis and M&amp;S support to enable critical decision making. \n\nEducation Required:  \nA Ph.D. degree in pharmacokinetics, pharmacology, or pharmaceutical Sciences with hands-on experience on PK/PD modeling is required\n\nEssential Functions of the job: \n•\tConduct QSP, mechanistic or semi-mechanistic PKPD modeling to understand the mechanism of action, facilitate molecular design and hypothesis testing, as well as build the correlation between PK and PD/efficacy \n•\tPredict maximum absorbable dose (MAD), human PK, and DDI with PBPK modeling\n•\tExplore drug ADME mechanistically with PBPK modeling\n•\tApply PKPD modeling and PBPK modeling into human efficacious dose prediction\n•\tCollaborate with clinical pharmacology to provide a rationale for dose escalation and dose range in phase 1 studies\n•\tEvaluate novel in silico tools and methodology to improve human PK and dose prediction\n•\tProvide DMPK and PK/PD expertise and input into related documents such as Investigator Brochures, SOPs, study reports, manuscripts, summaries for regulatory authorities, INDs, NDAs and sNDAs\n•\tOther duties as assigned",
+    "locations": [
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 447457,
+        "provinceName": "北京市"
+      },
+      {
+        "cityId": 310000,
+        "cityName": "上海市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 451425,
+        "provinceName": "上海市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-09-14T13:39:58",
+    "status": "open",
+    "title": "研究员，药代/药效建模/Research Investigator，PK/PD modeler(博士)",
+    "zhineng": {
+      "name": "其他"
+    }
+  }
+}

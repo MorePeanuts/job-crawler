@@ -412,3 +412,36 @@ def test_moseeker_explicit_lower_degree_exception_is_not_hidden_by_phd_field(now
     )
     assert fields["education"] == "博士；或本科教育学历，专业能力表现卓越"
     assert "或本科教育学历，专业能力表现卓越" in fields["requirements"]
+
+
+@pytest.mark.parametrize("name", ["moka-1", "moka-early-education", "moka-plain"])
+def test_moka_english_qualifications_preserve_real_blocks_and_education(now, name):
+    a = BeigeneMoka(adapter(now).source, cast(Session, Replay()), now)
+    d = sample(name)
+    job = a._job(d["detail"], d["listing"], "real-detail", is_detail=True)
+    assert job.duties and job.requirements and not a.result.warnings
+    assert job.field_sources["requirements"].endswith("明确英文/双语小标题")
+    if name == "moka-early-education":
+        assert "A Ph.D. degree" in job.requirements
+        assert "Conduct QSP" in job.duties and "Conduct QSP" not in job.requirements
+    if name == "moka-plain":
+        assert "Bachelor's degree" in job.requirements
+        assert "Responsible for testing stability samples" in job.duties
+
+
+def test_moka_no_explicit_qualification_heading_keeps_source_and_warning(now):
+    a = BeigeneMoka(adapter(now).source, cast(Session, Replay()), now)
+    d = sample("moka-no-heading")
+    job = a._job(d["detail"], d["listing"], "detail", is_detail=True)
+    assert job.duties and not job.requirements
+    assert a.result.warnings[0].code == "field_missing"
+
+
+def test_moka_sentence_mentioning_requirements_does_not_become_heading(now):
+    a = BeigeneMoka(adapter(now).source, cast(Session, Replay()), now)
+    d = sample("moka-plain")
+    d["detail"]["jobDescription"] = (
+        "<p>Collect requirements from product teams and maintain scientific records.</p><p>Provide support to colleagues in research programmes.</p>"
+    )
+    job = a._job(d["detail"], d["listing"], "detail", is_detail=True)
+    assert not job.requirements and "Collect requirements" in job.duties

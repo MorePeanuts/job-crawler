@@ -10,6 +10,7 @@ from job_crawler.adapters.base import Adapter, text
 from job_crawler.adapters.moka import Moka
 from job_crawler.adapters.platforms import check
 from job_crawler.adapters.workday import WorkdayPublicJobs, recruitment_type, words
+from job_crawler.description import clean_field_headings
 from job_crawler.models import Collection, Job, Scope
 from job_crawler.transport import BrowserSession, CrawlError
 
@@ -62,6 +63,61 @@ class BeigeneMoka(Namespaced, Moka):
     org = "beigene"
     site_id = 98935
     path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        *,
+        is_detail: bool = False,
+    ) -> Job:
+        job = super()._job(row, listing, evidence, is_detail=is_detail)
+        if job.requirements:
+            return job
+        raw = row.get("jobDescription") or listing.get("jobDescription") or ""
+        check(isinstance(raw, str), "百济校园正文类型变化")
+        doc = BeautifulSoup(raw, "html.parser")
+        # Plain text descriptions also contain meaningful newline-delimited headings.
+        for node in doc.select("p,li,div,h1,h2,h3,h4,h5,h6,br"):
+            node.insert_before("\n")
+            node.insert_after("\n")
+        lines = [words(line) for line in doc.get_text().splitlines() if words(line)]
+        duties: list[str] = []
+        requirements: list[str] = []
+        current = duties
+        for line in lines:
+            heading = line.rstrip(":：")
+            if re.fullmatch(
+                r"(?:Basic |Required |Preferred |Other )?Qualifications?(?: & Competencies| for candidates)?|(?:Job )?Requirements?|Education(?: Required)?|What We're Looking For|三、任职要求（Qualification）",
+                heading,
+                re.I,
+            ):
+                current = requirements
+            elif re.fullmatch(
+                r"General Description|Essential Functions of the Job|Job Descriptions?|(?:Job |Key )?Responsibilities|Main Responsibility|What You'll Do|二、岗位职责（Job Description）",
+                heading,
+                re.I,
+            ):
+                current = duties
+            current.append(line)
+        if requirements:
+            job.duties = clean_field_headings("\n".join(duties))
+            job.requirements = clean_field_headings("\n".join(requirements))
+            job.field_sources["requirements"] = (
+                "website/job.data.jobDescription:明确英文/双语小标题"
+            )
+            if is_detail:
+                self.result.warnings = [
+                    issue
+                    for issue in self.result.warnings
+                    if not (
+                        issue.job_key == str(row["id"])
+                        and issue.code == "field_missing"
+                        and issue.message == "源站详情无可辨认的任职要求段落"
+                    )
+                ]
+        return job
 
     def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
         check(text(detail.get("title")) == text(listing.get("title")), "百济校园详情标题错配")
@@ -296,6 +352,7 @@ class BeigeneMoseeker(Namespaced):
 
 class BeigeneRecruitment(Adapter):
     name = "beigene-campus-global"
+    version = "2"
     host = BeigeneMoka.host
     path = BeigeneMoka.path
     scope_description = "百济神州中国Moka应届目录、全球Workday与仟寻历史活动全目录；排除实习、社招及无明确应届资格项目"
