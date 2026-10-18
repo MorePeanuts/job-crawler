@@ -1190,3 +1190,19 @@ version = "1"
 [sources.COM0164]
 adapter = "uni-president-careers"
 version = "1"
+
+[sources.COM0500]
+adapter = "dfzq-campus"
+version = "1"
+
+[sources.COM0485]
+adapter = "bankgy-campus"
+version = "1"
+
+[sources.COM0384]
+adapter = "beigene-campus-global"
+version = "2"
+
+[sources.COM0438]
+adapter = "nbport-campus"
+version = "1"
