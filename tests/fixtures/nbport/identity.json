@@ -1,0 +1,13 @@
+{
+  "url": "https://nbport.m.zhiye.com/LightBoltAPI/MainView/GetCompanyInfo",
+  "body": {
+    "Code": 200,
+    "Message": "",
+    "RedirectUrl": null,
+    "Data": {
+      "Title": "宁波舟山港股份有限公司",
+      "TenantId": 111157,
+      "PortalId": 11115700
+    }
+  }
+}

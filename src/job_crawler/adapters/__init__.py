@@ -84,6 +84,7 @@ from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
 from job_crawler.adapters.mtr import MtrGraduate
 from job_crawler.adapters.mysteel import MysteelCampus
 from job_crawler.adapters.nbcb import NingboBank2027
+from job_crawler.adapters.nbport import NbportCampus
 from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.netease import NeteaseCampus
 from job_crawler.adapters.newhope import NewHopeCampus
@@ -238,6 +239,7 @@ REGISTRY = {
         BeigeneRecruitment,
         DfzqCampus,
         BankgyCampus,
+        NbportCampus,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,

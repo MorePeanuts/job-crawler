@@ -1,0 +1,35 @@
+{
+  "url": "https://nbport.m.zhiye.com/LightBoltAPI/JobAd/List?jc=2&jobads=&code=&c1=&c2=&ky=&c=&ct=&o=&rewardjob=0&shareid=&shopid=&From=%2Fjobs%3Fjc%3D2",
+  "body": {
+    "Code": 200,
+    "Message": "",
+    "RedirectUrl": null,
+    "Data": {
+      "colortheme": "4e6d8d",
+      "data": {
+        "DataResult": [],
+        "PageCount": 0,
+        "PageSize": 0,
+        "RowCount": 0,
+        "CurPageSize": 1
+      },
+      "IsWechatShowDepartment": true,
+      "IsWechatShowSalary": true,
+      "IsOpenRecommendCenter": true,
+      "pi": "1",
+      "ps": "10",
+      "jc": "2",
+      "c1": "",
+      "c2": "",
+      "ky": "",
+      "c": "",
+      "ct": "",
+      "o": "",
+      "jid": "",
+      "code": "",
+      "rewardjob": "0",
+      "shopid": "",
+      "JobAdId": null
+    }
+  }
+}

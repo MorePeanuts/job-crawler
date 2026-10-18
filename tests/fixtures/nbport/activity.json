@@ -1,0 +1,9 @@
+{
+  "url": "https://nbport.m.zhiye.com/LightBoltAPI/RecruitEvent/List?pageIndex=1&pageSize=10",
+  "body": {
+    "Code": 200,
+    "Message": "",
+    "RedirectUrl": null,
+    "Data": []
+  }
+}
