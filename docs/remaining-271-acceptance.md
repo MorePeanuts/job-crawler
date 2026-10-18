@@ -15,7 +15,7 @@
 
 合计5844确定有效、5907信息、473严格、5434待补全；63条截止待核验不计确定有效。A/B分别按16/31家有确定有效岗位企业通过审计。1264项测试及UV/Ruff/ty通过。A归档61a2d2771fe56e660e8d6a94.zip，B归档3c10f7f35852081018941868.zip；B的SHA256为7e4cc4906443b5251c4afebcb482bf9401d49d228bcdcb21987b120ae9b44c87，两份归档及四份发布工作簿字节校验通过。
 
-A剩39家、B剩167家，共206家未完成。B已确认117入口、42家验收、75家待适配；另92家继续查证，不视为没有入口。总名录408个链接、294家正式绑定、114个有链接来源待适配。任务仍在进行。
+A剩39家、B剩167家，共206家未完成。B已确认118入口、42家验收、76家待适配；另91家继续查证，不视为没有入口。总名录409个链接、294家正式绑定、115个有链接来源待适配。任务仍在进行。
 
 ## 历史阶段表（59家）
 
@@ -676,3 +676,11 @@ B组COM0297，SPEC-221、cka-careers@1。官网Careers全部部门两页8+4，�
 雅居乐COM0475官网3383.HK直接链接agilezp.zhiye.com及jtcampus，当前两者正常浏览器均404，保留失效入口证据、不写可用入口或计零。融创campus.sunac.com.cn正常浏览器502；正式校招范围未解决。证据agile-official、agile-campus、agile-portal-root、sunac-campus-domain。
 
 新濠国际COM0396官网列出Melco Resorts子公司，旧career.html实读Page not found；菲律宾career.html实读首页，Workday melcoresorts.wd3.myworkdayjobs.com/en-US/career渲染空白。公开企业招聘账号及Workday岗位提供候选链接，仍需验证可用完整目录；不把搜索缓存正文或空白页面计为验收。证据melco-group-current、melco-resorts-careers、melco-philippines-career、melco-workday-current。
+
+## Workday正常加载后的新证据与新濠缺口
+
+此前友邦、新濠、富卫的空白页面是过早结束的SPA结构检测；普通等待15–20秒即出现公开业务目录。声明实际业务ready_endpoints可在原框架内恢复，不涉及登录或绕过挑战。友邦公开目录1015条、富卫210条、新濠166条；目录可见不等于全部验收。
+
+COM0396新濠国际已补充正式招聘入口 https://melcoresorts.wd3.myworkdayjobs.com/en-US/career，仍属于原B组。13:07:20–13:10:29临时绑定实采166列表，155成功详情、11空白或仅标题；1明确应届候选有经验表述冲突，保留完整原文，0严格/1待补全。coverage partial，不计已完成、不加入阶段汇总；等待相应岗位官方正文。SPEC-222，快照collect-melco。新入口使B已确认入口增加到118、名录总链接409，尚待查证入口91；该变化不会增加验收数。
+
+华润公开校园目录1791条，首个职位实际跳转Hotjob后才出现完整资格，不能只使用聚合列表空的rmJobRqmt列交付。中信实际“校园招聘→应届生”目录203条，聚合HCM参数仍待解析。两者暂未增加完成数。
