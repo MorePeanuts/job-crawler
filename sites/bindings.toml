@@ -1186,3 +1186,7 @@ version = "1"
 [sources.COM0094]
 adapter = "aia-workday"
 version = "1"
+
+[sources.COM0164]
+adapter = "uni-president-careers"
+version = "1"
