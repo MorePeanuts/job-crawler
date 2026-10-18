@@ -16,7 +16,7 @@ JobAdId为唯一身份，TenantId固定603372，CategoryId必须2，KindId=1全�
 
 页面公开详情details.html?adId=<JobAdId>&jc=2，由目录a.item给出，实际调用/JobAd/_Info?adid=<JobAdId>&in=1。核对TenantId、JobAdId、JobAdName、Kind、Department、Categories招聘区域及PostDateStr。源详情Category=0、IsEmpty=true等默认字段不能误当社招、空记录或下架；校园类型来自已验证列表与页面标签，身份和正文必须完整关联。
 
-DutyStr与RequireStr分别职责和资格，附件/图片未解析需明确失败；DegreeStr、LocName、DetailAddress和SalaryName保持原值。日期用PostDateStr，核对列表ToPostDate，不采用CreateDate/ModifiedDate/ChangeDate。EndTimeStr为“-”且列表ToEndDate为2222-02-02时代表未知截止，导出留空；明确截止则需日期一致。不猜填详细地址，列表县区不提升为城市。没有投递链接时保留公开详情页，不请求投递接口。
+DutyStr与RequireStr分别职责和资格，附件/图片未解析需明确失败；DegreeStr、LocName、DetailAddress保持原值，SalaryName仅保留于原始证据（现有岗位模型没有薪资列）。日期用PostDateStr，核对列表ToPostDate，不采用CreateDate/ModifiedDate/ChangeDate。EndTimeStr为“-”且列表ToEndDate为2222-02-02时代表未知截止，导出留空；明确截止则需日期一致。不猜填详细地址，列表县区不提升为城市。没有投递链接时保留公开详情页，不请求投递接口。
 
 ## 失败、增量及验收
 

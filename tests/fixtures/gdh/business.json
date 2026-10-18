@@ -1,0 +1,61 @@
+{
+  "listing": {
+    "JobAdId": 561304544,
+    "JobAdName": "机电维修工",
+    "TenantId": 603372,
+    "CategoryId": 2,
+    "KindId": 1,
+    "KindName": "全职",
+    "Department": "湛江市粤海水务投资集团有限公司",
+    "OrgName": "湛江市粤海水务投资集团有限公司",
+    "Categories": [
+      {
+        "TypeId": 1,
+        "TypeName": "职位类型",
+        "CategoryId": 6,
+        "CategoryName": "其他"
+      },
+      {
+        "TypeId": 3,
+        "TypeName": "招聘区域",
+        "CategoryId": 8,
+        "CategoryName": "广东粤海水务股份有限公司"
+      }
+    ],
+    "Class1Name": "职位类型:其他",
+    "Class2Name": "招聘区域:广东粤海水务股份有限公司",
+    "ToPostDate": "2026-09-14",
+    "ToEndDate": "2222-02-02"
+  },
+  "detail": {
+    "TenantId": 603372,
+    "JobAdId": 561304544,
+    "JobAdName": "机电维修工",
+    "Department": "湛江市粤海水务投资集团有限公司",
+    "Kind": 1,
+    "KindName": "全职",
+    "Categories": [
+      {
+        "TypeId": 1,
+        "TypeName": "职位类型",
+        "ConstValue": 6,
+        "ConstText": "其他"
+      },
+      {
+        "TypeId": 3,
+        "TypeName": "招聘区域",
+        "ConstValue": 8,
+        "ConstText": "广东粤海水务股份有限公司"
+      }
+    ],
+    "PostDateStr": "2026-09-14",
+    "EndTimeStr": "-",
+    "DegreeStr": "本科及以上",
+    "LocName": "湛江市",
+    "DetailAddress": "",
+    "DutyStr": "维护机电设备。",
+    "RequireStr": "本科及以上，机械、电气专业。",
+    "Category": 0,
+    "IsEmpty": true
+  }
+}
