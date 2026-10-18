@@ -1206,3 +1206,7 @@ version = "2"
 [sources.COM0438]
 adapter = "nbport-campus"
 version = "1"
+
+[sources.COM0138]
+adapter = "yuntou-notices"
+version = "1"
