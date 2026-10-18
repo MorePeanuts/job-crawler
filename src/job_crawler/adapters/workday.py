@@ -84,6 +84,13 @@ def recruitment_type(title: str, requirements: str, time_type: str) -> str:
 class WorkdayPublicJobs(Adapter):
     tenant = ""
     site = ""
+    time_types = {"Full time", "Part time"}
+
+    def body(self, html: str) -> tuple[str, str]:
+        return description(html)
+
+    def kind(self, title: str, requirements: str, time_type: str) -> str:
+        return recruitment_type(title, words(requirements), time_type)
 
     @property
     def api(self) -> str:
@@ -116,11 +123,11 @@ class WorkdayPublicJobs(Adapter):
             type(info.get("canApply")) is bool and type(info.get("posted")) is bool,
             "Workday开放状态缺失",
         )
-        check(info.get("timeType") in {"Full time", "Part time"}, "Workday时间类型变化")
+        check(info.get("timeType") in self.time_types, "Workday时间类型变化")
         raw = info.get("jobDescription")
         check(isinstance(raw, str), "Workday正文类型变化")
         assert isinstance(raw, str)
-        duties, requirements = description(raw)
+        duties, requirements = self.body(raw)
         country = info.get("country", {})
         check(
             isinstance(country, dict) and isinstance(country.get("descriptor"), str),
@@ -147,7 +154,7 @@ class WorkdayPublicJobs(Adapter):
             "published": absolute_date(info.get("startDate")),
             "deadline": absolute_date(info.get("endDate")),
             "closed": not info["canApply"] or not info["posted"],
-            "work_type": recruitment_type(info["title"], requirements, info["timeType"]),
+            "work_type": self.kind(info["title"], requirements, info["timeType"]),
             "field_sources": {
                 "published": "jobPostingInfo.startDate；不使用相对postedOn",
                 "deadline": "jobPostingInfo.endDate；日粒度原值",
@@ -228,3 +235,65 @@ class MelcoWorkday(WorkdayPublicJobs):
     path = "/en-US/career"
     ready_endpoints = ("/wday/cxs/melcoresorts/career/jobs",)
     scope_description = "新濠博亚Workday全部国家地区公开目录；仅明确正式应届，缺正文报错"
+
+
+FWD_BACKGROUND_LINKS = {
+    "http://www.fwd.com",
+    "http://www.fwd.com/",
+    "https://www.fwd.com.hk/",
+    "http://www.insurance.gov.ph",
+    "https://talocity.ai/gdpr/",
+    "https://www.fwd.com.my/",
+    "http://www.fwd.com.vn",
+    "https://www.fwd.com.kh/en/",
+}
+
+
+class FwdWorkday(WorkdayPublicJobs):
+    name = "fwd-workday"
+    tenant = "fwd"
+    site = "FWDcareersite"
+    host = "fwd.wd3.myworkdayjobs.com"
+    path = "/zh-CN/FWDcareersite/"
+    ready_endpoints = ("/wday/cxs/fwd/FWDcareersite/jobs",)
+    time_types = {"全职"}
+    scope_description = "富卫Workday全部国家、公司、部门；仅明确正式应届，排除实习和已录用者登记"
+
+    def body(self, html: str) -> tuple[str, str]:
+        doc = BeautifulSoup(html, "html.parser")
+        check(not doc.select("img,iframe,object,embed,video"), "富卫正文含未展开媒体")
+        check(
+            all(a.get("href") in FWD_BACKGROUND_LINKS for a in doc.select("a[href]")),
+            "富卫新增正文链接需核对",
+        )
+        lines = doc.get_text("\n", strip=True).splitlines()
+        check(bool(lines) and lines[0] == "About FWD Group", "富卫正文主体变化")
+        if "Privacy Notice" in lines:
+            lines = lines[: lines.index("Privacy Notice")]
+        starts = [
+            n
+            for n, line in enumerate(lines)
+            if re.fullmatch(
+                r"Job Summary|Job Purpose|PURPOSE|The Job|Key Responsibilities|KEY ACCOUNTABILITIES|KEY ACCOUNTAIBILITIES",
+                words(line).rstrip(":"),
+                re.I,
+            )
+        ]
+        if starts:
+            lines = lines[min(starts) :]
+        check(len("\n".join(lines)) > 100, "富卫正文缺失")
+        for n, line in enumerate(lines):
+            if re.fullmatch(
+                r"The Person|QUALIFICATIONS(?: / EXPERIENCE)?|Skills & Experience Required|Job Requirements|Requirements?|Key Qualifications",
+                words(line).rstrip(":"),
+                re.I,
+            ):
+                return "\n".join(lines[:n]).strip(), "\n".join(lines[n + 1 :]).strip()
+        return "", "\n".join(lines)
+
+    def kind(self, title: str, requirements: str, time_type: str) -> str:
+        if re.fullmatch(r"【\d{4}年度新卒】内定者 登録用", title):
+            check("への内定、誠におめでとうございます" in requirements, "富卫内定者登记正文变化")
+            return "已录用者登记"
+        check("新卒" not in title, "富卫新增日文应届项目需核对")
+        return recruitment_type(title, words(requirements), time_type)

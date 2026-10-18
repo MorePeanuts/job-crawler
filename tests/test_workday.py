@@ -216,3 +216,70 @@ async def test_incremental_reuses_only_after_refreshing_full_listing(now):
     result = await a.collect()
     assert not result.coverage_issues()
     assert result.scopes[0].reused_details == 42 and len(r.calls) == 4
+
+
+@pytest.mark.parametrize(
+    "name,kind",
+    [
+        ("consultant", "校招"),
+        ("contract", "校招"),
+        ("registration", "已录用者登记"),
+        ("intern", "实习"),
+    ],
+)
+def test_fwd_real_tenant_samples(now, name, kind):
+    from job_crawler.adapters.workday import FwdWorkday
+
+    sample = json.loads((FIX / f"fwd-{name}.json").read_text())
+    a = FwdWorkday(
+        Source(
+            source_id="COM0417",
+            company_id="COM0417",
+            company="富卫集团",
+            url=f"https://{FwdWorkday.host}/zh-CN/FWDcareersite/",
+        ),
+        cast(Session, Replay()),
+        now,
+    )
+    fields = a.parse_detail(sample["detail"], sample["listing"])
+    assert fields["work_type"] == kind
+    assert "Privacy Notice" not in fields["requirements"]
+    if name == "contract":
+        assert fields["deadline"] == ""
+        assert "6 Months Contract" in fields["title"]
+        assert "Fresh graduate can be considered" in fields["requirements"]
+        assert fields["duties"].startswith("PURPOSE")
+    if name == "consultant":
+        assert fields["duties"].startswith("Job Summary:")
+        assert "Fresh graduate are strongly encouraged" in fields["requirements"]
+        assert fields["location"] == "菲律宾、Philippines - BGC Taguig"
+    if name == "registration":
+        assert fields["duties"] == ""
+        assert "への内定、誠におめでとうございます" in fields["requirements"]
+    sample["detail"]["jobPostingInfo"]["jobPostingSiteId"] = "career"
+    with pytest.raises(Exception, match="身份"):
+        a.parse_detail(sample["detail"], sample["listing"])
+
+
+def test_fwd_only_known_background_links_are_allowed(now):
+    from job_crawler.adapters.workday import FwdWorkday
+
+    a = FwdWorkday(
+        Source(
+            source_id="COM0417",
+            company_id="COM0417",
+            company="富卫",
+            url=f"https://{FwdWorkday.host}/zh-CN/FWDcareersite/",
+        ),
+        cast(Session, Replay()),
+        now,
+    )
+    sample = json.loads((FIX / "fwd-contract.json").read_text())
+    html = sample["detail"]["jobPostingInfo"]["jobDescription"]
+    with pytest.raises(Exception, match="新增正文链接"):
+        a.body(html + '<a href="https://example.test/requirements.pdf">Qualification</a>')
+    with pytest.raises(Exception, match="媒体"):
+        a.body(html + '<img src="qualifications.png">')
+    with pytest.raises(Exception, match="日文应届"):
+        a.kind("2028新卒採用", "採用情報", "全职")
+    assert a.kind("Internal Auditor", "新卒入社時研修", "全职") == "未明确校招"
