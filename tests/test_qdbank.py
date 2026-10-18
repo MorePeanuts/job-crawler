@@ -29,11 +29,27 @@ class Replay:
         self.url = ""
         self.pages: list[int] = []
         self.opened: list[str] = []
+        self.clicked: list[str] = []
 
     async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
-        assert (url, ready_endpoints) in {(CAMPUS, (LIST,)), (NEWS, (ANNOUNCEMENTS,))}
+        assert (url, ready_endpoints) == (CAMPUS, (LIST,))
         self.url = url
         self.opened.append(url)
+
+    def get_by_text(self, value: str, *, exact: bool) -> "Replay":
+        assert value == "最新动态" and exact
+        self.clicked.append(value)
+        return self
+
+    async def click(self, **options: int) -> None:
+        assert options == {"timeout": 10000}
+        self.url = NEWS
+
+    async def wait_for_function(self, script: str, **options: int) -> None:
+        assert "latest-news" in script and ".menuList .active" in script
+        assert options == {"timeout": 10000}
+        if self.fault == "news_navigation":
+            raise TimeoutError("latest-news redirected to social recruitment")
 
     def snapshot(self, label: str, html: str) -> str:
         return label + "-dom"
@@ -112,7 +128,7 @@ async def test_zero_requires_both_public_directories_and_campus_dom(now: datetim
     replay = Replay()
     result = await adapter(replay, now).collect()
     assert not result.coverage_issues() and not result.jobs
-    assert replay.opened == [CAMPUS, NEWS]
+    assert replay.opened == [CAMPUS] and replay.clicked == ["最新动态"]
     assert [(s.expected, s.unique, s.details, s.terminal) for s in result.scopes] == [
         (0, 0, 0, True),
         (0, 0, 0, True),
@@ -136,6 +152,7 @@ async def test_zero_requires_both_public_directories_and_campus_dom(now: datetim
         "page_count",
         "new_announcement",
         "news_business",
+        "news_navigation",
     ],
 )
 async def test_zero_is_not_inferred_from_failed_filtered_or_new_catalogs(
@@ -150,7 +167,8 @@ async def test_nonzero_paginates_but_does_not_bypass_detail_login_or_claim_compl
 ) -> None:
     replay = Replay(21)
     result = await adapter(replay, now).collect()
-    assert replay.pages == [1, 2, 3] and replay.opened == [CAMPUS, NEWS]
+    assert replay.pages == [1, 2, 3] and replay.opened == [CAMPUS]
+    assert replay.clicked == ["最新动态"]
     assert result.scopes[0].unique == result.scopes[0].expected == 21
     assert result.scopes[0].terminal and result.scopes[0].details == 0
     assert {issue.job_key for issue in result.issues if issue.code == "auth_required"} == {

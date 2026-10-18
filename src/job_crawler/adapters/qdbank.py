@@ -140,7 +140,14 @@ class QdbankCampus(Adapter):
             listing_evidence = self.session.last_evidence
 
         # A new announcement may add jobs outside the position list. Do not ignore it.
-        await self.session.open(NEWS, ready_endpoints=(ANNOUNCEMENTS,))
+        await browser.page.get_by_text("最新动态", exact=True).click(timeout=10000)
+        await browser.page.wait_for_function(
+            "() => location.pathname === '/TalentRecruit/latest-news' && "
+            "document.querySelector('.menuList .active')?.innerText.trim() === '最新动态'",
+            timeout=10000,
+        )
+        check(browser.page.url == NEWS, "青岛银行公告导航跳转异常")
+        browser.url = NEWS
         observed = await self.session.observed(ANNOUNCEMENTS)
         response = observed_body(observed, ANNOUNCEMENTS, NEWS_QUERY)
         evidence = self.session.last_evidence
