@@ -1178,3 +1178,11 @@ version = "1"
 [sources.COM0486]
 adapter = "hkex-workday"
 version = "1"
+
+[sources.COM0361]
+adapter = "kingboard-careers"
+version = "1"
+
+[sources.COM0094]
+adapter = "aia-workday"
+version = "1"
