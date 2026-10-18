@@ -1146,3 +1146,7 @@ version = "1"
 [sources.COM0324]
 adapter = "gdh-mobile-campus"
 version = "1"
+
+[sources.COM0401]
+adapter = "gemdale-campus"
+version = "1"
