@@ -1102,3 +1102,7 @@ version = "1"
 [sources.COM0243]
 adapter = "guangwu-campus"
 version = "1"
+
+[sources.COM0363]
+adapter = "moka-zczl-2027"
+version = "1"
