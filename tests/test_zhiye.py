@@ -24,6 +24,7 @@ from job_crawler.adapters.zhiye import (
     Mxbc2027,
     PICCGroup,
     Seres,
+    ShenghongCampus,
     Shenzhou,
     Shrcb,
     SinosigGroupCampus,
@@ -156,6 +157,50 @@ async def test_zhiye_shared_filter_does_not_masquerade_as_full_catalog(now: date
     result = await Xiangyu(source(), Replay(filtered=True), now).collect()
     assert not result.jobs and result.coverage_issues()
     assert "LocId" in result.issues[0].message
+
+
+@pytest.mark.parametrize("sector_filter", [False, True])
+async def test_shenghong_all_sectors_and_older_publications(
+    now: datetime, sector_filter: bool
+) -> None:
+    class ShenghongReplay(Replay):
+        async def observed(self, needle: str) -> dict[str, Any]:
+            result = await super().observed(needle)
+            if "Info" not in needle:
+                payload = json.loads(result["post_data"])
+                payload["ClassificationTwo"] = ["6"] if sector_filter else []
+                result["post_data"] = json.dumps(payload)
+            return result
+
+        async def request(
+            self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+        ) -> dict[str, Any]:
+            result = await super().request(url, payload=payload, detail=detail)
+            if payload is not None:
+                for row in result["Data"]:
+                    row.update(CategoryId="2", Kind="全职", PostDate="2024-08-14T09:34:53")
+            else:
+                result["Data"]["Kind"] = "实习" if result["Data"]["Id"] == "20" else "全职"
+            return result
+
+    entry = source().model_copy(update={"url": "https://shenghonggroup.zhiye.com/campus/jobs"})
+    replay = ShenghongReplay()
+    result = await ShenghongCampus(entry, replay, now).collect()
+    if sector_filter:
+        assert result.coverage_issues() and not result.jobs
+        assert "ClassificationTwo" in result.issues[0].message
+    else:
+        assert not result.coverage_issues() and len(result.jobs) == 21
+        assert replay.pages == [0, 1] and len(set(replay.details)) == 21
+        assert result.jobs[0].published == "2024-08-14T09:34:53"
+        assert result.jobs[0].deadline == result.jobs[0].address == result.jobs[0].unit == ""
+        assert next(j for j in result.jobs if j.source_key == "20").work_type == "实习"
+
+
+@pytest.mark.parametrize("category,kind", [("1", "全职"), ("2", "未知")])
+def test_shenghong_unknown_recruitment_contract(category: str, kind: str, now: datetime) -> None:
+    with pytest.raises(CrawlError):
+        ShenghongCampus(source(), Replay(), now).in_scope({"CategoryId": category, "Kind": kind})
 
 
 @pytest.mark.parametrize("adapter", [Xiangyu, WingtechCampus])

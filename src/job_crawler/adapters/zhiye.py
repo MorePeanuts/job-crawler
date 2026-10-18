@@ -231,6 +231,21 @@ class Zhiye(Adapter):
             page += 1
 
 
+class ShenghongCampus(Zhiye):
+    name = "zhiye-shenghong-group-campus"
+    host = "shenghonggroup.zhiye.com"
+    regular_only = True
+    scope_description = (
+        "盛虹控股集团北森Category=2校园全目录；含印染、化纤、石化等全部板块，"
+        "不将石化卡片局部目录或旧51job结束页当作集团范围"
+    )
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "盛虹校园目录混入其他招聘类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "盛虹岗位性质不明确")
+        return True
+
+
 class BusyMingCampus(Zhiye):
     name = "zhiye-busyming-campus"
     host = "hnlshm4.zhiye.com"
@@ -863,6 +878,7 @@ class SinosigGroupCampus(Zhiye):
 
 
 TENANTS = (
+    ShenghongCampus,
     BusyMingCampus,
     SunartCampus,
     YonghuiCampus,
