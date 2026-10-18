@@ -1,0 +1,123 @@
+<html><body>
+<div class="social-content">
+<div class="social-content-search">
+<select class="social-content-search1" id="zhiweileibie" name="" style="color: #888888; width:490px;height:54px;">
+<option value="">选择职位类别</option>
+<option value="1">管理类</option>
+<option value="2">营销类</option>
+<option value="3">操作类</option>
+<option value="4">专业支持岗</option>
+<option value="5">专业技术岗</option>
+</select>
+<select class="social-content-search1" id="gongzuodidian" name="" style="color: #888888; width:490px;height:54px;">
+<option value="">选择工作地点</option>
+<option value="1">上海</option>
+<option value="2">河北</option>
+<option value="3">山西</option>
+<option value="4">内蒙古</option>
+<option value="5">辽宁</option>
+<option value="6">吉林</option>
+<option value="7">黑龙江</option>
+<option value="8">江苏</option>
+<option value="9">浙江</option>
+<option value="10">安徽</option>
+<option value="11">福建</option>
+<option value="12">江西</option>
+<option value="13">山东</option>
+<option value="14">河南</option>
+<option value="15">湖北</option>
+<option value="16">湖南</option>
+<option value="17">广东</option>
+<option value="18">广西</option>
+<option value="19">海南</option>
+<option value="20">四川</option>
+<option value="21">贵州</option>
+<option value="22">云南</option>
+<option value="23">西藏</option>
+<option value="24">陕西</option>
+<option value="25">甘肃</option>
+<option value="26">青海</option>
+<option value="27">宁夏</option>
+<option value="28">新疆</option>
+<option value="29">北京</option>
+<option value="30">天津</option>
+<option value="31">重庆</option>
+<option value="32">香港</option>
+<option value="33">澳门</option>
+</select>
+<div class="social-content-search2" style="width:490px;height:54px;">
+<div class="search-input" style="width:490px;height:54px;">
+<input id="gangweimingcheng" placeholder="请输入关键字搜索" type="text"/>
+</div>
+<div class="search-btn" style="width:490px;height:54px;">
+<button class="search-btn icon iconfont fr" onclick="search()" type="button">搜索</button>
+<!--<div class="search-btn-img">-->
+<!--<img th:src="@{/res/ti/img/search.png}" alt="">-->
+<!--</div>-->
+<!--<div class="search-btn-text" onclick="search()">搜索</div>-->
+</div>
+</div>
+</div>
+<div class="social-content-table">
+<div class="social-content-table-thead">
+<div class="thead-li">岗位名称</div>
+<div class="thead-li">职位类别</div>
+<div class="thead-li">工作地点</div>
+<!--                    <div class="thead-li">招聘人数</div>-->
+<div class="thead-li">详情</div>
+</div>
+</div>
+<div class="page">
+<div class="paging"><span><i>1</i> /<i>0</i></span></div>
+</div>
+</div>
+<script>
+    function init() {
+        $('.social-content-table-tdata').find('.tdata-li-top').click(function () {
+            console.log($(this).next())
+            if ($(this).next().css("display") == "none") {
+                $(this).next().show();
+            } else {
+                $(this).next().hide();
+            }
+        })
+        var paging = new Paging({
+            total: 0
+        })
+
+        $(".close").click(function () {
+            hideMask()
+        })
+    }
+    init();
+    var zhaopintype = 1;
+
+
+        function processEamil(par_eamil) {
+    $("#cus_email").text(par_eamil);
+    showMask();
+    }
+
+
+    function showMask() {
+        //mask 高度设置为页面高度
+        $("#mask").css("height", $(document).height());
+        $("#mask").css("width", "100%");
+        $("#mask").show();
+        //隐藏页面滚动条
+        $('body').css("overflow", "hidden");
+    }
+
+    //关闭遮罩层
+    function hideMask() {
+        $("#mask").hide();
+        $('body').css("overflow", "auto");
+    }
+
+    function search() {
+        window.location.href = "/page/social/Search/" + zhaopintype + "?profession=" + $("#zhiweileibie").val() + "&province="
+            + $("#gongzuodidian").val() + "&title=" + $("#gangweimingcheng").val()+"&pageNum="+1;
+    }
+
+</script>
+<footer>版权所有：中国黄金集团黄金珠宝股份有限公司. All rights reserved.</footer></body></html>

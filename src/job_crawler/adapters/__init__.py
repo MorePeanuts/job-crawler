@@ -50,6 +50,7 @@ from job_crawler.adapters.gdh import GdhMobileCampus
 from job_crawler.adapters.gem import GemCampus
 from job_crawler.adapters.gemdale import GemdaleCampus
 from job_crawler.adapters.gig import GigCampus
+from job_crawler.adapters.goldjewelry import GoldJewelryCampus
 from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
 from job_crawler.adapters.gree import GreeCampus
 from job_crawler.adapters.greentown import GreentownCampus
@@ -272,6 +273,7 @@ REGISTRY = {
         NewHopeCampus,
         NewWorldCareers,
         HsbankCampus,
+        GoldJewelryCampus,
         SasDragonCareers,
         CathayIMatch,
         PddCampus,
