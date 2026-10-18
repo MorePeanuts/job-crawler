@@ -1214,3 +1214,15 @@ version = "1"
 [sources.COM0499]
 adapter = "newworld-careers"
 version = "1"
+
+[sources.COM0469]
+adapter = "sasdragon-careers"
+version = "1"
+
+[sources.COM0244]
+adapter = "hsbank-campus"
+version = "1"
+
+[sources.COM0124]
+adapter = "cathay-imatch-campus"
+version = "1"
