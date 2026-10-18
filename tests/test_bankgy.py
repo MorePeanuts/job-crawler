@@ -78,6 +78,12 @@ class Page:
         self.calls = 0
         self.text = ""
         self.in_cell = False
+        self.active_channel = False
+
+    def locator(self, selector):
+        assert selector == 'a.ivu-menu-item-active[href="#/channel/01"]'
+        self.active_channel = True
+        return self
 
     def get_by_role(self, role):
         assert role == "cell"
@@ -88,6 +94,8 @@ class Page:
         assert exact and text in {"搜索", "共0个职位", "暂无数据", "校园招聘"}
         if text == "暂无数据":
             assert self.in_cell, "the real page has a second empty-state node outside the table"
+        if text == "校园招聘":
+            assert self.active_channel, "desktop and mobile menus repeat the channel name"
         self.text = text
         return self
 

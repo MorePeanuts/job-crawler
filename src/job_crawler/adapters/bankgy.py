@@ -113,6 +113,10 @@ class BankgyCampus(Adapter):
                 raise CrawlError("unsupported_scope", "贵阳银行校园出现岗位，分页和详情须先核验")
         await page.get_by_text("共0个职位", exact=True).wait_for(timeout=15000)
         await page.get_by_role("cell").get_by_text("暂无数据", exact=True).wait_for(timeout=15000)
-        await page.get_by_text("校园招聘", exact=True).wait_for(timeout=15000)
+        await (
+            page.locator('a.ivu-menu-item-active[href="#/channel/01"]')
+            .get_by_text("校园招聘", exact=True)
+            .wait_for(timeout=15000)
+        )
         scope.evidence.append(browser.snapshot("bankgy-campus-empty", await page.content()))
         scope.terminal = True
