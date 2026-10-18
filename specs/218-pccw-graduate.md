@@ -8,7 +8,7 @@
 
 ## 完整范围与项目状态
 
-两个站点首页分别明确新版计划和Graduate-Hiring_pccw/7939210、Graduate-Hiring_hkt/7939110。检查导航仍与这两类入口一致；旧版Graduate-Development-Programmes不是当前入口。两个新版计划都有Technology和Business流，技术五方向、业务七方向，逐页读取两个站点全部24项目页面，检查导航闭合、正文资格及邀请链接。HKT和PCCW版本的邀请ID全部一致，正文除Media/Meida拼写差异外一致；同一方向不计两份岗位。
+两个站点首页分别明确新版计划和Graduate-Hiring_pccw/7939210、Graduate-Hiring_hkt/7939110。检查导航仍与这两类入口一致；旧版Graduate-Development-Programmes不是当前入口。两个新版计划都有Technology和Business流，技术五方向、业务七方向，逐页读取两个站点全部24项目页面，检查导航闭合、正文资格及邀请链接。两处菜单把Information Technology、Consumer Business写为空格路径，与其他菜单规范路径及当前激活标题核对后归一。项目底部隐藏的2024联系表单只记录、不访问；Digital Ventures三品牌介绍链接不是招聘目录。HKT和PCCW版本的邀请ID全部一致，正文除Media/Meida拼写差异外一致；同一方向不计两份岗位。
 
 当前技术五方向指向/job-invite/58548/，业务七方向指向/job-invite/58547/。正常公开访问重定向至HKT职位1329370866和1329371066，og:title与流名称一致，页面明确“Sorry, this position has been filled.”。以12个项目方向为scope口径，只有全部页面与两个招满详情验证后计12 skipped_closed；不会把培养介绍导出为在招岗位。两邀请每次重新读取，不缓存永久关闭。项目旧隐藏2024关闭文字不是2026状态依据。
 

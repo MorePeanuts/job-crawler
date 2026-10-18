@@ -81,6 +81,7 @@ from job_crawler.adapters.nbcb import NingboBank2027
 from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.netease import NeteaseCampus
 from job_crawler.adapters.newhope import NewHopeCampus
+from job_crawler.adapters.pccw import PccwGraduate
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.qdbank import QdbankCampus
@@ -215,6 +216,7 @@ REGISTRY = {
         GdhMobileCampus,
         GemdaleCampus,
         SjmPublicJobs,
+        PccwGraduate,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,
