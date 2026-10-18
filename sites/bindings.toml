@@ -1110,3 +1110,7 @@ version = "1"
 [sources.COM0481]
 adapter = "laopu-campus"
 version = "1"
+
+[sources.COM0044]
+adapter = "zhiye-shenghong-group-campus"
+version = "1"
