@@ -98,6 +98,7 @@ from job_crawler.adapters.shougang import ShougangCampus
 from job_crawler.adapters.sihc import SihcCampus
 from job_crawler.adapters.sinopec import SinopecCampus
 from job_crawler.adapters.sinopharm import SinopharmCampus
+from job_crawler.adapters.sjm import SjmPublicJobs
 from job_crawler.adapters.smic import SmicCampus
 from job_crawler.adapters.spic2027 import Spic2027
 from job_crawler.adapters.static_campus import TENANTS as STATIC_TENANTS
@@ -213,6 +214,7 @@ REGISTRY = {
         GemCampus,
         GdhMobileCampus,
         GemdaleCampus,
+        SjmPublicJobs,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,
