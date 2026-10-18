@@ -70,6 +70,7 @@ from job_crawler.adapters.jd import JD
 from job_crawler.adapters.jianlong import JianlongCampus
 from job_crawler.adapters.jointown import JointownCampus
 from job_crawler.adapters.jxcc import JxccCampus
+from job_crawler.adapters.kingboard import KingboardCareers
 from job_crawler.adapters.laopu import LaopuCampus
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.lixiang import LiAutoCampus
@@ -224,6 +225,7 @@ REGISTRY = {
         HuafaListedCampus,
         StecCampus,
         CkaCareers,
+        KingboardCareers,
         MelcoWorkday,
         FwdWorkday,
         HkexWorkday,
