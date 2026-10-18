@@ -8,7 +8,7 @@
 
 ## 观察到的契约和限制
 
-公开POST /api/ciic-ihr-rcr-service/rcr-positionLibrary/query-rcr-door-list，请求为page=1、limit=10、total=0、filters=[]、orders=[]，condition={reqType:"P3528000002",plName:"",plType:[],dept:[],workExp:[]}。P3528000001为社招。响应code="0"，data包含records/total/size/current/pages。只允许页码变化；严格核对总数、页大小、页码、唯一id、每页行数与末端。校园激活导航必须为“校园招聘”；总数零时还需.nodata显示“暂无职位”，不能以加载中或空白页面代替。
+公开POST /api/ciic-ihr-rcr-service/rcr-positionLibrary/query-rcr-door-list，请求为page=1、limit=10、total=0、filters=[]、orders=[]，condition={reqType:"P3528000002",plName:"",plType:[],dept:[],workExp:[]}。P3528000001为社招。响应code="0"，data包含records/total/size/current/pages。只允许页码及前端回填的total变化；严格核对总数、页大小、页码、唯一id、每页行数与末端。校园激活导航必须为“校园招聘”；总数零时还需.nodata显示“暂无职位”，不能以加载中或空白页面代替。
 
 最新动态公开路由/TalentRecruit/latest-news发起POST同前缀query-rcr-anno-list，page=1、limit=10、total=0、filters=[]、orders=[]，condition={plName:""}，同样code="0"、total=0、size=10、current=1、pages=0、records=[]。当前无公告可进一步展开；未来出现公告必须停止完整性验收并报告新公告需核验，不能忽略公告宣称全覆盖。
 

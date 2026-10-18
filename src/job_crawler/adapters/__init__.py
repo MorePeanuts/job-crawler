@@ -79,6 +79,7 @@ from job_crawler.adapters.netease import NeteaseCampus
 from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
+from job_crawler.adapters.qdbank import QdbankCampus
 from job_crawler.adapters.saic import SaicCampus
 from job_crawler.adapters.sbp import SbpCampus
 from job_crawler.adapters.scoped_coapi import BcdhListedCampus, KsfCampus
@@ -121,6 +122,7 @@ REGISTRY = {
     adapter.name: adapter
     for adapter in (
         AnkerCampus,
+        QdbankCampus,
         DingshengCampus,
         MingtaiCampus,
         MysteelCampus,
