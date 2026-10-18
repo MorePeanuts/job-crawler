@@ -612,3 +612,7 @@ SPEC-216接入固定B组COM0401，gemdale-campus@1。2026-10-18 11:30:27–11:31
 苏宁校园1200目录11个总部岗位，留学生目录明确零，但项目政策图片仍为2025届、秋招至2024年12月及春招2025年3–5月。安徽师大2026-09-09发布的[2027简章](https://career.ahnu.edu.cn/info/1008/34402.htm)另含区域采销、储备店长，不能只采总部11条声称覆盖完整。港中大深圳2027公告指向微信正文，正常访问遇到验证码，未操作。2025年报把苏宁置业集团列为持股5%以上股东关联方，原应届目录唯一置业睿城租赁经理不能直接归到上市主体。证据suning-global-current、suning-1200-current、suning-1200.jpg、suning-ahnu2027、suning-2027-wechat；继续待接入。
 
 B组COM0395电讯盈科[官网招聘页](https://www.pccw.com/careers/index.page)明确指向[新版毕业生计划](https://job.pccw.com/pccw/content/Graduate-Development-Programmes-v2/?locale=en_US)，Technology和Business两主线可读；搜索引擎旧版仍在，不能当现行范围。COM0338银河娱乐官方网站CAREER实际跳转[MyGalaxyCareer](https://www.mygalaxycareer.com/)，六业务类公开入口可读。COM0492澳门博彩控股[Human Resources](https://www.sjmholdings.com/en/human-resources)明确指向sjmjob.com，公开岗位及澳门/香港地区入口可读。三家仅补入口，未增加验收数；证据pccw-careers、pccw-graduates-v2、galaxy-careers、galaxy-career-page、sjm-careers、sjm-jobs。
+
+电讯盈科/pccw/下12项目页面全部读取：技术5项统一指向58548，业务7项统一指向58547。两个公开职位页均明确“Sorry, this position has been filled.”，不把项目介绍算在招；PCCW和HKT首页分别还有Graduate-Hiring_pccw/7939210、Graduate-Hiring_hkt/7939110，均明确0职位。HKT项目导航另外指向/hkt/下项目页面，仍需核对与/pccw/版本一致，尚未适配验收。证据pccw-projects-batch.log、pccw-58547、pccw-58548、pccw-graduate-hiring、pccw-hkt-graduate-hiring、pccw-hkt-programmes。
+
+澳娱经正常英文会话读取Jobs三页21+21+2，共44唯一ID及44成功公开详情。未发现明确应届/毕业生项目资格；school graduate为学历而非应届身份，部分“经验优先”及管事N/A亦不自行当校招。公开Post Date与中文刊登日期一致，当前仍为探索证据sjm-catalog-details，不计正式验收。银河娱乐viewalljobs的12项是六业务类别中英各一，不能误报12岗位；Explore Careers没有可见项目正文，不能视为零岗位。证据galaxy-all-jobs、galaxy-explore-careers。
