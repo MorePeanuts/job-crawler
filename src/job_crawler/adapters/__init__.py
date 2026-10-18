@@ -28,6 +28,7 @@ from job_crawler.adapters.chinatower import (
 )
 from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.cib import Cib2027
+from job_crawler.adapters.cka import CkaCareers
 from job_crawler.adapters.cmb import CmbCampus
 from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
@@ -221,6 +222,7 @@ REGISTRY = {
         PccwGraduate,
         HuafaListedCampus,
         StecCampus,
+        CkaCareers,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,
