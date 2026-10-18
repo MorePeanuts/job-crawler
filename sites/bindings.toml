@@ -1122,3 +1122,7 @@ version = "1"
 [sources.COM0090]
 adapter = "sdhsg-campus"
 version = "1"
+
+[sources.COM0411]
+adapter = "mingtai-campus"
+version = "1"
