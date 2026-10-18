@@ -930,6 +930,13 @@ class Wanhua2027(Hotjob):
         return super()._job(row, listing, evidence, locations, location_evidence)
 
 
+class HualuHengshengCampus(Hotjob):
+    name = "hotjob-hualuhengsheng-campus"
+    suite = "SU69b20f3e10919a570b6a96a0"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "华鲁恒升股份及荆州子公司官方校园门户完整目录；不含华鲁集团其他兄弟单位"
+
+
 class BbmgCampus(Hotjob):
     name = "hotjob-bbmg-campus"
     suite = "SU62d139692f9d2470a6e6e052"
@@ -975,6 +982,7 @@ class DbnCampus(Hotjob):
 
 
 TENANTS = (
+    HualuHengshengCampus,
     DbnCampus,
     BbmgCampus,
     ChanghongListed,
