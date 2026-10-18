@@ -64,6 +64,7 @@ from job_crawler.adapters.jd import JD
 from job_crawler.adapters.jianlong import JianlongCampus
 from job_crawler.adapters.jointown import JointownCampus
 from job_crawler.adapters.jxcc import JxccCampus
+from job_crawler.adapters.laopu import LaopuCampus
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.longi_legacy import LongiLegacyCampus
@@ -210,6 +211,7 @@ REGISTRY = {
         TfmeCampus,
         AisidiCampus,
         HaidilaoStoreTrainee,
+        LaopuCampus,
         GuangwuCampus,
         HbiscoCampus,
         NciCampus,
