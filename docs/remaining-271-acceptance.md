@@ -724,3 +724,8 @@ COM0417按SPEC-223启用fwd-workday@1。13:10:27–13:15:10完整读取210岗位
 COM0486按SPEC-224启用hkex-workday@1。官方Careers链接的全部145Workday岗位完整采集，5正式应届有效、0严格、5地点待映射；13:27:40–13:30:36真实验收和只读审计通过，B44汇总已发布。6条未填地点的社会招聘记录保持空值，不因缺国家字段丢失覆盖；官网Early Careers截至10月25日与R004464详情相符。
 
 新世界COM0499官网20条职位展示、独立Trainee栏目、招聘平台首页和单个1502详情已正常核对；Trainee当前是暑期实习与青年培育介绍，非明确正式应届目录。集团官网上传日期与平台详情发布日期不同，不能混用。随后完整目录程序在重新打开集团官网时遭Imperva/Incapsula访问拦截，未尝试绕过、不计验收或零岗位。证据newworld-careers-current、newworld-trainee-current、newworld-job1502、newworld-platform-root、newworld-full-research。
+
+
+友邦COM0094已完成1015公开详情研究并实现SPEC-225的aia-workday@1，当前1298项测试及完整门禁通过。10明确正式应届、2人才意向登记及实习等范围已分开，角色介绍与标题中的应届资格保留；独立实时collect-aia仍在运行，未纳入已验收67家计数。
+
+原A组世茂41541入口普通等待后仍明确“您访问的页面不存在”，不能计零。东方证券4928入口实际为培养实习，另链接日常实习5546和投行管理委员会实习4792；正式校招与关联单位范围仍待核实，未因campus_apply路径就自动当校招。证据shimao-current、dfzq-current。
