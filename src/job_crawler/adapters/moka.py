@@ -647,7 +647,19 @@ class Lingyi2027(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "领益智造详情标题不匹配")
 
 
+class Zczl2027(Moka):
+    name = "moka-zczl-2027"
+    org = "zczl"
+    site_id = 172433
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "中创智领官网2027届校园站全部板块、单位及城市的无筛选目录"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "中创智领详情标题不匹配")
+
+
 TENANTS = (
+    Zczl2027,
     Lingyi2027,
     Longcheer2027,
     Seazen2027,

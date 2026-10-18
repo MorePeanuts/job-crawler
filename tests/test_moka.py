@@ -31,6 +31,7 @@ from job_crawler.adapters.moka import (
     SunnyOptical,
     TrinaSolar,
     Yadea,
+    Zczl2027,
     ZhongAn,
     decode,
     sections,
@@ -219,6 +220,7 @@ async def test_sunny_rejects_internship_module(now: datetime) -> None:
         Hengrui,
         Seazen2027,
         Lingyi2027,
+        Zczl2027,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:
@@ -264,7 +266,7 @@ class TitleMismatch(Replay):
         return response
 
 
-@pytest.mark.parametrize("adapter", [Seazen2027, Lingyi2027])
+@pytest.mark.parametrize("adapter", [Seazen2027, Lingyi2027, Zczl2027])
 async def test_moka_rejects_detail_title_mismatch(adapter: type[Moka], now: datetime) -> None:
     source = Source(
         source_id="TEST",
