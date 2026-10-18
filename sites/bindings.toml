@@ -1098,3 +1098,7 @@ version = "1"
 [sources.COM0441]
 adapter = "hotjob-hualuhengsheng-campus"
 version = "1"
+
+[sources.COM0243]
+adapter = "guangwu-campus"
+version = "1"
