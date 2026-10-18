@@ -33,3 +33,11 @@
 R36824 GRA Fellow明确应在July 2027前完成PharmD/法规硕士/生命科学PhD，one-year rotational program、全职、75k/year；R36837 Medical Affairs Fellow明确recent pharmacy graduate，12个月博士后培养、全职薪酬，纳入正式毕业生项目。固定培养期本身不等于实习。R36838 Clinical Pharmacology and AI/ML Fellow仅PhD/MS和灵活入职日期，未明确应届，保留原始记录但不纳入校招。两条英语Intern及葡语Estagiário明确排除；不得以“graduate degree/无经验”推定应届。
 
 复用公共Workday采集时仅增加详情URL覆写点，默认其他租户行为保持；百济专用正文与类型规则不影响其他租户。两个子适配器独立collect并合并Scope/已成功记录，任一失败使总覆盖partial；共享同一个有限预算会话和增量状态。正式绑定需待实采及审计通过。
+
+## 仟寻旧入口仍有活动校招，扩展第三分支
+
+R1077背景链接实际打开仟寻企业1266291目录：页面正常点击第2页后URL为`/positions/index/cid/1266291?city=&custom=&keyword=&occupation=&pageNum=2`。服务器HTML公开全部当前页，`window.__globalConfig__.totalNum=351`，每页18，20页末页9；卡片`a.PositionList__job-item`指向`/position/index/pid/<id>`。全量详情研究进行中。
+
+2446362正常渲染页面明确“招聘类型：校招”“工作性质：全职”“学历要求：博士”，仍显示立即投递；因此该入口不能按年代当成无效背景。适配器增补第三个独立Scope/moseeker:命名空间；以当前无筛选目录穷尽及详情状态核对完整范围。正文分为职位描述和任职条件；DOM脚本的公开positionId/companyId与卡片、标题和公司链接核对。页面“2023-08-17 更新”仅为更新时间，published/deadline均不虚构。明确实习优先排除，保留公开学历、部门、地点。未知用工类型、正文附件、身份漂移和缺必需段落报partial。
+
+跨平台有相近研究院岗位，但2446362明确Huayi Wang组，当前Moka两条研究院岗位未出现该团队且职责资格不同；没有共同业务ID时不按相似标题擅自合并。三平台源ID和证据独立保存。全量目录、其他校招/实习/社招分布、链接与状态边界核对完成后，补充真实回放再正式采集。Workday的仟寻链接仅在第三分支也被完整采集的组合适配器中作为已支持入口处理。
