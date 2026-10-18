@@ -1090,3 +1090,7 @@ version = "1"
 [sources.COM0348]
 adapter = "haidilao-store-trainee"
 version = "1"
+
+[sources.COM0055]
+adapter = "cmb-campus"
+version = "1"
