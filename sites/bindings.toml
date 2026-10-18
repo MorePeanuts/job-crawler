@@ -1130,3 +1130,7 @@ version = "1"
 [sources.COM0488]
 adapter = "dingsheng-campus"
 version = "1"
+
+[sources.COM0482]
+adapter = "qdbank-campus"
+version = "1"
