@@ -1174,3 +1174,7 @@ version = "1"
 [sources.COM0417]
 adapter = "fwd-workday"
 version = "1"
+
+[sources.COM0486]
+adapter = "hkex-workday"
+version = "1"
