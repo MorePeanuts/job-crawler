@@ -15,6 +15,7 @@ from job_crawler.adapters.boe import BoeCampus
 from job_crawler.adapters.bohai import Bohai2027
 from job_crawler.adapters.byd import BYDCampus
 from job_crawler.adapters.campaign51 import TENANTS as CAMPAIGN51_TENANTS
+from job_crawler.adapters.cathay import CathayIMatch
 from job_crawler.adapters.cdkj import Cdkj
 from job_crawler.adapters.cdrcb import Cdrcb2027
 from job_crawler.adapters.ceair import Ceair2027
@@ -268,6 +269,7 @@ REGISTRY = {
         GuangzhouRuralBankCampus,
         NewHopeCampus,
         NewWorldCareers,
+        CathayIMatch,
         PddCampus,
         YingteCampus,
         YuexiuProperty2027,

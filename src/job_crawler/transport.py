@@ -410,6 +410,7 @@ class BrowserSession:
             "X-Language",
             "X-Referer",
             "X-ALB-Gray",
+            "Accept-Language",
         }:
             raise ValueError("仅允许已验证的公开站点请求头")
         identity: dict[str, Any] = {"url": url, "payload": payload, "headers": headers}

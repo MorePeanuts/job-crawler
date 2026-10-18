@@ -446,3 +446,27 @@ async def test_budget_stops_before_sending_request(tmp_path: Path, now: datetime
         assert page.calls == 1
     finally:
         store.close()
+
+
+async def test_public_language_header_is_preserved_and_cache_isolated(
+    tmp_path: Path, now: datetime
+) -> None:
+    store = Store(tmp_path / "db.sqlite")
+    store.begin("run", "hash", now, False, 6)
+    session = BrowserSession(
+        "A", "run", tmp_path / "evidence", store, CrawlConfig(delay=0), resume=True
+    )
+    page = Page()
+    session.page = page
+    try:
+        for locale in ["zh_TW", "zh_TW", "en_US"]:
+            await session.request(
+                "https://example.test/detail", headers={"Accept-Language": locale}, detail=True
+            )
+        assert page.calls == 2
+        assert '"Accept-Language": "zh_TW"' in page.scripts[0]
+        assert '"Accept-Language": "en_US"' in page.scripts[1]
+        with pytest.raises(ValueError, match="公开站点请求头"):
+            await session.request("https://example.test/detail", headers={"Authorization": "test"})
+    finally:
+        store.close()
