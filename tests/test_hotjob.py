@@ -2,6 +2,7 @@
 
 import json
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -12,6 +13,7 @@ from job_crawler.adapters.hotjob import (
     CrrcGroup,
     DbnCampus,
     EveEnergy,
+    FarEastListedCampus,
     Goertek,
     GwmListed,
     HaiTian,
@@ -1160,3 +1162,120 @@ async def test_dbn_first_publication_expiry_and_detail_identity(
         assert unknown_date.source_key == "c" and unknown_date.published == ""
         assert unknown_date.unit == "河南区"
         assert "不使用publishDate" in unknown_date.field_sources["published"]
+
+
+class FarEastReplay(Replay):
+    def __init__(self, fault: str = "") -> None:
+        super().__init__()
+        self.fault = fault
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        result = await super().observed(needle)
+        if "listSearchTerm" in needle:
+            terms = json.loads(result["body"])
+            child = {
+                "code": "0/9/39/85",
+                "nameCh": "安徽电缆股份有限公司",
+                "positionsNum": 2 if self.fault == "child_count" else 1,
+                "childNodes": [],
+            }
+            own = {
+                "code": "0/9/39",
+                "nameCh": "错误名称" if self.fault == "own_name" else "远东智慧能源股份有限公司",
+                "positionsNum": 3 if self.fault == "own_count" else 2,
+                "childNodes": [child, child] if self.fault == "duplicate" else [child],
+            }
+            terms["data"]["orgList"] = [
+                {
+                    "code": "0/9",
+                    "nameCh": "远东控股集团有限公司",
+                    "positionsNum": 3,
+                    "childNodes": [own],
+                }
+            ]
+            result["body"] = json.dumps(terms, ensure_ascii=False)
+        return result
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        company, code = {
+            "a": ("安徽电缆股份有限公司", "0/9/39/85/1550"),
+            "b": ("远东控股集团有限公司", "0/9/32"),
+            "c": ("远东智慧能源股份有限公司", "0/9/39/1719"),
+        }[post_id]
+        row.update(company=company, orgCode=code, postName="2027届技术营销校招生")
+        if post_id == "c":
+            row.pop("publishFirstDate")
+            if self.fault == "unknown_branch":
+                row["orgCode"] = "0/99/39"
+            if self.fault == "wrong_company":
+                row["company"] = "远东控股集团有限公司"
+        return row
+
+    def _detail(self, post_id: str) -> dict[str, Any]:
+        result = super()._detail(post_id)
+        result["data"]["orgName"] = "西北片区" if post_id == "a" else "研究院"
+        if post_id == "c" and self.fault in {"postName", "company", "orgCode", "postId"}:
+            result["data"][self.fault] = "其他岗位"
+        return result
+
+
+def fareast_source() -> Source:
+    return Source(
+        source_id="COM0470",
+        company_id="COM0470",
+        company="远东智慧能源股份有限公司",
+        url=f"https://wecruit.hotjob.cn/{FarEastListedCampus.suite}/pb/school.html",
+    )
+
+
+async def test_fareast_accounts_for_every_tree_level_and_keeps_same_title(now: datetime) -> None:
+    replay = FarEastReplay()
+    result = await FarEastListedCampus(fareast_source(), replay, now).collect()
+    assert not result.coverage_issues()
+    scope = result.scopes[0]
+    assert scope.expected == scope.unique == scope.listed == 3
+    assert scope.terminal
+    assert [form["currentPage"] for _, form in replay.calls if "currentPage" in form] == ["1", "2"]
+    assert scope.details == 2 and scope.skipped_out_of_scope == 1
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
+    assert result.jobs[0].title == result.jobs[1].title
+    assert result.jobs[0].unit == "安徽电缆股份有限公司 / 西北片区"
+    assert result.jobs[1].unit == "远东智慧能源股份有限公司 / 研究院"
+    assert result.jobs[1].published == ""
+    assert all(form.get("postId") != "b" for _, form in replay.calls)
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "child_count",
+        "own_count",
+        "own_name",
+        "duplicate",
+        "unknown_branch",
+        "wrong_company",
+        "postName",
+        "company",
+        "orgCode",
+        "postId",
+    ],
+)
+async def test_fareast_rejects_scope_and_identity_drift(fault: str, now: datetime) -> None:
+    result = await FarEastListedCampus(fareast_source(), FarEastReplay(fault), now).collect()
+    assert result.coverage_issues()
+    if fault in {"postName", "company", "orgCode", "postId"}:
+        assert [job.source_key for job in result.jobs] == ["a"]
+        assert result.scopes[0].details == 1
+
+
+def test_fareast_public_field_fixture(now: datetime) -> None:
+    data = json.loads(Path("tests/fixtures/hotjob/COM0470.json").read_text())
+    adapter = FarEastListedCampus(fareast_source(), FarEastReplay(), now)
+    job = adapter._job(data["detail"], data["listing"], "detail", {}, "tree")
+    assert job.source_key == "6ad07ebcf0cfabf2b4f31084"
+    assert job.unit == "安徽电缆股份有限公司 / 西北片区"
+    assert job.location == "滁州市-天长市" and job.education == "本科"
+    assert "【能力要求】" in job.duties and job.requirements == ""
+    assert job.published == "2026-10-15 15:20:15"
+    assert job.deadline == "2027-01-15 23:59:59"

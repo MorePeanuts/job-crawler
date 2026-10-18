@@ -981,7 +981,96 @@ class DbnCampus(Hotjob):
         return job
 
 
+class FarEastListedCampus(Hotjob):
+    name = "hotjob-fareast-listed-campus"
+    suite = "SU641d034b2f9d246c37bb1704"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "远东集团校园全目录；仅机构树0/9/39远东智慧能源上市分支及所属单位"
+    own_root = "0/9/39"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        roots = data.get("orgList", [])
+        check(
+            len(roots) == 1
+            and roots[0].get("code") == "0/9"
+            and roots[0].get("nameCh") == "远东控股集团有限公司",
+            "远东集团根机构身份变化",
+        )
+        self._nodes: dict[str, tuple[str, int]] = {}
+
+        def visit(node: dict[str, Any], parent: str = "") -> None:
+            code, name = text(node.get("code")), text(node.get("nameCh"))
+            check(
+                bool(name)
+                and code not in self._nodes
+                and (not parent or code.startswith(parent + "/")),
+                "远东机构树身份重复或层级异常",
+            )
+            count = int(node["positionsNum"])
+            check(count >= 0, "远东机构岗位数量异常")
+            self._nodes[code] = name, count
+            for child in node.get("childNodes", []):
+                visit(child, code)
+
+        visit(roots[0])
+        check(
+            self.own_root in self._nodes
+            and self._nodes[self.own_root][0] == "远东智慧能源股份有限公司",
+            "远东上市分支缺失或身份变化",
+        )
+        self._counts = dict.fromkeys(self._nodes, 0)
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        code = text(row.get("orgCode"))
+        ancestors = [key for key in self._nodes if code == key or code.startswith(key + "/")]
+        check(bool(ancestors), "远东岗位超出机构树")
+        nearest = max(ancestors, key=len)
+        check(text(row.get("company")) == self._nodes[nearest][0], "远东岗位所属公司不符")
+        for key in ancestors:
+            self._counts[key] += 1
+        return self.own_root in ancestors
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        check(
+            all(self._counts[key] == count for key, (_, count) in self._nodes.items()),
+            "远东机构树各级岗位计数不闭合",
+        )
+        scope = self.result.scopes[0]
+        check(
+            scope.expected == self._nodes["0/9"][1]
+            and scope.skipped_out_of_scope == self._nodes["0/9"][1] - self._nodes[self.own_root][1],
+            "远东上市分支与母集团排除计数不符",
+        )
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                all(
+                    text(row.get(key)) == text(listing.get(key))
+                    for key in ("postName", "company", "orgCode")
+                ),
+                "远东详情标题、公司或机构编码与列表不符",
+            )
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        company = text(listing.get("company"))
+        department = text(row.get("orgName") or listing.get("department"))
+        job.unit = f"{company} / {department}" if department and department != company else company
+        job.field_sources["unit"] = "company为招聘公司，orgName/department为所属部门"
+        job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
+        job.field_sources["published"] = "publishFirstDate；缺失保留未知，不使用publishDate更新日期"
+        return job
+
+
 TENANTS = (
+    FarEastListedCampus,
     HualuHengshengCampus,
     DbnCampus,
     BbmgCampus,
