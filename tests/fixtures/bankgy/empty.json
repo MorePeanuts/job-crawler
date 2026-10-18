@@ -1,0 +1,121 @@
+{
+  "functionId": "ZP1000000001",
+  "succeed": true,
+  "hire_channel": "01",
+  "pageNum": 1,
+  "pageSize": 20,
+  "queryitem": [
+    {
+      "itemid": "z0321"
+    },
+    {
+      "itemid": "z03aa",
+      "value": ""
+    },
+    {
+      "itemid": "z0351",
+      "value": ""
+    }
+  ],
+  "return_data": {
+    "paramValues": "Z0321`Z03AA",
+    "posName": "、工作地点",
+    "position_data": [],
+    "posTotal": 0,
+    "posMap": {
+      "需求单位`z0321": [
+        {
+          "hidden": false,
+          "name": "不限",
+          "check": true,
+          "value": "z0321,需求单位,0"
+        }
+      ]
+    },
+    "posMapKey": [
+      "需求单位`z0321"
+    ],
+    "dateMap": {},
+    "boardlist": [],
+    "batchList": [],
+    "columninfo": [
+      {
+        "itemid": "z0321",
+        "itemdesc": "需求单位",
+        "itemtype": "A",
+        "codesetid": "UN",
+        "deciwidth": "0"
+      },
+      {
+        "itemid": "z0325",
+        "itemdesc": "需求部门",
+        "itemtype": "A",
+        "codesetid": "UM",
+        "deciwidth": "0"
+      },
+      {
+        "itemid": "z0351",
+        "itemdesc": "职位名称",
+        "itemtype": "A",
+        "codesetid": "0",
+        "deciwidth": "0"
+      },
+      {
+        "itemid": "z0315",
+        "itemdesc": "招聘人数",
+        "itemtype": "N",
+        "codesetid": "0",
+        "deciwidth": "0"
+      },
+      {
+        "itemid": "z0329",
+        "itemdesc": "有效起始日期",
+        "itemtype": "D",
+        "codesetid": "0",
+        "deciwidth": "0"
+      },
+      {
+        "itemid": "z0331",
+        "itemdesc": "有效结束日期",
+        "itemtype": "D",
+        "codesetid": "0",
+        "deciwidth": "0"
+      },
+      {
+        "itemid": "z03aa",
+        "itemdesc": "工作地点",
+        "itemtype": "A",
+        "codesetid": "0",
+        "deciwidth": "0"
+      },
+      {
+        "itemid": "ypljl",
+        "itemdesc": "应聘",
+        "itemtype": "A",
+        "codesetid": "0",
+        "deciwidth": "0"
+      }
+    ],
+    "numMap": {},
+    "queryitems": [
+      {
+        "itemid": "z0321",
+        "itemdesc": "需求单位",
+        "itemtype": "A",
+        "itemlength": 30,
+        "codesetid": "UN",
+        "zpOrgShowStyle": "",
+        "layer": "2"
+      },
+      {
+        "itemid": "z03aa",
+        "itemdesc": "工作地点",
+        "itemtype": "A",
+        "itemlength": 150,
+        "codesetid": "0",
+        "zpOrgShowStyle": "",
+        "layer": "0"
+      }
+    ]
+  }
+}
