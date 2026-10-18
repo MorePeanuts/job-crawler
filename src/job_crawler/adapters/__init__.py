@@ -80,6 +80,7 @@ from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.saic import SaicCampus
 from job_crawler.adapters.sbp import SbpCampus
 from job_crawler.adapters.scoped_coapi import BcdhListedCampus, KsfCampus
+from job_crawler.adapters.sdhsg import SdhsgCampus
 from job_crawler.adapters.sdicpower import SdicPowerCampus
 from job_crawler.adapters.sf import SF
 from job_crawler.adapters.shccig_mt import ShccigHeadquartersTrainees
@@ -169,6 +170,7 @@ REGISTRY = {
         JxccCampus,
         Tencent,
         SF,
+        SdhsgCampus,
         SdicPowerCampus,
         SaicCampus,
         ShccigHeadquartersTrainees,
