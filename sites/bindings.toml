@@ -1138,3 +1138,7 @@ version = "1"
 [sources.COM0379]
 adapter = "avary-campus"
 version = "1"
+
+[sources.COM0310]
+adapter = "mtr-graduate"
+version = "1"
