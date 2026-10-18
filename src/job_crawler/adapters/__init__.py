@@ -60,6 +60,7 @@ from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hailiang import HailiangCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
+from job_crawler.adapters.hsbank import HsbankCampus
 from job_crawler.adapters.huafa import HuafaListedCampus
 from job_crawler.adapters.huaneng import HuanengCampus
 from job_crawler.adapters.huawei import HuaweiGraduate
@@ -270,6 +271,7 @@ REGISTRY = {
         GuangzhouRuralBankCampus,
         NewHopeCampus,
         NewWorldCareers,
+        HsbankCampus,
         SasDragonCareers,
         CathayIMatch,
         PddCampus,
