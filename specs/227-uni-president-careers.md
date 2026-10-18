@@ -1,6 +1,6 @@
 # SPEC-227 统一企业人力资源网
 
-状态：调查完成主要契约，待实现与真实验收；SPEC-156 固定 B 组 COM0164，不计入完成数。
+状态：已实现，待质量检查和真实验收；SPEC-156 固定 B 组 COM0164，不计入完成数。
 
 ## 目标与非目标
 
@@ -10,7 +10,7 @@
 
 输入上述企业与官方入口，输出公共 Job/Scope、证据及B组快照。页面真实 GET https://pechr-web-backend.azurewebsites.net/api/jobs 携带 page、countPerPage=10、targetDate（本轮UTC时刻），返回 items/totalCount。已观察page1十条、page2六条，totalCount=16；分页按固定本轮targetDate、总数、唯一jobId闭合，重复页、总数漂移、短页不得冒充终态。列表本身含完整职责与要求，无独立详情接口，不因缺日期跳读内联正文。
 
-字段包括 jobId、orgCode、jobName、jobDesc、workPlace、conditionEdu/Lang/Exp/Others、startDate/endDate、isClosedMark/isActiveMark/isDeleteMark、isSubJob、jobIntroUrl。仅保存公开岗位字段，不提交createBy/lastUpdateBy内部账号字段。requestDate是可报到时间，不是发布日期；creationDate/lastUpdateDate也不替代发布日期。startDate在页面显示为本地职务发布日期；endDate语义尚须核对后实现，不能任意延长有效期。未知日期、地点、单位、学历、专业不推填。
+字段包括 jobId、orgCode、jobName、jobDesc、workPlace、conditionEdu/Lang/Exp/Others、startDate/endDate、isClosedMark/isActiveMark/isDeleteMark、isSubJob、jobIntroUrl。仅保存公开岗位字段，不提交createBy/lastUpdateBy内部账号字段。requestDate是可报到时间，不是发布日期；creationDate/lastUpdateDate也不替代发布日期。startDate在页面显示为本地职务发布日期；endDate为接口提供的带Z时区日期时间，保留原值参与公共截止判断，不把本地午夜擅自延长至当天日末；页面没有单独展示截止字段，该限制保留在字段来源。未知日期、地点、单位、学历、专业不推填。
 
 MA主目录记录的报名入口与官方事业伙伴页核对，条件页六个公司分节各有职缺名称、工作内容、实作规划、职涯发展。以计划jobId+分节官方公司URL作稳定身份，重名标题仍分别保留。主目录计划记录计入父目录核对，不再导出为额外岗位。各职位职责逐节保留，公共申请资格与Q8应届资格带来源追加，实作培训不误判为实习。单位名称须有公开来源；只有Logo/URL时不猜法人名。MA日期只在证明主计划与六分节对应后继承，工作地不从页脚联系地址推填。
 
