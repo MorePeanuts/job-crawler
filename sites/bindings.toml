@@ -1170,3 +1170,7 @@ version = "1"
 [sources.COM0297]
 adapter = "cka-careers"
 version = "1"
+
+[sources.COM0417]
+adapter = "fwd-workday"
+version = "1"
