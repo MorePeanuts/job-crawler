@@ -1126,3 +1126,7 @@ version = "1"
 [sources.COM0411]
 adapter = "mingtai-campus"
 version = "1"
+
+[sources.COM0488]
+adapter = "dingsheng-campus"
+version = "1"
