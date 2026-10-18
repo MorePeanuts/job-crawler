@@ -1118,3 +1118,7 @@ version = "1"
 [sources.COM0470]
 adapter = "hotjob-fareast-listed-campus"
 version = "1"
+
+[sources.COM0090]
+adapter = "sdhsg-campus"
+version = "1"

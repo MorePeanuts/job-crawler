@@ -88,7 +88,7 @@ COM0086,COM0086,海尔智家股份有限公司,https://maker.haier.net/client/ca
 COM0087,COM0087,奇瑞汽车股份有限公司,https://chery.zhiye.com/campus/jobs,Category=2 全目录；仅奇瑞汽车股份（校招）组织编码 886961
 COM0088,COM0088,广州工业投资控股集团有限公司,,
 COM0089,COM0089,晋能控股集团有限公司,https://www.jnkgjtnews.com/info/1009/37343.htm,2025高校毕业生招聘公告
-COM0090,COM0090,山东高速集团有限公司,https://zhaopin.sdhsg.com/,；2026-10-18 查证招聘入口，待适配；SPEC-156 B组
+COM0090,COM0090,山东高速集团有限公司,https://zhaopin.sdhsg.com/#/centralizedRecruitment,SPEC-209：集团完整校园目录；2026-10-18真实零岗位验收，固定B组
 COM0091,COM0091,中国建材集团有限公司,https://cnbmjob.iguopin.com/job-campus,2027 届官方国聘校招专站
 COM0092,COM0092,陕西延长石油（集团）有限责任公司,https://talent-xaa.ycpc.com:8088/#/campus,SPEC-156：2026-10-18 官网招聘入口核验，待适配
 COM0093,COM0093,广东省广新控股集团有限公司,https://ehr.gdghg.com/recruit/,；SPEC-156：2026-10-18 官方页面核验招聘入口，待适配实采
@@ -409,7 +409,7 @@ COM0407,COM0407,江苏国信股份有限公司,,
 COM0408,COM0408,北京京能电力股份有限公司,,
 COM0409,COM0409,盈峰集团有限公司,https://recruit.infore.com/campus/jobs,校园招聘；盈峰集团公开全目录
 COM0410,COM0410,香农芯创科技股份有限公司,,
-COM0411,COM0411,河南明泰铝业股份有限公司,,
+COM0411,COM0411,河南明泰铝业股份有限公司,https://www.hngymt.com/contact/recruitment/,SPEC-156：官网人才招聘7条待核对校园范围；固定B组
 COM0412,COM0412,软通动力信息技术（集团）股份有限公司,https://career.isoftstone.com/talent/htmls/xiaoyuanzhaopin/index.html,校园招聘
 COM0413,COM0413,中信建投证券股份有限公司,https://csc108.zhiye.com/campus/jobs,校园招聘
 COM0414,COM0414,中国铁路通信信号股份有限公司,https://www.crsc.cn/news/tsi_1078_14155_100594.html,2027届校园招聘公告；集团范围
@@ -420,7 +420,7 @@ COM0418,COM0418,中国铁路物资股份有限公司,,
 COM0419,COM0419,申万宏源集团股份有限公司,https://app.mokahr.com/campus-recruitment/swhysc-job/166086?locale=zh-CN,; SPEC-156 B: official recruitment entrance verified 2026-10-18; adapter pending
 COM0420,COM0420,重庆银行股份有限公司,https://cqcbank2027.zhaopin.com/post/index.html,2027届校园招聘
 COM0421,COM0421,浙江英特集团股份有限公司,https://recruit.zibchina.com/campus.html,校园招聘；浙江国贸集团统一入口，覆盖英特集团
-COM0422,COM0422,佛燃能源集团股份有限公司,,
+COM0422,COM0422,佛燃能源集团股份有限公司,https://xiaoyuan.zhaopin.com/company/XY000632121,SPEC-156：高校校招直链及总公司已核验，待适配；固定B组
 COM0423,COM0423,蜜雪冰城股份有限公司,https://careers.mxbc.com/campus/jobs,集团公开2027届校园招聘目录；列表未公开逐岗法人名称
 COM0424,COM0424,哈尔滨银行股份有限公司,https://wisehr.hrbb.com.cn/pages/jobs/index.html,2027届校园招聘公告；哈尔滨银行集团
 COM0425,COM0425,深圳迈瑞生物医疗电子股份有限公司,https://career.mindray.com/campus/jobs,校园招聘
