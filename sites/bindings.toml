@@ -1114,3 +1114,7 @@ version = "1"
 [sources.COM0044]
 adapter = "zhiye-shenghong-group-campus"
 version = "1"
+
+[sources.COM0470]
+adapter = "hotjob-fareast-listed-campus"
+version = "1"
