@@ -1154,3 +1154,7 @@ version = "1"
 [sources.COM0492]
 adapter = "sjm-public-jobs"
 version = "1"
+
+[sources.COM0395]
+adapter = "pccw-graduate"
+version = "1"
