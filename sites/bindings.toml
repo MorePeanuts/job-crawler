@@ -1226,3 +1226,7 @@ version = "1"
 [sources.COM0124]
 adapter = "cathay-imatch-campus"
 version = "1"
+
+[sources.COM0253]
+adapter = "goldjewelry-campus"
+version = "1"
