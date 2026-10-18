@@ -4,6 +4,7 @@ from job_crawler.adapters.aisidi import AisidiCampus
 from job_crawler.adapters.anker import AnkerCampus
 from job_crawler.adapters.ansteel import Ansteel
 from job_crawler.adapters.asus import AsusMainlandCampus
+from job_crawler.adapters.avary import AvaryCampus
 from job_crawler.adapters.bank_catalogs import TENANTS as BANK_TENANTS
 from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bilibili import Bilibili
@@ -122,6 +123,7 @@ REGISTRY = {
     adapter.name: adapter
     for adapter in (
         AnkerCampus,
+        AvaryCampus,
         QdbankCampus,
         DingshengCampus,
         MingtaiCampus,
