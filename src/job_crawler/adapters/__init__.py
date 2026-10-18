@@ -95,6 +95,7 @@ from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.qdbank import QdbankCampus
 from job_crawler.adapters.saic import SaicCampus
+from job_crawler.adapters.sasdragon import SasDragonCareers
 from job_crawler.adapters.sbp import SbpCampus
 from job_crawler.adapters.scoped_coapi import BcdhListedCampus, KsfCampus
 from job_crawler.adapters.sdhsg import SdhsgCampus
@@ -269,6 +270,7 @@ REGISTRY = {
         GuangzhouRuralBankCampus,
         NewHopeCampus,
         NewWorldCareers,
+        SasDragonCareers,
         CathayIMatch,
         PddCampus,
         YingteCampus,
