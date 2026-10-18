@@ -151,3 +151,71 @@ def test_ma_missing_duties_not_silently_dropped():
     conditions = (FIX / "conditions.html").read_text().replace("工作內容", "未知內容", 1)
     with pytest.raises(CrawlError, match="分节不完整"):
         ma_program(conditions, (FIX / "faq.html").read_text())
+
+
+@pytest.mark.asyncio
+async def test_real_tab_roles_and_question_disclosure(now):
+    from bs4 import BeautifulSoup
+
+    from job_crawler.adapters.uni_president import INTERN, MATCHING
+
+    class Element:
+        def __init__(self, page, found, target=None):
+            assert found, "public DOM element not found"
+            self.page = page
+            self.target = target
+            self.first = self
+
+        async def click(self):
+            if self.target:
+                self.page.name = self.target
+
+        async def wait_for(self):
+            pass
+
+    class Page:
+        name = "conditions"
+
+        def soup(self):
+            return BeautifulSoup((FIX / (self.name + ".html")).read_text(), "html.parser")
+
+        def get_by_role(self, role, *, name, exact):
+            assert exact
+            found = [
+                e
+                for e in self.soup().select("button, [role]")
+                if e.get("role", e.name) == role and e.get_text(strip=True) == name
+            ]
+            return Element(self, found, "conditions" if name == "職缺條件" else "faq")
+
+        def get_by_text(self, value, *, exact):
+            assert exact
+            return Element(self, self.soup().find(string=lambda s: s and s.strip() == value))
+
+        def locator(self, selector):
+            return Element(self, self.soup().select(selector))
+
+        async def content(self):
+            return (FIX / (self.name + ".html")).read_text()
+
+    class Views:
+        page = Page()
+
+        async def open(self, url):
+            self.page.name = {MA: "conditions", MATCHING: "matching", INTERN: "intern"}[url]
+
+        def snapshot(self, label, html):
+            assert html
+            return label
+
+    adapter = UniPresidentCareers(
+        Source(
+            source_id="COM0164", company_id="COM0164", company="统一企业股份有限公司", url=CAREERS
+        ),
+        cast(Session, Views()),
+        now,
+    )
+    conditions, faq, matching, intern, evidence = await adapter.views()
+    assert len(ma_program(conditions, faq)[0]) == 6
+    assert "進行媒合60天" in matching and "實習期間為全職學生身分" in intern
+    assert len(evidence) == 4

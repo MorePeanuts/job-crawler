@@ -158,11 +158,11 @@ class UniPresidentCareers(Adapter):
         session = cast(BrowserSession, self.session)
         evidence: list[str] = []
         await session.open(MA)
-        await session.page.get_by_role("button", name="職缺條件", exact=True).click()
+        await session.page.get_by_role("tab", name="職缺條件", exact=True).click()
         await session.page.locator(".sheet-item-title").first.wait_for()
         conditions = await session.page.content()
         evidence.append(session.snapshot("ma-conditions", conditions))
-        await session.page.get_by_role("button", name="應徵Q&A", exact=True).click()
+        await session.page.get_by_role("tab", name="應徵Q&A", exact=True).click()
         for question in (Q8, Q5):
             await session.page.get_by_text(question, exact=True).click()
         await session.page.get_by_text("可以，請您於填寫履歷時說明。", exact=True).wait_for()
