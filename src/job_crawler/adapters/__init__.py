@@ -111,6 +111,7 @@ from job_crawler.adapters.swhy import SwhyCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.tfme import TfmeCampus
+from job_crawler.adapters.workday import MelcoWorkday
 from job_crawler.adapters.wtmec import Wtmec
 from job_crawler.adapters.xfusion import XfusionCampus
 from job_crawler.adapters.xingfa import XingfaCampus
@@ -223,6 +224,7 @@ REGISTRY = {
         HuafaListedCampus,
         StecCampus,
         CkaCareers,
+        MelcoWorkday,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,
