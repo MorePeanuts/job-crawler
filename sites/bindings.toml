@@ -1210,3 +1210,7 @@ version = "1"
 [sources.COM0138]
 adapter = "yuntou-notices"
 version = "1"
+
+[sources.COM0499]
+adapter = "newworld-careers"
+version = "1"
