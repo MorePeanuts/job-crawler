@@ -77,9 +77,17 @@ class Page:
         self.fault = fault
         self.calls = 0
         self.text = ""
+        self.in_cell = False
+
+    def get_by_role(self, role):
+        assert role == "cell"
+        self.in_cell = True
+        return self
 
     def get_by_text(self, text, *, exact):
         assert exact and text in {"搜索", "共0个职位", "暂无数据", "校园招聘"}
+        if text == "暂无数据":
+            assert self.in_cell, "the real page has a second empty-state node outside the table"
         self.text = text
         return self
 
