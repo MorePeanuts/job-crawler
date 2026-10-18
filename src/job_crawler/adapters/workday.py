@@ -95,6 +95,9 @@ class WorkdayPublicJobs(Adapter):
     def body(self, html: str) -> tuple[str, str]:
         return description(html)
 
+    def scope_text(self, duties: str, requirements: str) -> str:
+        return requirements
+
     def kind(self, title: str, requirements: str, time_type: str) -> str:
         return recruitment_type(title, words(requirements), time_type)
 
@@ -160,7 +163,9 @@ class WorkdayPublicJobs(Adapter):
             "published": absolute_date(info.get("startDate")),
             "deadline": absolute_date(info.get("endDate")),
             "closed": not info["canApply"] or not info["posted"],
-            "work_type": self.kind(info["title"], requirements, info["timeType"]),
+            "work_type": self.kind(
+                info["title"], self.scope_text(duties, requirements), info["timeType"]
+            ),
             "field_sources": {
                 "published": "jobPostingInfo.startDate；不使用相对postedOn",
                 "deadline": "jobPostingInfo.endDate；日粒度原值",
@@ -354,6 +359,63 @@ class HkexWorkday(WorkdayPublicJobs):
             if re.fullmatch(
                 r"(?:Job |Key |Essential )?Requirements?|Qualifications(?: & Experience)?|Required Skills & Experience|Academic and Professional Qualifications Required|We are looking for candidates who",
                 words(line).rstrip(":"),
+                re.I,
+            ):
+                return "\n".join(lines[:n]).strip(), "\n".join(lines[n + 1 :]).strip()
+        return "", "\n".join(lines)
+
+
+class AiaWorkday(WorkdayPublicJobs):
+    name = "aia-workday"
+    allow_locationless = True
+    allow_missing_country = True
+    tenant = "aia"
+    site = "External"
+    host = "aia.wd3.myworkdayjobs.com"
+    path = "/zh-CN/External"
+    ready_endpoints = ("/wday/cxs/aia/External/jobs",)
+    time_types = {"Full time", "Part time", ""}
+    scope_description = (
+        "友邦Workday所有国家/公司公开目录；仅明确正式应届，排除实习与兼职，地点按实际工作地"
+    )
+
+    def scope_text(self, duties: str, requirements: str) -> str:
+        # JR-69187 explicitly welcomes graduates in its role introduction.
+        return duties + "\n" + requirements
+
+    def kind(self, title: str, requirements: str, time_type: str) -> str:
+        if re.match(r"Expression of Interest\b", title, re.I):
+            return "人才意向登记"
+        return recruitment_type(title, title + "\n" + words(requirements), time_type)
+
+    def body(self, html: str) -> tuple[str, str]:
+        doc = BeautifulSoup(html, "html.parser")
+        check(not doc.select("img,iframe,object,embed,video"), "友邦正文含未展开媒体")
+        check(
+            all(
+                a.get("href") == "https://www.aia.co.th/th/about-aia/privacy/candidate"
+                for a in doc.select("a[href]")
+            ),
+            "友邦新增正文链接需核对",
+        )
+        lines = doc.get_text("\n", strip=True).splitlines()
+        if "About the Role" in lines:
+            lines = lines[lines.index("About the Role") + 1 :]
+        tails = [
+            n
+            for n, line in enumerate(lines)
+            if line.startswith("Build a career with us as we help our customers")
+            or line.startswith(
+                "You must provide all requested information, including Personal Data"
+            )
+        ]
+        if tails:
+            lines = lines[: min(tails)]
+        check(len("\n".join(lines)) > 100, "友邦岗位正文缺失")
+        for n, line in enumerate(lines):
+            if re.fullmatch(
+                r"(?:Minimum |Key )?(?:Job )?Requirements?|(?:Minimum )?Qualifications|岗位要求|任职要求|任職要求|資格要求",
+                words(line).rstrip(":："),
                 re.I,
             ):
                 return "\n".join(lines[:n]).strip(), "\n".join(lines[n + 1 :]).strip()

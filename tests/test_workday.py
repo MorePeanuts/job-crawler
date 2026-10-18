@@ -375,3 +375,90 @@ def test_hkex_relaxation_is_tenant_scoped_and_new_media_fails(now):
         a.body(html + '<a href="https://example.test/qualification.pdf">Details</a>')
     with pytest.raises(Exception, match="媒体"):
         a.body(html + '<img src="requirements.png">')
+
+
+@pytest.mark.parametrize(
+    "name,kind", [("intro", "校招"), ("chinese", "校招"), ("intern", "实习"), ("conflict", "校招")]
+)
+def test_aia_role_introduction_chinese_qualifications_and_unknown_time(now, name, kind):
+    from job_crawler.adapters.workday import AiaWorkday
+
+    sample = json.loads((FIX / f"aia-{name}.json").read_text())
+    a = AiaWorkday(
+        Source(
+            source_id="COM0094",
+            company_id="COM0094",
+            company="友邦保险",
+            url=f"https://{AiaWorkday.host}/zh-CN/External",
+        ),
+        cast(Session, Replay()),
+        now,
+    )
+    fields = a.parse_detail(sample["detail"], sample["listing"])
+    assert fields["work_type"] == kind
+    assert "You must provide all requested information" not in fields["requirements"]
+    if name == "intro":
+        assert "Fresh graduates" in fields["duties"]
+        assert "Fresh graduates" not in fields["requirements"]
+        assert fields["location"].startswith("马来西亚、Putrajaya")
+    if name == "chinese":
+        assert "应届生" in fields["requirements"]
+        assert "负责产品全生命周期管理" in fields["duties"]
+    if name == "intern":
+        assert sample["detail"]["jobPostingInfo"]["timeType"] == ""
+    if name == "conflict":
+        assert "Minimum of 5 years" in fields["requirements"]
+        assert "Fresh graduates are welcome" in fields["requirements"]
+
+
+def test_aia_privacy_link_is_not_a_job_attachment_but_unknown_links_fail(now):
+    from job_crawler.adapters.workday import AiaWorkday
+
+    sample = json.loads((FIX / "aia-intro.json").read_text())
+    a = AiaWorkday(
+        Source(
+            source_id="COM0094",
+            company_id="COM0094",
+            company="友邦保险",
+            url=f"https://{AiaWorkday.host}/zh-CN/External",
+        ),
+        cast(Session, Replay()),
+        now,
+    )
+    html = sample["detail"]["jobPostingInfo"]["jobDescription"]
+    assert a.body(
+        html + '<a href="https://www.aia.co.th/th/about-aia/privacy/candidate">Privacy</a>'
+    ) == a.body(html)
+    with pytest.raises(Exception, match="新增正文链接"):
+        a.body(html + '<a href="https://example.test/requirements">Required qualification</a>')
+    with pytest.raises(Exception, match="媒体"):
+        a.body(html + '<img src="qualifications.png">')
+
+
+@pytest.mark.parametrize(
+    "name,kind", [("title", "校招"), ("locationless", "未明确校招"), ("interest", "人才意向登记")]
+)
+def test_aia_last_page_shapes_and_title_only_graduate_scope(now, name, kind):
+    from job_crawler.adapters.workday import AiaWorkday
+
+    sample = json.loads((FIX / f"aia-{name}.json").read_text())
+    a = AiaWorkday(
+        Source(
+            source_id="COM0094",
+            company_id="COM0094",
+            company="友邦保险",
+            url=f"https://{AiaWorkday.host}/zh-CN/External",
+        ),
+        cast(Session, Replay()),
+        now,
+    )
+    fields = a.parse_detail(sample["detail"], sample["listing"])
+    assert fields["work_type"] == kind
+    if name == "title":
+        assert "Fresh Graduate" in fields["title"]
+        assert "fresh graduate" not in (fields["duties"] + fields["requirements"]).lower()
+    if name == "locationless":
+        assert fields["location"] == "" and fields["published"]
+    if name == "interest":
+        assert "Fresh Graduate" in fields["requirements"]
+        assert fields["title"].startswith("Expression of Interest")
