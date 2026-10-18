@@ -7,6 +7,7 @@ from job_crawler.adapters.asus import AsusMainlandCampus
 from job_crawler.adapters.avary import AvaryCampus
 from job_crawler.adapters.bank_catalogs import TENANTS as BANK_TENANTS
 from job_crawler.adapters.bankcomm import BankComm
+from job_crawler.adapters.beigene import BeigeneRecruitment
 from job_crawler.adapters.bilibili import Bilibili
 from job_crawler.adapters.bluefocus import BlueFocus
 from job_crawler.adapters.boe import BoeCampus
@@ -232,6 +233,7 @@ REGISTRY = {
         FwdWorkday,
         HkexWorkday,
         AiaWorkday,
+        BeigeneRecruitment,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,

@@ -92,6 +92,9 @@ class WorkdayPublicJobs(Adapter):
     def listing_key(self, row: dict[str, Any]) -> str:
         return listing(row, allow_locationless=self.allow_locationless)
 
+    def detail_endpoint(self, row: dict[str, Any]) -> str:
+        return self.api + "/job/" + self.listing_key(row)
+
     def body(self, html: str) -> tuple[str, str]:
         return description(html)
 
@@ -211,7 +214,7 @@ class WorkdayPublicJobs(Adapter):
                     if reused is not None:
                         self.result.jobs.extend(reused)
                         continue
-                    data = await self.session.request(self.api + "/job/" + key)
+                    data = await self.session.request(self.detail_endpoint(row))
                     job = self.job(key, **self.parse_detail(data, row))
                     job.evidence = [evidence, self.session.last_evidence]
                     self.result.jobs.append(job)

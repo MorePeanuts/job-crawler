@@ -1,0 +1,67 @@
+{
+  "listing": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "3d3a2e40-26a9-4657-bc7f-ad75f2cbd16c",
+    "jobDescription": "<p>Key Responsibilities</p><p>1.\tParticipate in preclinical DMPK studies and development strategy for innovative drug programs, including pharmacokinetics, drug metabolism, ADME, and related studies. Contribute to study design, data analysis, and integrated interpretation of study results to build comprehensive DMPK packages supporting clinical development and regulatory submissions.</p><p>2.\tParticipate in the design, execution, and oversight of DMPK studies, working with internal laboratory teams and CROs to advance relevant studies. Analyze and interpret study results and help address DMPK-related scientific questions arising during drug development.</p><p>3.\tContribute to the preparation and review of DMPK-related technical and regulatory documents, including study protocols, study reports, development summaries, and relevant submission documents, while progressively developing the capability to support global regulatory submissions such as IND/CTA and NDA/BLA.</p><p>4.\tParticipate in project team and scientific discussions, identify and assess DMPK-related risks during drug development, and progressively develop the capability to independently design study strategies, solve scientific problems, and support project decision-making.</p><p><br></p><p>Qualifications</p><p>1.\tPhD or anticipated PhD graduate in Pharmacokinetics, Drug Metabolism, Pharmaceutical Sciences, Pharmacology, or a related discipline.</p><p>2.\tResearch experience in DMPK, ADME, pharmacokinetics, drug metabolism, bioanalysis, or related areas during PhD training.</p><p>3.\tStrong scientific foundation in DMPK/PK and sound scientific thinking, with demonstrated capabilities in data analysis and interpretation. Ability to identify scientific questions, develop reasonable hypotheses, and draw clear conclusions based on experimental data.</p><p>4.\tStrong interest in innovative drug development and DMPK research, with the motivation to develop from expertise in individual studies toward an integrated understanding of the drug development process, DMPK strategy, and multidisciplinary project decision-making.</p><p>5.\tStrong learning agility, communication skills, and collaborative mindset, with the ability to communicate and collaborate effectively in a cross-functional project environment.</p><p>6.\tGood verbal and written communication skills in both Chinese and English, with the ability to effectively read scientific literature in English and communicate scientific information clearly in writing and presentations.</p><p>7.\tExperience with GastroPlus, Phoenix WinNonlin, PK-Sim, PBPK modeling, PK/PD modeling, or other pharmacokinetic modeling and simulation tools is preferred.</p>",
+    "locations": [
+      {
+        "cityId": 310000,
+        "cityName": "上海市",
+        "country": "中国",
+        "id": 565845,
+        "provinceId": 310000,
+        "provinceName": "上海市"
+      },
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "id": 447457,
+        "provinceId": 110000,
+        "provinceName": "北京市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-10-15T17:32:51",
+    "status": "open",
+    "title": "研究员，药代动力学 Research Investigator, Development DMPK, DMPK-BA（博士岗）"
+  },
+  "detail": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "3d3a2e40-26a9-4657-bc7f-ad75f2cbd16c",
+    "jobDescription": "<p>Key Responsibilities</p><p>1.\tParticipate in preclinical DMPK studies and development strategy for innovative drug programs, including pharmacokinetics, drug metabolism, ADME, and related studies. Contribute to study design, data analysis, and integrated interpretation of study results to build comprehensive DMPK packages supporting clinical development and regulatory submissions.</p><p>2.\tParticipate in the design, execution, and oversight of DMPK studies, working with internal laboratory teams and CROs to advance relevant studies. Analyze and interpret study results and help address DMPK-related scientific questions arising during drug development.</p><p>3.\tContribute to the preparation and review of DMPK-related technical and regulatory documents, including study protocols, study reports, development summaries, and relevant submission documents, while progressively developing the capability to support global regulatory submissions such as IND/CTA and NDA/BLA.</p><p>4.\tParticipate in project team and scientific discussions, identify and assess DMPK-related risks during drug development, and progressively develop the capability to independently design study strategies, solve scientific problems, and support project decision-making.</p><p><br></p><p>Qualifications</p><p>1.\tPhD or anticipated PhD graduate in Pharmacokinetics, Drug Metabolism, Pharmaceutical Sciences, Pharmacology, or a related discipline.</p><p>2.\tResearch experience in DMPK, ADME, pharmacokinetics, drug metabolism, bioanalysis, or related areas during PhD training.</p><p>3.\tStrong scientific foundation in DMPK/PK and sound scientific thinking, with demonstrated capabilities in data analysis and interpretation. Ability to identify scientific questions, develop reasonable hypotheses, and draw clear conclusions based on experimental data.</p><p>4.\tStrong interest in innovative drug development and DMPK research, with the motivation to develop from expertise in individual studies toward an integrated understanding of the drug development process, DMPK strategy, and multidisciplinary project decision-making.</p><p>5.\tStrong learning agility, communication skills, and collaborative mindset, with the ability to communicate and collaborate effectively in a cross-functional project environment.</p><p>6.\tGood verbal and written communication skills in both Chinese and English, with the ability to effectively read scientific literature in English and communicate scientific information clearly in writing and presentations.</p><p>7.\tExperience with GastroPlus, Phoenix WinNonlin, PK-Sim, PBPK modeling, PK/PD modeling, or other pharmacokinetic modeling and simulation tools is preferred.</p>",
+    "locations": [
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 447457,
+        "provinceName": "北京市"
+      },
+      {
+        "cityId": 310000,
+        "cityName": "上海市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 565845,
+        "provinceName": "上海市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-10-15T17:32:51",
+    "status": "open",
+    "title": "研究员，药代动力学 Research Investigator, Development DMPK, DMPK-BA（博士岗）",
+    "zhineng": {
+      "name": "其他"
+    }
+  }
+}

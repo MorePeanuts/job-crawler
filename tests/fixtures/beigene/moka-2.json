@@ -1,0 +1,51 @@
+{
+  "listing": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "1ff4ce16-5a07-4f80-834d-d4c78bbf9e3b",
+    "jobDescription": "<p>We are seeking a highly motivated Investigator to join the Drug Substance (DS) Process Development team within Small Molecule CMC. The successful candidate will contribute to the development of safe, scalable, and robust chemical manufacturing processes for innovative small-molecule drug candidates. The role focuses on chemical process development, route evaluation, process optimization, scale-up studies, and technology transfer activities that support clinical drug substance manufacturing and future commercial development. The position offers opportunities to work closely with Process Chemistry, Analytical Development, Manufacturing, and external CDMO partners while contributing to the development of life-changing medicines.</p><p><br></p><p>Education</p><p>PhD degree in Organic Chemistry, Medicinal Chemistry, Chemical Engineering, Pharmaceutical Sciences, or a related discipline.</p>",
+    "locations": [
+      {
+        "cityId": 320500,
+        "cityName": "苏州市",
+        "country": "中国",
+        "id": 445500,
+        "provinceId": 320000,
+        "provinceName": "江苏"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-10-14T19:17:26",
+    "status": "open",
+    "title": "工艺研究员/Research Investigator, CMC Drug Substance (博士)"
+  },
+  "detail": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "1ff4ce16-5a07-4f80-834d-d4c78bbf9e3b",
+    "jobDescription": "<p>We are seeking a highly motivated Investigator to join the Drug Substance (DS) Process Development team within Small Molecule CMC. The successful candidate will contribute to the development of safe, scalable, and robust chemical manufacturing processes for innovative small-molecule drug candidates. The role focuses on chemical process development, route evaluation, process optimization, scale-up studies, and technology transfer activities that support clinical drug substance manufacturing and future commercial development. The position offers opportunities to work closely with Process Chemistry, Analytical Development, Manufacturing, and external CDMO partners while contributing to the development of life-changing medicines.</p><p><br></p><p>Education</p><p>PhD degree in Organic Chemistry, Medicinal Chemistry, Chemical Engineering, Pharmaceutical Sciences, or a related discipline.</p>",
+    "locations": [
+      {
+        "cityId": 320500,
+        "cityName": "苏州市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 445500,
+        "provinceName": "江苏"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-10-14T19:17:26",
+    "status": "open",
+    "title": "工艺研究员/Research Investigator, CMC Drug Substance (博士)",
+    "zhineng": {
+      "name": "其他"
+    }
+  }
+}

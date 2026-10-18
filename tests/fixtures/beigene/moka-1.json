@@ -1,0 +1,67 @@
+{
+  "listing": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "d80980ae-f53b-4af1-8e8b-21339a2645ca",
+    "jobDescription": "<p>General Description:</p><p>About BeOne and BeOne Institute</p><p>Over the past decade BeOne has grown exponentially and become an industry leader with a robust drug pipeline combined with strong production capacity. In addition, as an emerging industry leader with over 7000 employees globally, BeOne has built a world-class clinical development team and a leading commercial team to bring accessible and affordable medicines to patients around the world.</p><p><br></p><p>As part of its ongoing efforts to drive the development of truly innovative and transformative medicines, BeOne is creating a brand-new research institution in Shanghai, China, BeOne Institute. Our goal is to establish a cross-disciplinary research organization where cutting-edge science and technology drive the discovery of impactful Insights into human health and disease. BeOne Institute functions as an independent research entity within BeOne to enable sustainable scientific discoveries and innovation.</p><p><strong>Key Responsibilities</strong></p><ul><li>Design, develop, optimize, and execute cell-based in vitro assays to support target discovery, target validation, and therapeutic candidate evaluation.</li><li>Generate high-quality experimental data to investigate target biology, disease mechanisms, and pharmacologic activity of therapeutic candidates.</li><li>Propose and test novel scientific hypotheses, therapeutic concepts, and experimental approaches that advance immunology and inflammation research programs.</li><li>Contribute to the evaluation and prioritization of emerging targets, pathways, and therapeutic modalities through literature review and experimental investigation.</li><li>Apply cellular and molecular biology techniques to characterize immune cell function and interrogate mechanisms relevant to autoimmune and inflammatory diseases.</li><li>Collaborate effectively within cross-functional project teams to advance research objectives and support key program decisions.</li><li>Analyze, interpret, and communicate scientific findings through presentations, technical reports, and scientific documentation.</li><li>Troubleshoot experimental challenges and contribute to the continuous improvement of assay platforms, technologies, and research workflows.</li></ul><p><strong>Qualifications</strong></p><ul><li>Ph.D. in Immunology, Cell Biology, Molecular Biology, Pharmacology, Translational Medicine, or a related life sciences discipline.</li><li>0-3 years of relevant research experience in academia, biotechnology, or pharmaceutical research.</li><li>Strong foundation in immunology, inflammation, autoimmune diseases, or related areas of biology.</li><li>Demonstrated ability to formulate scientific hypotheses, design experiments, and interpret complex biological data.</li><li>Hands-on experience with cell-based assays and immunology research techniques.</li><li>Experience with technologies such as flow cytometry, cell culture, ELISA, qPCR, Western blotting, multiplex immunoassays, or related methodologies.</li><li>Strong critical thinking, problem-solving, and data interpretation skills.</li><li>Evidence of scientific achievement through publications, presentations, patents, or other significant research accomplishments.</li><li>Excellent communication and collaborative skills in a multidisciplinary research environment.</li></ul><p><strong>Preferred Qualifications</strong></p><ul><li>Experience studying immune cell biology, cytokine signaling, or mechanisms underlying autoimmune and inflammatory diseases.</li><li>Experience developing mechanistically informative cellular assays to support drug discovery decision-making.</li></ul>",
+    "locations": [
+      {
+        "cityId": 310115,
+        "cityName": "浦东新区",
+        "country": "中国",
+        "id": 830866,
+        "provinceId": 310000,
+        "provinceName": "上海市"
+      },
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "id": 453344,
+        "provinceId": 110000,
+        "provinceName": "北京市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-10-15T15:04:13",
+    "status": "open",
+    "title": "研究员，免疫/Research Investigator, Non-Oncology Therapeutics(博士)"
+  },
+  "detail": {
+    "commitment": "全职",
+    "department": {
+      "id": 2839343,
+      "name": "Research"
+    },
+    "id": "d80980ae-f53b-4af1-8e8b-21339a2645ca",
+    "jobDescription": "<p>General Description:</p><p>About BeOne and BeOne Institute</p><p>Over the past decade BeOne has grown exponentially and become an industry leader with a robust drug pipeline combined with strong production capacity. In addition, as an emerging industry leader with over 7000 employees globally, BeOne has built a world-class clinical development team and a leading commercial team to bring accessible and affordable medicines to patients around the world.</p><p><br></p><p>As part of its ongoing efforts to drive the development of truly innovative and transformative medicines, BeOne is creating a brand-new research institution in Shanghai, China, BeOne Institute. Our goal is to establish a cross-disciplinary research organization where cutting-edge science and technology drive the discovery of impactful Insights into human health and disease. BeOne Institute functions as an independent research entity within BeOne to enable sustainable scientific discoveries and innovation.</p><p><strong>Key Responsibilities</strong></p><ul><li>Design, develop, optimize, and execute cell-based in vitro assays to support target discovery, target validation, and therapeutic candidate evaluation.</li><li>Generate high-quality experimental data to investigate target biology, disease mechanisms, and pharmacologic activity of therapeutic candidates.</li><li>Propose and test novel scientific hypotheses, therapeutic concepts, and experimental approaches that advance immunology and inflammation research programs.</li><li>Contribute to the evaluation and prioritization of emerging targets, pathways, and therapeutic modalities through literature review and experimental investigation.</li><li>Apply cellular and molecular biology techniques to characterize immune cell function and interrogate mechanisms relevant to autoimmune and inflammatory diseases.</li><li>Collaborate effectively within cross-functional project teams to advance research objectives and support key program decisions.</li><li>Analyze, interpret, and communicate scientific findings through presentations, technical reports, and scientific documentation.</li><li>Troubleshoot experimental challenges and contribute to the continuous improvement of assay platforms, technologies, and research workflows.</li></ul><p><strong>Qualifications</strong></p><ul><li>Ph.D. in Immunology, Cell Biology, Molecular Biology, Pharmacology, Translational Medicine, or a related life sciences discipline.</li><li>0-3 years of relevant research experience in academia, biotechnology, or pharmaceutical research.</li><li>Strong foundation in immunology, inflammation, autoimmune diseases, or related areas of biology.</li><li>Demonstrated ability to formulate scientific hypotheses, design experiments, and interpret complex biological data.</li><li>Hands-on experience with cell-based assays and immunology research techniques.</li><li>Experience with technologies such as flow cytometry, cell culture, ELISA, qPCR, Western blotting, multiplex immunoassays, or related methodologies.</li><li>Strong critical thinking, problem-solving, and data interpretation skills.</li><li>Evidence of scientific achievement through publications, presentations, patents, or other significant research accomplishments.</li><li>Excellent communication and collaborative skills in a multidisciplinary research environment.</li></ul><p><strong>Preferred Qualifications</strong></p><ul><li>Experience studying immune cell biology, cytokine signaling, or mechanisms underlying autoimmune and inflammatory diseases.</li><li>Experience developing mechanistically informative cellular assays to support drug discovery decision-making.</li></ul>",
+    "locations": [
+      {
+        "cityId": 110000,
+        "cityName": "北京市",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 453344,
+        "provinceName": "北京市"
+      },
+      {
+        "cityId": 310115,
+        "cityName": "浦东新区",
+        "country": "中国",
+        "countryDescription": "中国",
+        "id": 830866,
+        "provinceName": "上海市"
+      }
+    ],
+    "orgId": "beigene",
+    "publishedAt": "2026-10-15T15:04:13",
+    "status": "open",
+    "title": "研究员，免疫/Research Investigator, Non-Oncology Therapeutics(博士)",
+    "zhineng": {
+      "name": "其他"
+    }
+  }
+}
