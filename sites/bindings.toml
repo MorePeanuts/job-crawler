@@ -1106,3 +1106,7 @@ version = "1"
 [sources.COM0363]
 adapter = "moka-zczl-2027"
 version = "1"
+
+[sources.COM0481]
+adapter = "laopu-campus"
+version = "1"
