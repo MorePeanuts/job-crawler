@@ -1,0 +1,21 @@
+# SPEC-212 青岛银行公开校园目录
+
+状态：计划；SPEC-156 固定A组COM0482，qdbank-campus@1。
+
+## 目标、输入输出与非目标
+
+接入官网人才招聘实际跳转的 https://ehr.qdboffice.com:7000/TalentRecruit/campus-recruitment，核对全部部门、类别、经验的校园职位，并检查同门户最新动态公告。输入为青岛银行股份有限公司来源，输出公共Collection/Scope、目录证据和运行报告。当前两类目录均明确为零，只有接口和校园DOM一致才允许零岗位验收；不把社招岗位算校招。不登录、注册、发送验证码、投递或调用登录后详情接口。
+
+## 观察到的契约和限制
+
+公开POST /api/ciic-ihr-rcr-service/rcr-positionLibrary/query-rcr-door-list，请求为page=1、limit=10、total=0、filters=[]、orders=[]，condition={reqType:"P3528000002",plName:"",plType:[],dept:[],workExp:[]}。P3528000001为社招。响应code="0"，data包含records/total/size/current/pages。只允许页码变化；严格核对总数、页大小、页码、唯一id、每页行数与末端。校园激活导航必须为“校园招聘”；总数零时还需.nodata显示“暂无职位”，不能以加载中或空白页面代替。
+
+最新动态公开路由/TalentRecruit/latest-news发起POST同前缀query-rcr-anno-list，page=1、limit=10、total=0、filters=[]、orders=[]，condition={plName:""}，同样code="0"、total=0、size=10、current=1、pages=0、records=[]。当前无公告可进一步展开；未来出现公告必须停止完整性验收并报告新公告需核验，不能忽略公告宣称全覆盖。
+
+校园与社招复用公开social-recruitment前端组件。queryDetails先检查登录状态，无会话则跳到/login；实际点击社招“查看详情”已正常进入登录页。非零社招仅用于验证分页字段与访问行为，不当成校招实采样本。适配器继续保留非零校园目录计数和逐岗位id，但不从列表虚构职责、要求或详情状态，不请求受保护详情，不将未取得详情计作完成。当前没有非零校园岗位可验收，未来非零运行须明确partial/auth_required，待合法公开详情来源或另行授权的会话支持后再扩展。
+
+## 失败与可验证验收
+
+未知入口/端口、业务失败、筛选变化、总数或页码变化、重复ID、缺行、校园DOM不符、公告新增、非零详情不可访问均保留问题，不成为成功空结果。目录岗位按源id计数；无详情时不生成虚构Job，因此无日期补造和增量详情复用。当前零范围每次实时核验，不复用历史空结果。
+
+回放覆盖两类明确零目录、校园导航和空状态、社招参数误入、接口身份、非零多页目录受登录限制、重复/短页/总数变化、业务和网络失败、新公告出现以及入口端口。非零回放为合成数据，仅验证拒绝误验收，不能冒充非零岗位采集能力。UV同步、Ruff、ty及全部pytest通过后，临时绑定实采并审计，才正式启用并加入A组汇总；零岗位只增加覆盖企业数，不增加有岗位企业数或岗位行数。
