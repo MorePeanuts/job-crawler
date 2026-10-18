@@ -43,6 +43,7 @@ from job_crawler.adapters.foxconn import FoxconnCampus
 from job_crawler.adapters.fuyao import FuyaoHeadquarters
 from job_crawler.adapters.gdh import GdhMobileCampus
 from job_crawler.adapters.gem import GemCampus
+from job_crawler.adapters.gemdale import GemdaleCampus
 from job_crawler.adapters.gig import GigCampus
 from job_crawler.adapters.grcbank import GuangzhouRuralBankCampus
 from job_crawler.adapters.gree import GreeCampus
@@ -211,6 +212,7 @@ REGISTRY = {
         CpcgCampus,
         GemCampus,
         GdhMobileCampus,
+        GemdaleCampus,
         SwhyCampus,
         BcdhListedCampus,
         KsfCampus,
