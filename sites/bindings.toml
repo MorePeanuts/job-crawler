@@ -1302,3 +1302,27 @@ version = "1"
 [sources.COM0033]
 adapter = "rongsheng-hebut-2027"
 version = "1"
+
+[sources.COM0074]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0237]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0431]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0017]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0061]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0162]
+adapter = "inventec-hebut-2027"
+version = "1"

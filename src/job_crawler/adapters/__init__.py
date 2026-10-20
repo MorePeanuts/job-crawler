@@ -70,6 +70,7 @@ from job_crawler.adapters.haidilao import HaidilaoStoreTrainee
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hailiang import HailiangCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
+from job_crawler.adapters.hebut_fair import HebutFair2027
 from job_crawler.adapters.hengli_shipbuilding import HengliShipbuilding2027
 from job_crawler.adapters.hongwang_kmust import HongwangKmust2027
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
@@ -82,6 +83,7 @@ from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.iguopin_projects import Ceec2027, Cnbm2027, Cosco2027
 from job_crawler.adapters.inline_catalogs import TENANTS as INLINE_TENANTS
 from job_crawler.adapters.inovance import InovanceCampus
+from job_crawler.adapters.inventec_hebut import InventecHebut2027
 from job_crawler.adapters.isoftstone import ISoftStoneCampus
 from job_crawler.adapters.itg_holding import ItgHoldingCampus
 from job_crawler.adapters.jd import JD
@@ -214,6 +216,7 @@ REGISTRY = {
         FuyaoHeadquarters,
         *INLINE_TENANTS,
         InovanceCampus,
+        InventecHebut2027,
         ISoftStoneCampus,
         ItgHoldingCampus,
         *EXTRA_TENANTS,
@@ -273,6 +276,7 @@ REGISTRY = {
         HongwangKmust2027,
         BaowuBaosteel2027,
         RongshengHebut2027,
+        HebutFair2027,
         TongweiShare2027,
         KingboardCareers,
         UniPresidentCareers,
