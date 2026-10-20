@@ -123,6 +123,7 @@ from job_crawler.adapters.swhy import SwhyCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.tfme import TfmeCampus
+from job_crawler.adapters.tianshan_hebut import TianshanHebutCampus
 from job_crawler.adapters.uni_president import UniPresidentCareers
 from job_crawler.adapters.workday import AiaWorkday, FwdWorkday, HkexWorkday, MelcoWorkday
 from job_crawler.adapters.wtmec import Wtmec
@@ -240,6 +241,7 @@ REGISTRY = {
         StecCampus,
         CkaCareers,
         ClpGraduate2027,
+        TianshanHebutCampus,
         KingboardCareers,
         UniPresidentCareers,
         MelcoWorkday,

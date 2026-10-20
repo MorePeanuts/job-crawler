@@ -1238,3 +1238,7 @@ version = "1"
 [sources.COM0228]
 adapter = "clp-graduate-2027"
 version = "1"
+
+[sources.COM0455]
+adapter = "tianshan-hebut-campus"
+version = "1"
