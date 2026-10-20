@@ -1378,3 +1378,15 @@ version = "1"
 [sources.COM0131]
 adapter = "hengtong-gdut-2027"
 version = "1"
+
+[sources.COM0321]
+adapter = "bgyfw-xasyxy-2027"
+version = "1"
+
+[sources.COM0314]
+adapter = "hngold-gov-2027"
+version = "1"
+
+[sources.COM0233]
+adapter = "zhongjin-gold-chnu-2027"
+version = "1"

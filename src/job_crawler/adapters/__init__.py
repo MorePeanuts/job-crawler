@@ -10,6 +10,7 @@ from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bankgy import BankgyCampus
 from job_crawler.adapters.baowu_baosteel import BaowuBaosteel2027
 from job_crawler.adapters.beigene import BeigeneRecruitment
+from job_crawler.adapters.bgyfw_xasyxy import BgyfwXasyxy2027
 from job_crawler.adapters.bilibili import Bilibili
 from job_crawler.adapters.bluefocus import BlueFocus
 from job_crawler.adapters.boe import BoeCampus
@@ -75,6 +76,7 @@ from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hebut_fair import HebutFair2027
 from job_crawler.adapters.hengli_shipbuilding import HengliShipbuilding2027
 from job_crawler.adapters.hengtong_gdut import HengtongGdut2027
+from job_crawler.adapters.hngold_gov import HngoldGov2027
 from job_crawler.adapters.hongqiao_cup import HongqiaoCup2027
 from job_crawler.adapters.hongwang_kmust import HongwangKmust2027
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
@@ -166,6 +168,7 @@ from job_crawler.adapters.yuntou import YuntouNotices
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhaopin import Cnooc2027
 from job_crawler.adapters.zhiye import TENANTS, Ctf2027, WeichaiPower2027
+from job_crawler.adapters.zhongjin_gold_chnu import ZhongjinGoldChnu2027
 from job_crawler.adapters.zjamp import ZjampCampus
 from job_crawler.adapters.zjci import ZjciCampus
 from job_crawler.adapters.zjjt import Zjjt2027
@@ -235,6 +238,9 @@ REGISTRY = {
         YtoZju2027,
         SatelliteHust2027,
         HengtongGdut2027,
+        BgyfwXasyxy2027,
+        HngoldGov2027,
+        ZhongjinGoldChnu2027,
         ISoftStoneCampus,
         ItgHoldingCampus,
         *EXTRA_TENANTS,
