@@ -899,10 +899,6 @@ version = "1"
 adapter = "hbisco-group-campus"
 version = "1"
 
-[sources.COM0329]
-adapter = "zjamp-2027-announcement"
-version = "1"
-
 [sources.COM0235]
 adapter = "zhaopin-dongfang-2027"
 version = "1"
@@ -1015,10 +1011,6 @@ version = "1"
 adapter = "zto-campus"
 version = "1"
 
-[sources.COM0392]
-adapter = "gem-2027-campus-announcement"
-version = "1"
-
 [sources.COM0419]
 adapter = "swhy-group-campus"
 version = "1"
@@ -1105,10 +1097,6 @@ version = "1"
 
 [sources.COM0363]
 adapter = "moka-zczl-2027"
-version = "1"
-
-[sources.COM0481]
-adapter = "laopu-campus"
 version = "1"
 
 [sources.COM0044]
@@ -1239,160 +1227,8 @@ version = "1"
 adapter = "clp-graduate-2027"
 version = "1"
 
-[sources.COM0455]
-adapter = "tianshan-hebut-campus"
-version = "1"
-
 [sources.COM0374]
 adapter = "zhiye-guotai-huasheng-2027"
-version = "1"
-
-[sources.COM0415]
-adapter = "yuneng-csu-2027"
-version = "1"
-
-[sources.COM0282]
-adapter = "zhongjinlingnan-csu-2027"
-version = "1"
-
-[sources.COM0109]
-adapter = "shagang-csu-2027"
-version = "1"
-
-[sources.COM0281]
-adapter = "chujiang-ustc-campus"
-version = "1"
-
-[sources.COM0106]
-adapter = "tongling-ustc-2027"
-version = "1"
-
-[sources.COM0322]
-adapter = "zhongwei-ustc-2027"
-version = "1"
-
-[sources.COM0462]
-adapter = "shanying-ustc-2027"
-version = "1"
-
-[sources.COM0064]
-adapter = "qingshan-ustc-2027"
-version = "1"
-
-[sources.COM0355]
-adapter = "sangang-mingguang-cup-2027"
-version = "1"
-
-[sources.COM0020]
-adapter = "hengli-shipbuilding-2027"
-version = "1"
-
-[sources.COM0115]
-adapter = "tongwei-share-nankai-2027"
-version = "1"
-
-[sources.COM0271]
-adapter = "hongwang-kmust-2027"
-version = "1"
-
-[sources.COM0029]
-adapter = "baowu-baosteel-hust-2027"
-version = "1"
-
-[sources.COM0033]
-adapter = "rongsheng-hebut-2027"
-version = "1"
-
-[sources.COM0074]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0237]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0431]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0017]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0061]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0162]
-adapter = "inventec-hebut-2027"
-version = "1"
-
-[sources.COM0397]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0414]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0019]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0013]
-adapter = "crecg-zhongtiejianggong-hebut-2027"
-version = "1"
-
-[sources.COM0114]
-adapter = "hunansteel-hualing-cable-hust-2027"
-version = "1"
-
-[sources.COM0143]
-adapter = "hebut-fair-2027"
-version = "1"
-
-[sources.COM0181]
-adapter = "conch-new-materials-ahnu-2027"
-version = "1"
-
-[sources.COM0376]
-adapter = "risun-dingzhou-hebut-2027"
-version = "1"
-
-[sources.COM0160]
-adapter = "hongqiao-cup-2027"
-version = "1"
-
-[sources.COM0025]
-adapter = "yankuang-uibe-2027"
-version = "1"
-
-[sources.COM0240]
-adapter = "yto-zju-2027"
-version = "1"
-
-[sources.COM0188]
-adapter = "satellite-hust-2027"
-version = "1"
-
-[sources.COM0131]
-adapter = "hengtong-gdut-2027"
-version = "1"
-
-[sources.COM0321]
-adapter = "bgyfw-xasyxy-2027"
-version = "1"
-
-[sources.COM0314]
-adapter = "hngold-gov-2027"
-version = "1"
-
-[sources.COM0233]
-adapter = "zhongjin-gold-chnu-2027"
-version = "1"
-
-[sources.COM0474]
-adapter = "fufeng-tust-2027"
 version = "1"
 
 [sources.COM0088]
@@ -1401,22 +1237,6 @@ version = "1"
 
 [sources.COM0116]
 adapter = "hotjob-gpc-headquarters-2027"
-version = "1"
-
-[sources.COM0004]
-adapter = "cscec-five-civil-csu-2027"
-version = "1"
-
-[sources.COM0016]
-adapter = "crcc-twenty-two-csu-2027"
-version = "1"
-
-[sources.COM0030]
-adapter = "powerchina-eight-csu-2027"
-version = "1"
-
-[sources.COM0466]
-adapter = "ctgne-liaoning-dlmu-2027"
 version = "1"
 
 [sources.COM0077]

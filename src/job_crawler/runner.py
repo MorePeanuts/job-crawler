@@ -28,6 +28,7 @@ from job_crawler.incremental import IncrementalSource
 from job_crawler.models import Binding, Collection, Issue, Job, Source, SourceReport
 from job_crawler.retention import index as archive_index
 from job_crawler.retention import register_state
+from job_crawler.source_policy import is_non_enterprise_source
 from job_crawler.storage import Store, fingerprint, write_json
 from job_crawler.transport import BrowserSession
 
@@ -49,6 +50,8 @@ def preflight(sources: list[Source], bindings: dict[str, Binding], settings: Set
     for source in sources:
         binding = bindings.get(source.source_id)
         if binding:
+            if is_non_enterprise_source(source.url):
+                raise ValueError(f"非企业招聘入口不得绑定适配器: {source.source_id}")
             if binding.adapter not in REGISTRY:
                 raise ValueError(f"未知适配器 {binding.adapter}")
             if REGISTRY[binding.adapter].version != binding.version:
