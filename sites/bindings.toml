@@ -1290,3 +1290,7 @@ version = "1"
 [sources.COM0115]
 adapter = "tongwei-share-nankai-2027"
 version = "1"
+
+[sources.COM0271]
+adapter = "hongwang-kmust-2027"
+version = "1"

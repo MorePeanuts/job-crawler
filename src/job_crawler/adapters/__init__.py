@@ -70,6 +70,7 @@ from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hailiang import HailiangCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hengli_shipbuilding import HengliShipbuilding2027
+from job_crawler.adapters.hongwang_kmust import HongwangKmust2027
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hsbank import HsbankCampus
 from job_crawler.adapters.huafa import HuafaListedCampus
@@ -267,6 +268,7 @@ REGISTRY = {
         ShanyingUstc2027,
         SangangMingguang2027,
         HengliShipbuilding2027,
+        HongwangKmust2027,
         TongweiShare2027,
         KingboardCareers,
         UniPresidentCareers,
