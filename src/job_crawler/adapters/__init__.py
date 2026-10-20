@@ -32,6 +32,7 @@ from job_crawler.adapters.chinatower import (
 from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.chujiang_ustc import (
     ChujiangUstcCampus,
+    QingshanUstc2027,
     ShanyingUstc2027,
     TonglingUstc2027,
     ZhongweiUstc2027,
@@ -68,6 +69,7 @@ from job_crawler.adapters.haidilao import HaidilaoStoreTrainee
 from job_crawler.adapters.haier import HaierCampus
 from job_crawler.adapters.hailiang import HailiangCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
+from job_crawler.adapters.hengli_shipbuilding import HengliShipbuilding2027
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hsbank import HsbankCampus
 from job_crawler.adapters.huafa import HuafaListedCampus
@@ -105,6 +107,7 @@ from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.qdbank import QdbankCampus
 from job_crawler.adapters.saic import SaicCampus
+from job_crawler.adapters.sangang_cup import SangangMingguang2027
 from job_crawler.adapters.sasdragon import SasDragonCareers
 from job_crawler.adapters.sbp import SbpCampus
 from job_crawler.adapters.scoped_coapi import BcdhListedCampus, KsfCampus
@@ -130,6 +133,7 @@ from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.tfme import TfmeCampus
 from job_crawler.adapters.tianshan_hebut import TianshanHebutCampus
+from job_crawler.adapters.tongwei_share import TongweiShare2027
 from job_crawler.adapters.uni_president import UniPresidentCareers
 from job_crawler.adapters.workday import AiaWorkday, FwdWorkday, HkexWorkday, MelcoWorkday
 from job_crawler.adapters.wtmec import Wtmec
@@ -257,9 +261,13 @@ REGISTRY = {
         ZhongjinlingnanCsu2027,
         ShagangCsu2027,
         ChujiangUstcCampus,
+        QingshanUstc2027,
         TonglingUstc2027,
         ZhongweiUstc2027,
         ShanyingUstc2027,
+        SangangMingguang2027,
+        HengliShipbuilding2027,
+        TongweiShare2027,
         KingboardCareers,
         UniPresidentCareers,
         MelcoWorkday,

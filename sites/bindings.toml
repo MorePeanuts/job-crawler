@@ -1274,3 +1274,19 @@ version = "1"
 [sources.COM0462]
 adapter = "shanying-ustc-2027"
 version = "1"
+
+[sources.COM0064]
+adapter = "qingshan-ustc-2027"
+version = "1"
+
+[sources.COM0355]
+adapter = "sangang-mingguang-cup-2027"
+version = "1"
+
+[sources.COM0020]
+adapter = "hengli-shipbuilding-2027"
+version = "1"
+
+[sources.COM0115]
+adapter = "tongwei-share-nankai-2027"
+version = "1"

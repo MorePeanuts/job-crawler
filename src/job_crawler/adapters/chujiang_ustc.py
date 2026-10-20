@@ -164,3 +164,29 @@ class ShanyingUstc2027(UstcCompanyCampus):
 
     def campus_job(self, company: dict[str, Any], detail: dict[str, Any]) -> bool:
         return "2027届毕业生" in text(detail.get("Require"))
+
+
+class QingshanUstc2027(UstcCompanyCampus):
+    name = "qingshan-ustc-2027"
+    company_id = "29423"
+    employer = "青山控股集团有限公司"
+    credit_code = "91330300751176226P"
+    path = "/Jobinformation/info.aspx?itemid=29423"
+    scope_description = (
+        "中国科大青山控股认证企业账号八岗全目录；仅纳入武汉纺大2027届展位同题"
+        "且无工作年限要求的冶金、机械管培生和会计三岗"
+    )
+    cohort_titles = frozenset({"冶金管培生", "机械管培生", "会计"})
+
+    def campus_job(self, company: dict[str, Any], detail: dict[str, Any]) -> bool:
+        if text(detail.get("JobName")) not in self.cohort_titles:
+            return False
+        check("年以上" not in text(detail.get("Require")), "青山当届岗位出现工作年限要求")
+        return True
+
+    async def harvest(self) -> None:
+        await super().harvest()
+        check(
+            {job.title for job in self.result.jobs} == self.cohort_titles,
+            "青山高校 2027 届已核对岗位集合变化",
+        )
