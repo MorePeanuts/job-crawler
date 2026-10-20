@@ -50,14 +50,17 @@ from job_crawler.adapters.cpcg import CpcgCampus
 from job_crawler.adapters.crecg_hebut import CrecgZhongtieJianggong2027
 from job_crawler.adapters.cspc import CspcCampus
 from job_crawler.adapters.ctg_dutyfree import CtgDutyFreeCampus
+from job_crawler.adapters.ctgne_dlmu import CtgneLiaoningDlmu2027
 from job_crawler.adapters.ctrip import CtripCampus
 from job_crawler.adapters.datang import Datang2027
 from job_crawler.adapters.dfzq import DfzqCampus
 from job_crawler.adapters.dingsheng import DingshengCampus
+from job_crawler.adapters.dongfeng_liuzhou import DongfengLiuzhou2027
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.faw import FawCampus
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
 from job_crawler.adapters.foxconn import FoxconnCampus
+from job_crawler.adapters.fufeng_tust import FufengTust2027
 from job_crawler.adapters.fuyao import FuyaoHeadquarters
 from job_crawler.adapters.gdh import GdhMobileCampus
 from job_crawler.adapters.gem import GemCampus
@@ -146,6 +149,7 @@ from job_crawler.adapters.swhy import SwhyCampus
 from job_crawler.adapters.tcl import TCLCampus
 from job_crawler.adapters.tencent import Tencent
 from job_crawler.adapters.tfme import TfmeCampus
+from job_crawler.adapters.tiandi_international import TiandiInternational2027
 from job_crawler.adapters.tianshan_hebut import TianshanHebutCampus
 from job_crawler.adapters.tongwei_share import TongweiShare2027
 from job_crawler.adapters.uni_president import UniPresidentCareers
@@ -160,13 +164,16 @@ from job_crawler.adapters.yingte import YingteCampus
 from job_crawler.adapters.yto_zju import YtoZju2027
 from job_crawler.adapters.yuexiu2027 import YuexiuProperty2027
 from job_crawler.adapters.yuneng_csu import (
+    CrccTwentyTwoCsu2027,
+    CscecFiveCivilCsu2027,
+    PowerchinaEightCsu2027,
     ShagangCsu2027,
     YunengCsu2027,
     ZhongjinlingnanCsu2027,
 )
 from job_crawler.adapters.yuntou import YuntouNotices
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
-from job_crawler.adapters.zhaopin import Cnooc2027
+from job_crawler.adapters.zhaopin import Cnooc2027, Giihg2027
 from job_crawler.adapters.zhiye import TENANTS, Ctf2027, WeichaiPower2027
 from job_crawler.adapters.zhongjin_gold_chnu import ZhongjinGoldChnu2027
 from job_crawler.adapters.zjamp import ZjampCampus
@@ -241,6 +248,8 @@ REGISTRY = {
         BgyfwXasyxy2027,
         HngoldGov2027,
         ZhongjinGoldChnu2027,
+        FufengTust2027,
+        Giihg2027,
         ISoftStoneCampus,
         ItgHoldingCampus,
         *EXTRA_TENANTS,
@@ -290,6 +299,12 @@ REGISTRY = {
         YunengCsu2027,
         ZhongjinlingnanCsu2027,
         ShagangCsu2027,
+        CscecFiveCivilCsu2027,
+        CrccTwentyTwoCsu2027,
+        PowerchinaEightCsu2027,
+        CtgneLiaoningDlmu2027,
+        DongfengLiuzhou2027,
+        TiandiInternational2027,
         ChujiangUstcCampus,
         QingshanUstc2027,
         TonglingUstc2027,

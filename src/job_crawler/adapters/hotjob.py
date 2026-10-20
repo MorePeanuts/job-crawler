@@ -1069,7 +1069,106 @@ class FarEastListedCampus(Hotjob):
         return job
 
 
+class Lining2027(Hotjob):
+    name = "hotjob-lining-2027"
+    suite = "SU6018f8695d83dc072073e990"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "李宁官方 Hotjob 校园频道全目录；仅纳入 2027校园招聘项目"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(bool(text(row.get("company"))), "李宁岗位缺少所属业务单元")
+        project = text(row.get("projectName"))
+        check(bool(project), "李宁岗位缺少校招项目名称")
+        return project == "2027校园招聘"
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                all(
+                    text(row.get(key)) == text(listing.get(key))
+                    for key in ("postId", "postName", "company", "projectName")
+                ),
+                "李宁详情 ID、标题、业务单元或项目与列表不符",
+            )
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
+        job.field_sources["published"] = "首次发布日期 publishFirstDate；不使用更新日 publishDate"
+        return job
+
+
+class GpcHeadquarters2027(Hotjob):
+    name = "hotjob-gpc-headquarters-2027"
+    suite = "SU6a94e5b85e09b14b274b6888"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "广药集团官方校园频道全目录；只纳入广州医药集团总部法人岗位"
+    headquarters = "广州医药集团有限公司（总部）"
+    headquarters_code = "0/122736"
+
+    def validate_terms(self, data: dict[str, Any]) -> None:
+        roots = data.get("orgList")
+        check(isinstance(roots, list), "广药校园招聘机构树缺失")
+        assert isinstance(roots, list)
+        headquarters = [root for root in roots if root.get("code") == self.headquarters_code]
+        check(
+            len(headquarters) == 1
+            and headquarters[0].get("nameCh") == self.headquarters
+            and int(headquarters[0].get("positionsNum", 0)) > 0,
+            "广药集团总部机构代码或岗位数变化",
+        )
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        company = text(row.get("company"))
+        code = text(row.get("orgCode"))
+        check(bool(company and code), "广药校园岗位缺少所属公司或机构编码")
+        if company != self.headquarters:
+            check(not code.startswith(self.headquarters_code + "/"), "广药总部机构混入其他公司")
+            return False
+        check(code.startswith(self.headquarters_code + "/"), "广药总部岗位机构代码错配")
+        return True
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                all(
+                    text(row.get(key)) == text(listing.get(key))
+                    for key in ("postName", "company", "orgCode")
+                ),
+                "广药详情标题、公司或机构编码与列表不符",
+            )
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        department = text(row.get("orgName") or listing.get("department"))
+        job.unit = (
+            f"{self.headquarters} / {department}"
+            if department and department != self.headquarters
+            else self.headquarters
+        )
+        job.work_type = "校招"
+        job.field_sources["unit"] = "高校招聘列表 company 为集团总部；orgName 为部门"
+        job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
+        job.field_sources["published"] = "首次发布日期 publishFirstDate；不使用更新日 publishDate"
+        if job.deadline.startswith("3000-"):
+            job.deadline = ""
+            job.field_sources["deadline"] = "source_missing:3000-01-01 为站点占位值"
+        return job
+
+
 TENANTS = (
+    Lining2027,
+    GpcHeadquarters2027,
     FarEastListedCampus,
     HualuHengshengCampus,
     DbnCampus,

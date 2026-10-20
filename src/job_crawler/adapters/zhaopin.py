@@ -438,6 +438,17 @@ class ShenzhenEnergy(Zhaopin):
     org_number = "107415"
 
 
+class Giihg2027(Zhaopin):
+    name = "zhaopin-giihg-2027"
+    host = "giihg-c.zhaopin.com"
+    path = "/job/index.html"
+    org_number = "104680"
+    scope_description = "广州工控 2027 校招智联公开全目录；仅集团总部法人岗位，排除分支公司"
+
+    def in_scope(self, company_data: dict[str, Any]) -> bool:
+        return company_data.get("campusOrgName") == "广州工业投资控股集团有限公司"
+
+
 class Hadian(Zhaopin):
     name = "zhaopin-hadian"
     host = "hadian.zhaopin.com"

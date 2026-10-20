@@ -1390,3 +1390,43 @@ version = "1"
 [sources.COM0233]
 adapter = "zhongjin-gold-chnu-2027"
 version = "1"
+
+[sources.COM0474]
+adapter = "fufeng-tust-2027"
+version = "1"
+
+[sources.COM0088]
+adapter = "zhaopin-giihg-2027"
+version = "1"
+
+[sources.COM0116]
+adapter = "hotjob-gpc-headquarters-2027"
+version = "1"
+
+[sources.COM0004]
+adapter = "cscec-five-civil-csu-2027"
+version = "1"
+
+[sources.COM0016]
+adapter = "crcc-twenty-two-csu-2027"
+version = "1"
+
+[sources.COM0030]
+adapter = "powerchina-eight-csu-2027"
+version = "1"
+
+[sources.COM0466]
+adapter = "ctgne-liaoning-dlmu-2027"
+version = "1"
+
+[sources.COM0077]
+adapter = "dongfeng-liuzhou-2027"
+version = "1"
+
+[sources.COM0458]
+adapter = "tiandi-international-iguopin-2027"
+version = "1"
+
+[sources.COM0453]
+adapter = "hotjob-lining-2027"
+version = "1"

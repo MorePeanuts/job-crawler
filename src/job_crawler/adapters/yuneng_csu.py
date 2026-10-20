@@ -53,7 +53,7 @@ def job_row(row: Tag) -> dict[str, str]:
     check(anchor is not None and len(cells) == 7, "湖南裕能岗位行结构改变")
     assert anchor is not None
     check(
-        bool(cells[0]) and bool(cells[1]) and cells[4] in {"本科", "硕士", "博士"},
+        bool(cells[0]) and bool(cells[1]) and cells[4] in {"不限", "本科", "硕士", "博士"},
         "湖南裕能岗位字段缺失",
     )
     check(cells[2].isdigit() and int(cells[2]) > 0, "湖南裕能招聘人数无效")
@@ -141,3 +141,27 @@ class ShagangCsu2027(CsuFair2027):
     employer = "江苏沙钢集团有限公司"
     credit_code = "91320582134789270G"
     fair_sid = "361"
+
+
+class CscecFiveCivilCsu2027(CsuFair2027):
+    name = "cscec-five-civil-csu-2027"
+    path = "/largefairs/company/id/1312/sid/22/stype/1"
+    employer = "中建五局土木工程有限公司"
+    credit_code = "914301001838581486"
+    fair_sid = "22"
+
+
+class CrccTwentyTwoCsu2027(CsuFair2027):
+    name = "crcc-twenty-two-csu-2027"
+    path = "/largefairs/company/id/1312/sid/363/stype/1"
+    employer = "中铁二十二局集团有限公司"
+    credit_code = "9111000071092227XH"
+    fair_sid = "363"
+
+
+class PowerchinaEightCsu2027(CsuFair2027):
+    name = "powerchina-eight-csu-2027"
+    path = "/largefairs/company/id/1312/sid/27/stype/1"
+    employer = "中国水利水电第八工程局有限公司"
+    credit_code = "91430000183761776J"
+    fair_sid = "27"
