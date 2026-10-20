@@ -1294,3 +1294,11 @@ version = "1"
 [sources.COM0271]
 adapter = "hongwang-kmust-2027"
 version = "1"
+
+[sources.COM0029]
+adapter = "baowu-baosteel-hust-2027"
+version = "1"
+
+[sources.COM0033]
+adapter = "rongsheng-hebut-2027"
+version = "1"

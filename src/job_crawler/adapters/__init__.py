@@ -8,6 +8,7 @@ from job_crawler.adapters.avary import AvaryCampus
 from job_crawler.adapters.bank_catalogs import TENANTS as BANK_TENANTS
 from job_crawler.adapters.bankcomm import BankComm
 from job_crawler.adapters.bankgy import BankgyCampus
+from job_crawler.adapters.baowu_baosteel import BaowuBaosteel2027
 from job_crawler.adapters.beigene import BeigeneRecruitment
 from job_crawler.adapters.bilibili import Bilibili
 from job_crawler.adapters.bluefocus import BlueFocus
@@ -107,6 +108,7 @@ from job_crawler.adapters.pccw import PccwGraduate
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.qdbank import QdbankCampus
+from job_crawler.adapters.rongsheng_hebut import RongshengHebut2027
 from job_crawler.adapters.saic import SaicCampus
 from job_crawler.adapters.sangang_cup import SangangMingguang2027
 from job_crawler.adapters.sasdragon import SasDragonCareers
@@ -269,6 +271,8 @@ REGISTRY = {
         SangangMingguang2027,
         HengliShipbuilding2027,
         HongwangKmust2027,
+        BaowuBaosteel2027,
+        RongshengHebut2027,
         TongweiShare2027,
         KingboardCareers,
         UniPresidentCareers,
