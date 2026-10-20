@@ -45,6 +45,7 @@ from job_crawler.adapters.cmb import CmbCampus
 from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
 from job_crawler.adapters.cpcg import CpcgCampus
+from job_crawler.adapters.crecg_hebut import CrecgZhongtieJianggong2027
 from job_crawler.adapters.cspc import CspcCampus
 from job_crawler.adapters.ctg_dutyfree import CtgDutyFreeCampus
 from job_crawler.adapters.ctrip import CtripCampus
@@ -78,6 +79,7 @@ from job_crawler.adapters.hsbank import HsbankCampus
 from job_crawler.adapters.huafa import HuafaListedCampus
 from job_crawler.adapters.huaneng import HuanengCampus
 from job_crawler.adapters.huawei import HuaweiGraduate
+from job_crawler.adapters.hunansteel_hualing import HunansteelHualingCable2027
 from job_crawler.adapters.hzbank import HzbankCampus
 from job_crawler.adapters.hzsteel import Hzsteel
 from job_crawler.adapters.iguopin_projects import Ceec2027, Cnbm2027, Cosco2027
@@ -217,6 +219,8 @@ REGISTRY = {
         *INLINE_TENANTS,
         InovanceCampus,
         InventecHebut2027,
+        CrecgZhongtieJianggong2027,
+        HunansteelHualingCable2027,
         ISoftStoneCampus,
         ItgHoldingCampus,
         *EXTRA_TENANTS,

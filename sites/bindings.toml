@@ -1326,3 +1326,27 @@ version = "1"
 [sources.COM0162]
 adapter = "inventec-hebut-2027"
 version = "1"
+
+[sources.COM0397]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0414]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0019]
+adapter = "hebut-fair-2027"
+version = "1"
+
+[sources.COM0013]
+adapter = "crecg-zhongtiejianggong-hebut-2027"
+version = "1"
+
+[sources.COM0114]
+adapter = "hunansteel-hualing-cable-hust-2027"
+version = "1"
+
+[sources.COM0143]
+adapter = "hebut-fair-2027"
+version = "1"

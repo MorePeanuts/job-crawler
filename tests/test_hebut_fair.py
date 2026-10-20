@@ -124,3 +124,16 @@ def test_detail_rejects_social_requirements() -> None:
             row,
             TENANTS["COM0074"],
         )
+
+
+def test_tianjin_signal_company_title_requires_specific_detail_role() -> None:
+    tenant = TENANTS["COM0414"]
+    row = {"title": tenant.employer, "published": "2026-10-07"}
+    html = (
+        detail(employer=tenant.employer, title=tenant.employer)
+        .replace("19621.html", "2223.html")
+        .replace("生产现场轮岗，培养技术骨干。", "从事产品技术研发工作")
+    )
+    assert detail_job(html, row, tenant)["title"] == "产品技术研发"
+    with pytest.raises(CrawlError):
+        detail_job(html.replace("从事产品技术研发工作", "工作内容未明确"), row, tenant)

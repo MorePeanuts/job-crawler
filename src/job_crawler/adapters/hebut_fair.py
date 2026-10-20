@@ -32,6 +32,7 @@ TENANTS = {
     "COM0017": Tenant(
         "COM0017", "中信戴卡股份有限公司", "1292", "中国中信集团公司于1988年投资组建"
     ),
+    "COM0019": Tenant("COM0019", "华润江中药业股份有限公司", "19524", "现为华润集团直管业务单元"),
     "COM0061": Tenant(
         "COM0061",
         "中国太平洋财产保险股份有限公司天津分公司",
@@ -39,7 +40,20 @@ TENANTS = {
         "中国太平洋保险（集团）股份有限公司",
     ),
     "COM0074": Tenant("COM0074", "江苏敬业钢铁有限责任公司", "19621", "隶属于敬业集团"),
+    "COM0143": Tenant("COM0143", "中国化学工程第四建设有限公司", "18472", "中国化学工程集团公司"),
     "COM0237": Tenant("COM0237", "山东创新精密科技有限公司", "15401", "股票代码：600361"),
+    "COM0397": Tenant(
+        "COM0397",
+        "芜湖新兴铸管有限责任公司",
+        "7106",
+        "芜湖新兴铸管有限责任公司为新兴铸管股份有限公司",
+    ),
+    "COM0414": Tenant(
+        "COM0414",
+        "天津铁路信号有限责任公司",
+        "2223",
+        "隶属于通号（西安）轨道交通工业集团有限公司",
+    ),
     "COM0431": Tenant("COM0431", "河北立中集团", "10136", "立中四通轻合金集团股份有限公司"),
 }
 
@@ -127,8 +141,12 @@ def detail_job(html: str, listed: dict[str, str], tenant: Tenant) -> dict[str, s
     duties = text(contents[1].get_text(" ", strip=True))
     check(bool(majors) and bool(duties), "高校岗位专业或正文为空")
     check(SOCIAL_RE.search(duties) is None, "岗位详情出现社招工作年限要求")
+    job_title = listed["title"]
+    if tenant.company_id == "COM0414" and job_title == tenant.employer:
+        check(duties == "从事产品技术研发工作", "天津信号企业名标题无法确认具体岗位")
+        job_title = "产品技术研发"
     return {
-        "title": listed["title"],
+        "title": job_title,
         "published": listed["published"],
         "location": location[1].strip(),
         "category": category[1].strip(),
