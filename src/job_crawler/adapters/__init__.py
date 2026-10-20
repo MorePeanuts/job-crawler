@@ -133,6 +133,11 @@ from job_crawler.adapters.xmwy import XiamenTungsten2027
 from job_crawler.adapters.yili import YiliHeadquarters
 from job_crawler.adapters.yingte import YingteCampus
 from job_crawler.adapters.yuexiu2027 import YuexiuProperty2027
+from job_crawler.adapters.yuneng_csu import (
+    ShagangCsu2027,
+    YunengCsu2027,
+    ZhongjinlingnanCsu2027,
+)
 from job_crawler.adapters.yuntou import YuntouNotices
 from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhaopin import Cnooc2027
@@ -242,6 +247,9 @@ REGISTRY = {
         CkaCareers,
         ClpGraduate2027,
         TianshanHebutCampus,
+        YunengCsu2027,
+        ZhongjinlingnanCsu2027,
+        ShagangCsu2027,
         KingboardCareers,
         UniPresidentCareers,
         MelcoWorkday,

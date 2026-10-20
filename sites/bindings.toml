@@ -1242,3 +1242,19 @@ version = "1"
 [sources.COM0455]
 adapter = "tianshan-hebut-campus"
 version = "1"
+
+[sources.COM0374]
+adapter = "zhiye-guotai-huasheng-2027"
+version = "1"
+
+[sources.COM0415]
+adapter = "yuneng-csu-2027"
+version = "1"
+
+[sources.COM0282]
+adapter = "zhongjinlingnan-csu-2027"
+version = "1"
+
+[sources.COM0109]
+adapter = "shagang-csu-2027"
+version = "1"

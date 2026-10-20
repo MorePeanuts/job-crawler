@@ -107,7 +107,7 @@ COM0105,COM0105,海亮集团有限公司,https://hailiang.jobs.feishu.cn/583086,
 COM0106,COM0106,铜陵有色金属集团控股有限公司,,
 COM0107,COM0107,蜀道投资集团有限责任公司,https://sdhr.shudaojt.com/recruit#/index,；SPEC-156：2026-10-18 官网或企业招聘页面核验，目录范围与适配待完成
 COM0108,COM0108,中国民生银行股份有限公司,https://career.cmbc.com.cn/#/app/recruitmentlist/campus/,民生银行公开 campus 全目录；排除五家独立子公司
-COM0109,COM0109,江苏沙钢集团有限公司,http://www.shasteel.cn/rlzy/rczp/rczp_jt/xyzp/index.shtml,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
+COM0109,COM0109,江苏沙钢集团有限公司,https://career.csu.edu.cn/largefairs/company/id/1312/sid/361/stype/1,2026-10-20 中南大学2027届双选会完整展位；原官网入口 http://www.shasteel.cn/rlzy/rczp/rczp_jt/xyzp/index.shtml；SPEC-244
 COM0110,COM0110,中国电子信息产业集团有限公司,https://campus.cec.com.cn/position?positionType=0,中国电子集团官网校园招聘全目录
 COM0111,COM0111,中国大唐集团有限公司,https://zhaopin.china-cdt.com/zpgg_xyzp.html?random=1790467200101,校园招聘公告
 COM0112,COM0112,长江和记实业有限公司,https://www.ckh.com.hk/tc/about/ckh_careers.php,；2026-10-18 核验官方招聘入口
@@ -280,7 +280,7 @@ COM0278,COM0278,惠州亿纬锂能股份有限公司,https://wecruit.hotjob.cn/S
 COM0279,COM0279,宁波均胜电子股份有限公司,https://app.mokahr.com/campus-recruitment/joyson/94311#/jobs,
 COM0280,COM0280,渤海银行股份有限公司,https://campus.51job.com/bhyh2027/head.html,2027届校园招聘；总行及分行岗位；排除渤银理财独立主体
 COM0281,COM0281,安徽楚江科技新材料股份有限公司,,
-COM0282,COM0282,深圳市中金岭南有色金属股份有限公司,,
+COM0282,COM0282,深圳市中金岭南有色金属股份有限公司,https://career.csu.edu.cn/largefairs/company/id/1312/sid/320/stype/1,2026-10-20 中南大学2027届双选会完整展位；SPEC-244
 COM0283,COM0283,华峰集团有限公司,https://huafeng.zhiye.com/campus,校园招聘
 COM0284,COM0284,浙江正泰电器股份有限公司,https://campus.chint.com/campus-recruitment/chint/40745/#/jobs?zhineng%5B0%5D=112000,正泰集团校园招聘，正泰电器定向筛选。
 COM0285,COM0285,超聚变数字技术股份有限公司,https://career.xfusion.com/OfficialPortal/#/campusList,超聚变官方校园招聘，含主岗位方向
@@ -372,7 +372,7 @@ COM0370,COM0370,湖南博深实业集团有限公司,,
 COM0371,COM0371,苏州东山精密制造股份有限公司,https://dsbj.zhiye.com/campus/jobs,校园招聘
 COM0372,COM0372,福建省电子信息（集团）有限责任公司,http://campus.51job.com/feig2024,2024校园招聘专题；福建电子信息集团统一入口
 COM0373,COM0373,上海国际港务（集团）股份有限公司,https://sipg.zhaopin.com/post/index.html,校园招聘
-COM0374,COM0374,江苏国泰国际集团股份有限公司,,
+COM0374,COM0374,江苏国泰国际集团股份有限公司,https://gths.zhiye.com/campus/jobs,2026-10-20 官网核心子公司国泰华盛 2027 校招目录；SPEC-242
 COM0375,COM0375,北方华创科技集团股份有限公司,https://career.naura.com/campus,校园招聘
 COM0376,COM0376,中国旭阳集团有限公司,https://risun.zhiye.com/campus/jobs,
 COM0377,COM0377,山东太阳纸业股份有限公司,https://51uns.bysjy.com.cn/Announce/Details/3616396?schoolCode=10708,SPEC-194：企业高校2027简章及官方二维码报名入口已核实；关联详情受阻，未验收；固定B组
@@ -413,7 +413,7 @@ COM0411,COM0411,河南明泰铝业股份有限公司,https://www.hngymt.com/cont
 COM0412,COM0412,软通动力信息技术（集团）股份有限公司,https://career.isoftstone.com/talent/htmls/xiaoyuanzhaopin/index.html,校园招聘
 COM0413,COM0413,中信建投证券股份有限公司,https://csc108.zhiye.com/campus/jobs,校园招聘
 COM0414,COM0414,中国铁路通信信号股份有限公司,https://www.crsc.cn/news/tsi_1078_14155_100594.html,2027届校园招聘公告；集团范围
-COM0415,COM0415,湖南裕能新能源电池材料股份有限公司,https://www.hunanyuneng.com/rlzy/1.html,2026-10-18 查证招聘入口，待适配；SPEC-156 B组
+COM0415,COM0415,湖南裕能新能源电池材料股份有限公司,https://career.csu.edu.cn/largefairs/company/id/1312/sid/104/stype/1,2026-10-20 中南大学2027届双选会展位公开岗位；原官网入口 https://www.hunanyuneng.com/rlzy/1.html；SPEC-243
 COM0416,COM0416,山东南山铝业股份有限公司,,
 COM0417,COM0417,富卫集团有限公司,https://fwd.wd3.myworkdayjobs.com/zh-CN/FWDcareersite/,SPEC-223 fwd-workday@1：2026-10-18全租户210完整目录，3明确应届有效；17实习、1已录用者登记及189未明确校招排除。3信息、0严格、3境外地点等待补全。
 COM0418,COM0418,中国铁路物资股份有限公司,,

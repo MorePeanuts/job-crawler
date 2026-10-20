@@ -23,6 +23,7 @@ class Zhiye(Adapter):
     regular_only = False
     listing_complete = False
     listing_unit_field = "Org"
+    listing_unit_fallback = ""
     category_field = "ClassificationOne"
     expected_org = ""
     page_size = 20
@@ -105,7 +106,9 @@ class Zhiye(Adapter):
                                 else "校招"
                             ),
                             source_url=self.detail_page(str(listed["Id"])),
-                            unit=text(listed.get(self.listing_unit_field)),
+                            unit=text(
+                                listed.get(self.listing_unit_field) or self.listing_unit_fallback
+                            ),
                             location=text(listed.get("LocNames")),
                             education=text(listed.get("Degree")),
                             address=text(listed.get("DetailAddress")),
@@ -115,6 +118,12 @@ class Zhiye(Adapter):
                             published=date_text(listed.get("PostDate")),
                             deadline=date_text(listed.get("EndTime")),
                             field_sources={
+                                "unit": (
+                                    "本租户官方公司身份；列表 Org 为空"
+                                    if self.listing_unit_fallback
+                                    and not listed.get(self.listing_unit_field)
+                                    else "GetJobAdPageList.Data[].Org"
+                                ),
                                 "duties": "GetJobAdPageList.Data[].Duty",
                                 "requirements": "GetJobAdPageList.Data[].Require",
                                 "published": "PostDate；0001 哨兵为空",
@@ -877,6 +886,21 @@ class SinosigGroupCampus(Zhiye):
         return True
 
 
+class GuotaiHuashengCampus(Zhiye):
+    name = "zhiye-guotai-huasheng-2027"
+    host = "gths.zhiye.com"
+    listing_complete = True
+    listing_unit_fallback = "江苏国泰华盛实业有限公司"
+    scope_description = (
+        "国泰华盛官方北森门户 Category=2 的 2027 届全职校园目录；国泰集团其他子公司不在此源范围"
+    )
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "国泰华盛目录混入非校园类别")
+        check(text(row.get("JobAdName")).startswith("2027校招-"), "国泰华盛目录混入异年岗位")
+        return True
+
+
 TENANTS = (
     ShenghongCampus,
     BusyMingCampus,
@@ -891,6 +915,7 @@ TENANTS = (
     TongkunCampus,
     CcccGroupCampus,
     SinosigGroupCampus,
+    GuotaiHuashengCampus,
     Mxbc2027,
     GenertecCampus,
     Sph2027,
