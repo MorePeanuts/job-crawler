@@ -1350,3 +1350,19 @@ version = "1"
 [sources.COM0143]
 adapter = "hebut-fair-2027"
 version = "1"
+
+[sources.COM0181]
+adapter = "conch-new-materials-ahnu-2027"
+version = "1"
+
+[sources.COM0376]
+adapter = "risun-dingzhou-hebut-2027"
+version = "1"
+
+[sources.COM0160]
+adapter = "hongqiao-cup-2027"
+version = "1"
+
+[sources.COM0025]
+adapter = "yankuang-uibe-2027"
+version = "1"

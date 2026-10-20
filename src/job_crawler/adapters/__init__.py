@@ -44,6 +44,7 @@ from job_crawler.adapters.clp import ClpGraduate2027
 from job_crawler.adapters.cmb import CmbCampus
 from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
+from job_crawler.adapters.conch_ahnu import ConchNewMaterialsAhnu2027
 from job_crawler.adapters.cpcg import CpcgCampus
 from job_crawler.adapters.crecg_hebut import CrecgZhongtieJianggong2027
 from job_crawler.adapters.cspc import CspcCampus
@@ -73,6 +74,7 @@ from job_crawler.adapters.hailiang import HailiangCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hebut_fair import HebutFair2027
 from job_crawler.adapters.hengli_shipbuilding import HengliShipbuilding2027
+from job_crawler.adapters.hongqiao_cup import HongqiaoCup2027
 from job_crawler.adapters.hongwang_kmust import HongwangKmust2027
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
 from job_crawler.adapters.hsbank import HsbankCampus
@@ -112,6 +114,7 @@ from job_crawler.adapters.pccw import PccwGraduate
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.qdbank import QdbankCampus
+from job_crawler.adapters.risun_hebut import RisunDingzhouHebut2027
 from job_crawler.adapters.rongsheng_hebut import RongshengHebut2027
 from job_crawler.adapters.saic import SaicCampus
 from job_crawler.adapters.sangang_cup import SangangMingguang2027
@@ -147,6 +150,7 @@ from job_crawler.adapters.wtmec import Wtmec
 from job_crawler.adapters.xfusion import XfusionCampus
 from job_crawler.adapters.xingfa import XingfaCampus
 from job_crawler.adapters.xmwy import XiamenTungsten2027
+from job_crawler.adapters.yankuang_uibe import YankuangUibe2027
 from job_crawler.adapters.yili import YiliHeadquarters
 from job_crawler.adapters.yingte import YingteCampus
 from job_crawler.adapters.yuexiu2027 import YuexiuProperty2027
@@ -221,6 +225,10 @@ REGISTRY = {
         InventecHebut2027,
         CrecgZhongtieJianggong2027,
         HunansteelHualingCable2027,
+        ConchNewMaterialsAhnu2027,
+        RisunDingzhouHebut2027,
+        HongqiaoCup2027,
+        YankuangUibe2027,
         ISoftStoneCampus,
         ItgHoldingCampus,
         *EXTRA_TENANTS,
