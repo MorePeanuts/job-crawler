@@ -1230,3 +1230,11 @@ version = "1"
 [sources.COM0253]
 adapter = "goldjewelry-campus"
 version = "1"
+
+[sources.COM0490]
+adapter = "cspc-campus"
+version = "1"
+
+[sources.COM0228]
+adapter = "clp-graduate-2027"
+version = "1"

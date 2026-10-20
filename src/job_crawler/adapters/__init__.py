@@ -32,10 +32,12 @@ from job_crawler.adapters.chinatower import (
 from job_crawler.adapters.chnenergy import Chnenergy
 from job_crawler.adapters.cib import Cib2027
 from job_crawler.adapters.cka import CkaCareers
+from job_crawler.adapters.clp import ClpGraduate2027
 from job_crawler.adapters.cmb import CmbCampus
 from job_crawler.adapters.cmbc import CmbcCampus
 from job_crawler.adapters.coapi51 import TENANTS as COAPI51_TENANTS
 from job_crawler.adapters.cpcg import CpcgCampus
+from job_crawler.adapters.cspc import CspcCampus
 from job_crawler.adapters.ctg_dutyfree import CtgDutyFreeCampus
 from job_crawler.adapters.ctrip import CtripCampus
 from job_crawler.adapters.datang import Datang2027
@@ -228,6 +230,7 @@ REGISTRY = {
         HuaweiGraduate,
         FawCampus,
         CpcgCampus,
+        CspcCampus,
         GemCampus,
         GdhMobileCampus,
         GemdaleCampus,
@@ -236,6 +239,7 @@ REGISTRY = {
         HuafaListedCampus,
         StecCampus,
         CkaCareers,
+        ClpGraduate2027,
         KingboardCareers,
         UniPresidentCareers,
         MelcoWorkday,
