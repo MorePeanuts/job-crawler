@@ -1366,3 +1366,15 @@ version = "1"
 [sources.COM0025]
 adapter = "yankuang-uibe-2027"
 version = "1"
+
+[sources.COM0240]
+adapter = "yto-zju-2027"
+version = "1"
+
+[sources.COM0188]
+adapter = "satellite-hust-2027"
+version = "1"
+
+[sources.COM0131]
+adapter = "hengtong-gdut-2027"
+version = "1"

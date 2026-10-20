@@ -74,6 +74,7 @@ from job_crawler.adapters.hailiang import HailiangCampus
 from job_crawler.adapters.hbisco import HbiscoCampus
 from job_crawler.adapters.hebut_fair import HebutFair2027
 from job_crawler.adapters.hengli_shipbuilding import HengliShipbuilding2027
+from job_crawler.adapters.hengtong_gdut import HengtongGdut2027
 from job_crawler.adapters.hongqiao_cup import HongqiaoCup2027
 from job_crawler.adapters.hongwang_kmust import HongwangKmust2027
 from job_crawler.adapters.hotjob import TENANTS as HOTJOB_TENANTS
@@ -119,6 +120,7 @@ from job_crawler.adapters.rongsheng_hebut import RongshengHebut2027
 from job_crawler.adapters.saic import SaicCampus
 from job_crawler.adapters.sangang_cup import SangangMingguang2027
 from job_crawler.adapters.sasdragon import SasDragonCareers
+from job_crawler.adapters.satellite_hust import SatelliteHust2027
 from job_crawler.adapters.sbp import SbpCampus
 from job_crawler.adapters.scoped_coapi import BcdhListedCampus, KsfCampus
 from job_crawler.adapters.sdhsg import SdhsgCampus
@@ -153,6 +155,7 @@ from job_crawler.adapters.xmwy import XiamenTungsten2027
 from job_crawler.adapters.yankuang_uibe import YankuangUibe2027
 from job_crawler.adapters.yili import YiliHeadquarters
 from job_crawler.adapters.yingte import YingteCampus
+from job_crawler.adapters.yto_zju import YtoZju2027
 from job_crawler.adapters.yuexiu2027 import YuexiuProperty2027
 from job_crawler.adapters.yuneng_csu import (
     ShagangCsu2027,
@@ -229,6 +232,9 @@ REGISTRY = {
         RisunDingzhouHebut2027,
         HongqiaoCup2027,
         YankuangUibe2027,
+        YtoZju2027,
+        SatelliteHust2027,
+        HengtongGdut2027,
         ISoftStoneCampus,
         ItgHoldingCampus,
         *EXTRA_TENANTS,
