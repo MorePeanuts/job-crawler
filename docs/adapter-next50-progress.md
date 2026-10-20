@@ -12,7 +12,7 @@
 
 天山铝业的五条岗位在高校企业主页均为「校招生」，详情主体、标题、日期与主页一致，职责及专业要求均有原文；高校来源只证明该认证账号的公开目录，不扩大为企业全网岗位。详情工作地域只给省或跨省范围，五条均保留为待地点补全。本站独立只读审计 `.runtime/batches/next-50-20261020/tianshan-audit.json` 通过，coverage 为 complete、无采集 issue。
 
-三家快照已离线合并到 `.runtime/runs/next-50-phase3`，`phase3-audit.json` 的只读审计通过：17 条有效与信息岗位、2 条严格导入、15 条待补全，合表时刻 2026-10-20 11:28:25。此目录是进行中批次的后台快照，最终 50 家表格仍待后续来源补齐后发布。
+三家快照已离线合并到 `.runtime/runs/next-50-phase3`，`phase3-audit.json` 的只读审计通过：17 条有效与信息岗位、2 条严格导入、15 条待补全，合表时刻 2026-10-20 11:28:25。本次已发布阶段表 `outputs/2026-10-20/next-50-stage-3-岗位信息汇总.xlsx` 和 `outputs/2026-10-20/next-50-stage-3-严格导入.xlsx`；最终 50 家表格仍待后续来源补齐。原始快照已按归档索引保留。
 
 本阶段离线汇总 `.runtime/runs/next-50-phase2-v2` 使用上述两份独立真实全量快照，未为合表重复抓取。只读 `audit_delivery.py --expected-companies 2` 通过：12 条有效和信息岗位，2 条严格导入，10 条待补全；汇总时刻 2026-10-20 11:03:28。已用 `archive --publish` 发布 `outputs/2026-10-20/next-50-stage-2-岗位信息汇总.xlsx` 和 `outputs/2026-10-20/next-50-stage-2-严格导入.xlsx`，两份文件分别有 12、2 条岗位及模板规定的 13 列。原始与审计路径由 `.runtime/batches/next-50-20261020/inputs-phase2-v2.json`、`phase2-audit-v2.json` 保留。
 
