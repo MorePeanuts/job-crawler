@@ -1258,3 +1258,19 @@ version = "1"
 [sources.COM0109]
 adapter = "shagang-csu-2027"
 version = "1"
+
+[sources.COM0281]
+adapter = "chujiang-ustc-campus"
+version = "1"
+
+[sources.COM0106]
+adapter = "tongling-ustc-2027"
+version = "1"
+
+[sources.COM0322]
+adapter = "zhongwei-ustc-2027"
+version = "1"
+
+[sources.COM0462]
+adapter = "shanying-ustc-2027"
+version = "1"

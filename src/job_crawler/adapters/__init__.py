@@ -30,6 +30,12 @@ from job_crawler.adapters.chinatower import (
     ShudaoCampus,
 )
 from job_crawler.adapters.chnenergy import Chnenergy
+from job_crawler.adapters.chujiang_ustc import (
+    ChujiangUstcCampus,
+    ShanyingUstc2027,
+    TonglingUstc2027,
+    ZhongweiUstc2027,
+)
 from job_crawler.adapters.cib import Cib2027
 from job_crawler.adapters.cka import CkaCareers
 from job_crawler.adapters.clp import ClpGraduate2027
@@ -250,6 +256,10 @@ REGISTRY = {
         YunengCsu2027,
         ZhongjinlingnanCsu2027,
         ShagangCsu2027,
+        ChujiangUstcCampus,
+        TonglingUstc2027,
+        ZhongweiUstc2027,
+        ShanyingUstc2027,
         KingboardCareers,
         UniPresidentCareers,
         MelcoWorkday,
