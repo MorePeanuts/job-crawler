@@ -43,6 +43,8 @@ uv run job-crawler sources add --id COM0002-campus-new \
 
 `supported` 表示已绑定启用的适配器，`pending` 为待适配，`missing` 为缺少入口，`disabled` 为禁用。新增链接不会自动生成适配器，后续将 URL 和 [适配器开发规范](docs/adapter-development.md) 交给 Codex 按契约扩展。
 
+2026 独角兽榜单候选来源的提取、去重、招聘入口及待复核范围见 [调查记录](docs/unicorn-2026-recruitment-research.md)。其中暂用榜单显示名，法定主体和后台导出名需在适配前核实；这些来源尚无启用绑定。
+
 ## 采集
 
 ```sh
