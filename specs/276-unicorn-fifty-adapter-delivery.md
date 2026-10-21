@@ -61,3 +61,65 @@ COM0521 元气森林飞书有不同项目门户：`/126537/position/list` 当前
 COM0653 海柔创新招聘门户 `/campus/jobs` 有独立实习入口；无筛选 `Category=["2"]` 校园列表首屏 `Count=87`，含跨境地点、`Kind=全职` 和完整职位正文。逐页核对 87 个 ID 与列表字段，海外地址按来源原文留存，无法映射到国内导入枚举的行进入待补全表。
 
 COM0523 得物公开飞书校园门户 `/578078/position/list` 的无筛选 `portal_type=6` 请求返回 162 条，公开项目含 2027 正式校招与实习。须逐页核对全部 ID、源招聘类型与项目，排除实习，不用首页展示的前十条推断整个目录。
+
+COM0678 麦田能源高校招聘公告给出 `fox-ess.zhiye.com` 投递地址，北森独立校园目录无筛选 `Category=["2"]` 首屏 `Count=71`，`Kind=全职`，标题含 27 届，列表含正文和源发布日期。须逐页核对目录数量、ID、正文与末页。
+
+COM0803 零一汽车 2027 校招官网公布 `zeron.jobs.feishu.cn/campus`，其飞书职位页 `/campus/position/list` 的 `portal_type=6,offset=0,limit=10` 无筛选列表首屏 `count=40`。源招聘类型为“正式”或“实习”混列，须逐页核对 40 个 ID，仅纳入正式校招；详情链接沿用 `/campus/position/{id}/detail`。
+
+COM0616 智元机器人官网招聘页明确链接 `agirobot.jobs.feishu.cn` 的“校园招聘”和单列的“实习招聘”。校园目录 `/campusrecruitment/position/list` 无筛选 `portal_type=6,offset=0,limit=10` 首屏 `count=427`，涵盖官网披露的集团旗下业务，含源类型“正式”与部分实习，须逐页完整遍历并逐项排除实习。页面不提供可靠逐岗法人字段，导出主体只能按榜单品牌“智元机器人”表示集团招聘来源，不据此声称所有岗位属于单一法人。
+
+COM0596 星海图官网北森 `/campus/jobs` 独立校园目录首屏 `Count=4`，`Category=["2"]` 无筛选、逐条 `Kind=全职`，但导航文案为“27届校招实习”；需核对四条目录正文和工作性质后纳入正式岗，实习入口在 `/intern` 单列。
+
+COM0648 库洛游戏 2027 校招高校公告给出 `kurogame.jobs.feishu.cn/campus`，职位页 `/campus/position/list` 无筛选 `portal_type=6` 返回 `count=90`。其中有“2027届秋季校园招聘”与“日常实习生招聘”两个项目，源类型有缺失，须以项目名和标题排除实习，逐页核对全部 90 个 ID。
+
+COM0563 海辰储能 2027 校招高校公告给出 Moka `campus-recruitment/hithium/70080`，实际 `#/jobs` 路由发出 `site=campus,orgId=hithium,siteId=70080,limit=30,offset=0` 的无筛选 `website/jobs/v2` 请求，页面显示 360 结果。须按源站页面公开 AES IV 解码目录与详情，核对组织、总数、分页、详情 ID 和首次发布时间，不把 Moka 首页宣传页当作岗位目录。
+
+COM0570 懂车帝官方飞书品牌招聘页可进入 `/campus/position/list`，其无筛选 `portal_type=6` 首屏返回 `count=117`，项目含“AI车青年”“正式”“实习”，实习项目与实习标题排除，须完整核对 117 个 ID 与招聘类型；不可从社招门户补入岗位。
+
+COM0503 SHEIN 官方 Moka 校园页 `campus-recruitment/shein/2932#/jobs` 显示 61 个结果，公开无筛选 `website/jobs/v2` 请求为 `site=campus,orgId=shein,siteId=2932,limit=30,offset=0`。目录混有全职、兼职、实习、其他性质；需逐页核对源性质、截止时间和详情 ID，仅纳入有效正式校招。
+
+COM0527 阶跃星辰 2027 校招高校公告给出 Moka `campus-recruitment/step/94905`，其 `#/jobs` 无筛选 `website/jobs/v2` 请求为 `site=campus,orgId=step,siteId=94905,limit=30,offset=0`，页面显示 130 条。须逐页核对全目录与详情，按源职位性质区分正式校招和实习；官网可能含北京、上海等主体，岗位表使用榜单品牌名表示共用招聘来源。
+
+COM0796 思谋科技 2027 校招高校公告给出 Moka `campus_apply/smartmore/40506#/jobs`，页面展示 19 条；无筛选 `website/jobs/v2` 请求参数为 `site=campus,orgId=smartmore,siteId=40506,limit=30,offset=0`。须核对源总数、每条详情与标题，排除实习并保留无地区等缺失字段。
+
+COM0516 远景能源 2027 秋招高校信息与远景集团站给出 Moka `campus-recruitment/envisiongroup/43123#/jobs`，无筛选请求为 `site=campus,orgId=envisiongroup,siteId=43123,limit=30,offset=0`，首屏总数 348。该集团目录同时含远景能源、远景动力等不同事业部；首屏公开解码后的 `department={id:958964,name:远景能源}` 是本来源的精准纳入边界，其他事业部仍须全量遍历并在 Scope 中标记越界，不能与已接入的 COM0522 远景动力重复。详情须核对 ID、标题和事业部。
+
+COM0561 远景智能使用同一集团 Moka 校园目录；公开完整列表 348 条按部门计数为远景能源 167、远景动力 170、远景智能 11，其中远景智能逐条 `department={id:958965,name:远景智能}`。须对全目录 348 条核对并只纳入该事业部，不将集团各事业部重复计入企业数；详情标题和事业部需匹配列表。
+
+COM0568 银河通用机器人 2027 校招高校公告指向 Moka `campus-recruitment/yinhetongyong/165930`，站点列出 2027 届校招与日常实习。公开 `#/jobs` 无筛选全目录请求为 `site=campus,orgId=yinhetongyong,siteId=165930,limit=30,offset=0`，当前总数 53；完整两页逐项性质统计为全职 32、实习 21，与首页正式校招模块的 32 条一致。须完整遍历 53 条并核对详情身份、标题、组织，程序按源性质排除 21 条实习，不能把首页展示的 32 条当作已经验证的全目录。
+
+COM0623 慧策 2027 校招高校公告明确官方 `huicecom.zhiye.com/Campus`，实际可读目录为 `/campus/jobs`，公开北森无筛选 `Category=["2"]` 首屏回报 `Count=67`。列表有稳定 ID、完整 `Duty/Require`、`Kind=全职`，标题同时含校招、实习转正或不标届别，须完整翻页并以标题排除实习；`PostDate/EndTime=0001-01-01` 哨兵保留空日期。个别源条目的职责与要求疑似倒置，应保留源字段及证据，不能凭语义擅自交换。
+
+COM0539 Momenta 官方飞书校招门户 `/campus/position/list` 无筛选 `portal_type=6,offset=0,limit=10` 返回首屏总数 30，项目含 Mstar 计划、2027 届校园招聘与日常实习。须以站点签名逐页读完 30 条，保留项目原文，按项目与标题排除实习，列表的职责、要求、地点和源发布时间须可追溯。
+
+COM0542 垣信卫星官方北森门户 `spacesail.zhiye.com/campus/jobs` 无筛选 `Category=["2"]` 首屏总数 30，列表含稳定 ID、职责、任职要求和 2026 年源发布时间，类别为校园招聘且性质为全职。须完整翻页核对 30 条及末端，排除实习标题并保留源站地点，不能将社招入口混入。
+
+COM0688 云鲸智能现行官方招聘站 `careers.narwal.com/jobs` 首屏混合目录 88 条，类别含社招、校招、实习。须在初始无筛选请求上仅添加北森 `Category=["2"]` 精确校园类别，再按该类别返回总数完整翻页；逐条核对 `CategoryId=2` 与源性质，排除实习，避免将混合首屏的 88 条直接当校招。
+
+COM0618 云深处 2027 校招浙江大学公告指向 `app135149.eapps.dingtalkcloud.com/campus-recruitment/yunshenchu/`；该白标 Moka 首页重定向至站点 100000136，`#/jobs` 公开无筛选 `site=campus,orgId=yunshenchu,siteId=100000136,limit=30,offset=0` 全目录显示 19 条。须核对白标域名、详情身份、组织、标题和 19 条末端；按性质排除实习。
+
+COM0792 元戎启行 2027 秋招公开 Moka `campus-recruitment/deeproute/145894#/jobs` 无筛选 `website/jobs/v2` 首屏总数 19，均展示 2027 秋招标题。须遍历全目录及详情，并按源职位性质排除实习，岗位表使用名录品牌标示该独立招聘来源。
+
+COM0800 新石器无人车 2027 校招高校公告指向 `r3c0qt6yjw.jobs.feishu.cn/campus/`，公开职位页无筛选 `portal_type=6,offset=0,limit=10` 首屏总数 20，源类型含正式与实习，项目包含 2027 全球校园招聘、校招实习和普通实习。须完整翻页并逐条排除实习，保留源地点与发布时间。
+
+COM0763 极飞科技官方北森 `zhaopin.xa.com/campus/jobs` 无筛选 `Category=["2"]` 首屏总数 29，性质为全职或实习混合且有标题为“测试实习生（27届）”却标全职的行；须按性质和标题双重排除实习，全量翻页并核对 29 条与末端。
+
+COM0752 本源量子官网“加入我们”提供独立校园类别 `originqc.com.cn/zh/recruit?type=1`，其公开 `POST /api/recruit/recruitList` 使用 `categoryId=1,positionId="",addressId="",pageNum=1,pageSize=10`，响应提供 `totalRecords`、`totalPages`、稳定岗位 ID、源发布时间和类别。须按实时总数遍历全部页面并核对不同 ID 与 `categoryName=校园招聘`；详情 `/zh/job_details?jobId={id}` 的标题、职责、任职资格、地点及源发布日期与列表身份对应，局部页面失败保留已成功记录并使覆盖不完整。2026-10-21 实采校园类别为 13 条、2 页；首次探测的 40 条属于未限定校园类别的混合目录，不作为校园范围计数。
+
+COM0709 微容科技官网 `viiyong.com/cn/JobList.aspx?TypeId=10029` 为独立校园频道，服务端 `current` 分页，页码条公开全部页号，岗位条目含 `AddJob` 数字 ID、标题、职责与要求；首项“微容科技校招介绍”为宣讲文本，不是岗位。须从第一页遍历至页码末端，核对当前页、总页数、无重复 ID、每个岗位正文，并排除宣讲项；列表没有岗位发布日期，应保留空值，不能使用企业 2027 校招公告日期替代。页面上的“我要应聘”表示站点仍提供投递入口；若内容或页码改变则报告覆盖失败。
+
+COM0693 自变量机器人官网“校园招聘”页面公开指向 `x2-robot.jobs.feishu.cn/912130/position/list`，该飞书站无筛选 `portal_type=6` 首屏显示 80 条，项目同时含“27届校园招聘”和“实习生招聘”。须完整分页核对源总数和 ID，按项目、招聘性质及标题排除实习，只把有效正式校园岗位纳入；不能仅从官网首页精选职位估计全量。
+
+COM0593 百川智能官网“源点顶尖人才计划”同时给出“应届岗位投递”和“实习岗位投递”两个项目链接，共用 `cq6qe6bvfr6.jobs.feishu.cn/646926/` 飞书招聘站。无筛选 `portal_type=6` 首屏显示 18 条，项目包括“源点顶尖人才计划-应届生”“源点顶尖人才计划-实习生”“日常实习”。须遍历全部 18 条并核对项目、性质、岗位 ID，只纳入应届正式岗位；官网项目的 `project` 参数仅用于确认分类，不替代无筛选全量验证。
+
+COM0587 灵心巧手官网 `/about/join` 公共 `GET /jeecg-boot/lingxin/jobCategory/public/tree` 返回四类下共 34 条不同 ID，其中 `recruitType=campus,status=published` 为 22 条，社会招聘为 12 条；校园 UI 选项显示对应 22 个职位卡片。须核对完整类别树、ID 唯一性与分类计数，只纳入仍发布的校园岗位，标题含“实习”的行排除正式校招；职责、要求来自该树 JSON 字段，`createTime` 仅代表后台建档时间，不能冒充发布日期。
+
+COM0633 统信软件官网 `uniontech.com/Recruitment.html` 服务端页面一次呈现 35 个岗位条目，`pageNew(ID)` 指向页面中对应隐藏详情面板。列表含 10 个标为校园招聘的条目，但 ID 1859 的详情实际写“社会招聘”；须按列表与详情双重核验，只接入一致标为校园招聘且显示“招聘中”的 9 个岗位，对冲突 ID 1859 标记范围排除并保留证据。页面未提供发布日期，不得填入采集日期。
+
+COM0604 正泰新能官网 `/join/index/mode/campus.html` 是独立校园类别；2026-10-21 页面展示 1 个带稳定 UUID 的“HRBP【正泰新能2027届校招】”岗位，类型标校招、性质为全职，职责与任职要求位于展开区；“加载更多”控件隐藏。须核对类别、岗位身份、展开正文和分页末端；页面日期列标“更新时间”，不可填为源发布日期。
+
+COM0661 度小满金融独立校园站 `campus.duxiaoman.com/051736/position/list` 公开飞书无筛选 `portal_type=6` 职位目录，首屏回报 35 条，含稳定 ID、源发布时间和正文；源 `recruit_type`、项目可能留空。须按校园门户及 `portal_type=6` 的范围完整分页，不能用空性质虚构“正式”，标题含实习仍须排除；保留源字段缺失，并核对详情路由由目录站点代码生成。
+
+COM0631 正浩创新官网招聘首页“校园招聘”指向 `jobs.ecoflow.com/602892/`，职位页 `/602892/position/list` 公开飞书无筛选 `portal_type=6` 全目录 99 条，项目混有“2027届校园招聘”“日常实习”“2027届校招实习”。须完整翻页核对 99 个 ID，并按项目、源性质及标题排除实习，只纳入 2027 正式校招；临时接口 405 不代表岗位数为零，应以职位页公开签名请求复核。
+
+COM0550 自如官网 `job.ziroom.com/campus/enter` 的校园频道显示“共10个岗位”，十个标题均标“2027秋招”；每个卡片展开后在页面呈现职责和要求，地点在卡片表层。其代理接口响应加密，不依赖猜测解密；须通过官网 UI 逐个展开全部十个卡片，核对页面总数、标题与地点唯一性、职责和要求，并保留展开证据。该页没有公开岗位 ID 与发布日期，使用标题加地点的确定性哈希作来源键，发布日期留空；目录数量不符或任一卡片无法展开均判覆盖失败。
