@@ -658,7 +658,127 @@ class Zczl2027(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "中创智领详情标题不匹配")
 
 
+class Hithium2027(Moka):
+    name = "moka-hithium-2027"
+    org = "hithium"
+    site_id = 70080
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "海辰储能高校公告指向的 Moka 2027 校园站无筛选全部岗位"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "海辰储能详情标题不匹配")
+
+
+class Shein2027(Moka):
+    name = "moka-shein-2027"
+    org = "shein"
+    site_id = 2932
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "SHEIN 官方 Moka 2027 校园站无筛选全目录；实习/兼职按源性质排除"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "SHEIN 详情标题不匹配")
+
+
+class Stepfun2027(Moka):
+    name = "moka-stepfun-2027"
+    org = "step"
+    site_id = 94905
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "阶跃星辰 2027 Moka 校园站无筛选全目录；实习与正式按源性质区分"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "阶跃星辰详情标题不匹配")
+
+
+class Smartmore2027(Moka):
+    name = "moka-smartmore-2027"
+    org = "smartmore"
+    site_id = 40506
+    route = "campus_apply"
+    path = f"/{route}/{org}/{site_id}#/jobs"
+    scope_description = "思谋科技 2027 Moka 校园站无筛选全目录；以源码性质排除实习"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "思谋科技详情标题不匹配")
+
+
+class EnvisionEnergy2027(Moka):
+    name = "moka-envision-energy-2027"
+    org = "envisiongroup"
+    site_id = 43123
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "远景集团 Moka 2027 校园全目录仅纳入 department.id=958964 远景能源；其他事业部逐条核对后排除"
+    department_id = "958964"
+    department_name = "远景能源"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        department = row.get("department") or {}
+        check(
+            isinstance(department, dict) and bool(department.get("id")),
+            "远景集团岗位缺少事业部身份",
+        )
+        return (
+            str(department["id"]) == self.department_id
+            and text(department.get("name")) == self.department_name
+        )
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "远景集团详情标题不匹配")
+        check(detail.get("department") == listing.get("department"), "远景集团详情事业部不匹配")
+
+
+class EnvisionDigital2027(EnvisionEnergy2027):
+    name = "moka-envision-digital-2027"
+    scope_description = "远景集团 Moka 2027 校园全目录仅纳入 department.id=958965 远景智能；其他事业部逐条核对后排除"
+    department_id = "958965"
+    department_name = "远景智能"
+
+
+class Galbot2027(Moka):
+    name = "moka-galbot-2027"
+    org = "yinhetongyong"
+    site_id = 165930
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "银河通用机器人2027校园站全目录；按源职位性质排除日常实习"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "银河通用详情标题不一致")
+
+
+class Yunshenchu2027(Moka):
+    name = "moka-yunshenchu-2027"
+    host = "app135149.eapps.dingtalkcloud.com"
+    org = "yunshenchu"
+    site_id = 100000136
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "云深处 2027 白标 Moka 校园门户无筛选全目录；按性质排除实习"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "云深处详情标题不一致")
+
+
+class Deeproute2027(Moka):
+    name = "moka-deeproute-2027"
+    org = "deeproute"
+    site_id = 145894
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "元戎启行 2027 秋招 Moka 校园站无筛选全目录；按性质排除实习"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "元戎启行详情标题不一致")
+
+
 TENANTS = (
+    EnvisionDigital2027,
+    EnvisionEnergy2027,
+    Galbot2027,
+    Yunshenchu2027,
+    Deeproute2027,
+    Smartmore2027,
+    Stepfun2027,
+    Shein2027,
+    Hithium2027,
     Zczl2027,
     Lingyi2027,
     Longcheer2027,

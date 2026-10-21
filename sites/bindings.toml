@@ -1327,3 +1327,127 @@ version = "1"
 [sources.COM0523]
 adapter = "feishu-dewu-campus"
 version = "1"
+
+[sources.COM0678]
+adapter = "zhiye-fox-ess-campus"
+version = "1"
+
+[sources.COM0803]
+adapter = "feishu-zeron-campus"
+version = "1"
+
+[sources.COM0596]
+adapter = "zhiye-galaxea-campus"
+version = "1"
+
+[sources.COM0648]
+adapter = "feishu-kuro-campus"
+version = "1"
+
+[sources.COM0616]
+adapter = "feishu-agibot-campus"
+version = "1"
+
+[sources.COM0563]
+adapter = "moka-hithium-2027"
+version = "1"
+
+[sources.COM0570]
+adapter = "feishu-dcar-campus"
+version = "1"
+
+[sources.COM0503]
+adapter = "moka-shein-2027"
+version = "1"
+
+[sources.COM0527]
+adapter = "moka-stepfun-2027"
+version = "1"
+
+[sources.COM0796]
+adapter = "moka-smartmore-2027"
+version = "1"
+
+[sources.COM0561]
+adapter = "moka-envision-digital-2027"
+version = "1"
+
+[sources.COM0516]
+adapter = "moka-envision-energy-2027"
+version = "1"
+
+[sources.COM0568]
+adapter = "moka-galbot-2027"
+version = "1"
+
+[sources.COM0623]
+adapter = "zhiye-huice-campus"
+version = "1"
+
+[sources.COM0539]
+adapter = "feishu-momenta-campus"
+version = "1"
+
+[sources.COM0542]
+adapter = "zhiye-spacesail-campus"
+version = "1"
+
+[sources.COM0688]
+adapter = "zhiye-narwal-campus"
+version = "1"
+
+[sources.COM0800]
+adapter = "feishu-neolix-campus"
+version = "1"
+
+[sources.COM0618]
+adapter = "moka-yunshenchu-2027"
+version = "1"
+
+[sources.COM0763]
+adapter = "zhiye-xag-campus"
+version = "1"
+
+[sources.COM0752]
+adapter = "originqc-campus"
+version = "1"
+
+[sources.COM0792]
+adapter = "moka-deeproute-2027"
+version = "1"
+
+[sources.COM0709]
+adapter = "viiyong-campus"
+version = "1"
+
+[sources.COM0693]
+adapter = "feishu-x2robot-campus"
+version = "1"
+
+[sources.COM0593]
+adapter = "feishu-baichuan-origin-campus"
+version = "1"
+
+[sources.COM0587]
+adapter = "linkerbot-campus"
+version = "1"
+
+[sources.COM0633]
+adapter = "uniontech-campus"
+version = "1"
+
+[sources.COM0604]
+adapter = "astronergy-campus"
+version = "1"
+
+[sources.COM0661]
+adapter = "feishu-duxiaoman-campus"
+version = "1"
+
+[sources.COM0631]
+adapter = "feishu-ecoflow-campus"
+version = "1"
+
+[sources.COM0550]
+adapter = "ziroom-campus"
+version = "1"

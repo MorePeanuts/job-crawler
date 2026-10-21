@@ -15,10 +15,15 @@ from job_crawler.adapters.moka import (
     STO,
     Anta2027,
     Dasenlin,
+    Deeproute2027,
     Digiloong,
     EastchinaPharm,
+    EnvisionDigital2027,
+    EnvisionEnergy2027,
     Fehorizon,
+    Galbot2027,
     Hengrui,
+    Hithium2027,
     Huaqin,
     Jinko,
     Lingyi2027,
@@ -27,10 +32,14 @@ from job_crawler.adapters.moka import (
     Moka,
     Sanhua,
     Seazen2027,
+    Shein2027,
+    Smartmore2027,
+    Stepfun2027,
     Sungrow,
     SunnyOptical,
     TrinaSolar,
     Yadea,
+    Yunshenchu2027,
     Zczl2027,
     ZhongAn,
     decode,
@@ -63,10 +72,17 @@ class Replay:
     page = Page()
 
     def __init__(
-        self, org: str, site_id: int, *, duplicate: bool = False, missing_description: bool = False
+        self,
+        org: str,
+        site_id: int,
+        *,
+        host: str = "app.mokahr.com",
+        duplicate: bool = False,
+        missing_description: bool = False,
     ):
         self.org = org
         self.site_id = site_id
+        self.host = host
         self.duplicate = duplicate
         self.missing_description = missing_description
         self.calls: list[dict[str, Any]] = []
@@ -91,7 +107,7 @@ class Replay:
     async def observed_path(self, needle: str) -> dict[str, Any]:
         if needle == "/api/outer/ats-apply/website/jobs/v2":
             return {
-                "url": "https://app.mokahr.com/api/outer/ats-apply/website/jobs/v2",
+                "url": f"https://{self.host}/api/outer/ats-apply/website/jobs/v2",
                 "post_data": json.dumps(
                     {
                         "orgId": self.org,
@@ -106,7 +122,7 @@ class Replay:
                 ),
             }
         return {
-            "url": "https://app.mokahr.com/api/outer/ats-apply/website/job",
+            "url": f"https://{self.host}/api/outer/ats-apply/website/job",
             "body": json.dumps(encrypted({"code": 0, "data": self._row("a")})),
         }
 
@@ -218,18 +234,25 @@ async def test_sunny_rejects_internship_module(now: datetime) -> None:
         TrinaSolar,
         Anta2027,
         Hengrui,
+        Hithium2027,
+        Shein2027,
+        Stepfun2027,
+        Smartmore2027,
+        Galbot2027,
+        Yunshenchu2027,
+        Deeproute2027,
         Seazen2027,
         Lingyi2027,
         Zczl2027,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:
-    session = Replay(adapter.org, adapter.site_id)
+    session = Replay(adapter.org, adapter.site_id, host=adapter.host)
     source = Source(
         source_id="SITE",
         company_id="SITE",
         company="企业",
-        url=f"https://app.mokahr.com/{adapter.route}/{adapter.org}/{adapter.site_id}",
+        url=f"https://{adapter.host}/{adapter.route}/{adapter.org}/{adapter.site_id}",
     )
     result = await adapter(source, session, now).collect()
     assert result.coverage_issues() == []
@@ -240,7 +263,7 @@ async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: dat
     assert result.jobs[1].work_type == "实习"
     assert result.jobs[0].published == "2026-10-10T09:00:00"
     assert result.jobs[0].source_url.startswith(
-        f"https://app.mokahr.com/{adapter.route}/{adapter.org}/{adapter.site_id}#/job/"
+        f"https://{adapter.host}/{adapter.route}/{adapter.org}/{adapter.site_id}#/job/"
     )
     assert [call["offset"] for call in session.calls if "offset" in call] == [0, 2]
 
@@ -256,6 +279,55 @@ async def test_moka_rejects_duplicate_page(now: datetime) -> None:
     assert "duplicate_page" in {issue.code for issue in result.coverage_issues()}
 
 
+class EnvisionReplay(Replay):
+    def __init__(self) -> None:
+        super().__init__("envisiongroup", 43123)
+
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        row["department"] = (
+            {"id": 967570, "name": "远景动力"}
+            if job_id == "b"
+            else {"id": 958964, "name": "远景能源"}
+        )
+        return row
+
+
+async def test_envision_energy_excludes_other_group_departments(now: datetime) -> None:
+    source = Source(
+        source_id="COM0516",
+        company_id="COM0516",
+        company="远景能源",
+        url="https://app.mokahr.com/campus-recruitment/envisiongroup/43123#/jobs",
+    )
+    result = await EnvisionEnergy2027(source, EnvisionReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert result.scopes[0].skipped_out_of_scope == 1
+
+
+class EnvisionDigitalReplay(EnvisionReplay):
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        if job_id == "a":
+            row["department"] = {"id": 958965, "name": "远景智能"}
+        return row
+
+
+async def test_envision_digital_is_distinct_from_energy_and_power(now: datetime) -> None:
+    source = Source(
+        source_id="COM0561",
+        company_id="COM0561",
+        company="远景智能",
+        url="https://app.mokahr.com/campus-recruitment/envisiongroup/43123#/jobs",
+    )
+    result = await EnvisionDigital2027(source, EnvisionDigitalReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert [job.source_key for job in result.jobs] == ["a"]
+    assert result.scopes[0].skipped_out_of_scope == 2
+
+
 class TitleMismatch(Replay):
     async def observed_path(self, needle: str) -> dict[str, Any]:
         response = await super().observed_path(needle)
@@ -266,7 +338,10 @@ class TitleMismatch(Replay):
         return response
 
 
-@pytest.mark.parametrize("adapter", [Seazen2027, Lingyi2027, Zczl2027])
+@pytest.mark.parametrize(
+    "adapter",
+    [Seazen2027, Lingyi2027, Zczl2027, Hithium2027, Shein2027, Stepfun2027, Smartmore2027],
+)
 async def test_moka_rejects_detail_title_mismatch(adapter: type[Moka], now: datetime) -> None:
     source = Source(
         source_id="TEST",

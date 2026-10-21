@@ -12,13 +12,19 @@ from job_crawler.adapters.zhiye import (
     CasSpaceCampus,
     CxmtCampus,
     DreameCampus,
+    FoxEssCampus,
+    GalaxeaCampus,
     GalaxyCampus,
     HairoboticsCampus,
     HellobikeCampus,
+    HuiceCampus,
     IrootechCampus,
     JunlebaoCampus,
     LeheCampus,
+    NarwalCampus,
+    SpacesailCampus,
     SvoltCampus,
+    XagCampus,
     YmtcCampus,
     ZhihuiyaCampus,
     Zhiye,
@@ -98,6 +104,11 @@ class CampusReplay:
         (JunlebaoCampus, "junlebaoruye.zhiye.com"),
         (SvoltCampus, "svolt.zhiye.com"),
         (HairoboticsCampus, "hairobotics.zhiye.com"),
+        (FoxEssCampus, "fox-ess.zhiye.com"),
+        (GalaxeaCampus, "galaxea.zhiye.com"),
+        (HuiceCampus, "huicecom.zhiye.com"),
+        (SpacesailCampus, "spacesail.zhiye.com"),
+        (XagCampus, "zhaopin.xa.com"),
     ],
 )
 async def test_unicorn_beisen_full_catalog_and_internship(
@@ -123,3 +134,29 @@ async def test_unicorn_beisen_rejects_partial_location_filter(now: datetime) -> 
     result = await YmtcCampus(source, replay, now).collect()
     assert not result.jobs and result.coverage_issues()
     assert "LocId" in result.issues[0].message
+
+
+class MixedCampusReplay(CampusReplay):
+    async def observed(self, needle: str) -> dict[str, Any]:
+        result = await super().observed(needle)
+        payload = json.loads(result["post_data"])
+        payload.pop("Category")
+        payload["SpecialType"] = 0
+        result["post_data"] = json.dumps(payload)
+        return result
+
+
+async def test_narwal_mixed_catalog_filters_exact_campus_category(now: datetime) -> None:
+    replay = MixedCampusReplay()
+    source = Source(
+        source_id="COM0688",
+        company_id="COM0688",
+        company="云鲸智能",
+        url="https://careers.narwal.com/jobs",
+    )
+    result = await NarwalCampus(source, replay, now).collect()
+    assert replay.opens == ["https://careers.narwal.com/jobs"]
+    assert replay.pages == [0, 1]
+    assert not result.coverage_issues()
+    assert len(result.jobs) == 21
+    assert result.jobs[-1].work_type == "实习"

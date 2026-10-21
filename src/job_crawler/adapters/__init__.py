@@ -3,6 +3,7 @@
 from job_crawler.adapters.aisidi import AisidiCampus
 from job_crawler.adapters.anker import AnkerCampus
 from job_crawler.adapters.ansteel import Ansteel
+from job_crawler.adapters.astronergy import AstronergyCampus
 from job_crawler.adapters.asus import AsusMainlandCampus
 from job_crawler.adapters.avary import AvaryCampus
 from job_crawler.adapters.bank_catalogs import TENANTS as BANK_TENANTS
@@ -103,6 +104,7 @@ from job_crawler.adapters.jxcc import JxccCampus
 from job_crawler.adapters.kingboard import KingboardCareers
 from job_crawler.adapters.laopu import LaopuCampus
 from job_crawler.adapters.lenovo import Lenovo
+from job_crawler.adapters.linkerbot import LinkerbotCampus
 from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.longi_legacy import LongiLegacyCampus
 from job_crawler.adapters.meituan import Meituan
@@ -116,6 +118,7 @@ from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.netease import NeteaseCampus
 from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.newworld import NewWorldCareers
+from job_crawler.adapters.originqc import OriginQCCampus
 from job_crawler.adapters.pccw import PccwGraduate
 from job_crawler.adapters.pdd import PddCampus
 from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
@@ -153,6 +156,8 @@ from job_crawler.adapters.tiandi_international import TiandiInternational2027
 from job_crawler.adapters.tianshan_hebut import TianshanHebutCampus
 from job_crawler.adapters.tongwei_share import TongweiShare2027
 from job_crawler.adapters.uni_president import UniPresidentCareers
+from job_crawler.adapters.uniontech import UnionTechCampus
+from job_crawler.adapters.viiyong import ViiyongCampus
 from job_crawler.adapters.workday import AiaWorkday, FwdWorkday, HkexWorkday, MelcoWorkday
 from job_crawler.adapters.wtmec import Wtmec
 from job_crawler.adapters.xfusion import XfusionCampus
@@ -176,6 +181,7 @@ from job_crawler.adapters.zhaopin import TENANTS as ZHAOPIN_TENANTS
 from job_crawler.adapters.zhaopin import Cnooc2027, Giihg2027
 from job_crawler.adapters.zhiye import TENANTS, Ctf2027, WeichaiPower2027
 from job_crawler.adapters.zhongjin_gold_chnu import ZhongjinGoldChnu2027
+from job_crawler.adapters.ziroom import ZiroomCampus
 from job_crawler.adapters.zjamp import ZjampCampus
 from job_crawler.adapters.zjci import ZjciCampus
 from job_crawler.adapters.zjjt import Zjjt2027
@@ -347,6 +353,12 @@ REGISTRY = {
         HbiscoCampus,
         NciCampus,
         NeteaseCampus,
+        OriginQCCampus,
+        ViiyongCampus,
+        LinkerbotCampus,
+        UnionTechCampus,
+        AstronergyCampus,
+        ZiroomCampus,
         NingboBank2027,
         SunwodaCampus,
         GreentownCampus,

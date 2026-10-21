@@ -1013,6 +1013,56 @@ class HairoboticsCampus(Zhiye):
     scope_description = "海柔创新北森 Category=2 公开校园全目录；海外地点保留原文"
 
 
+class FoxEssCampus(Zhiye):
+    name = "zhiye-fox-ess-campus"
+    host = "fox-ess.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "麦田能源北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class GalaxeaCampus(Zhiye):
+    name = "zhiye-galaxea-campus"
+    host = "galaxea.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "星海图北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class HuiceCampus(Zhiye):
+    name = "zhiye-huice-campus"
+    host = "huicecom.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "慧策北森 Category=2 校招/实习共享全目录；按源性质及标题排除实习"
+
+
+class SpacesailCampus(Zhiye):
+    name = "zhiye-spacesail-campus"
+    host = "spacesail.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "垣信卫星北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class NarwalCampus(Zhiye):
+    name = "zhiye-narwal-campus"
+    host = "careers.narwal.com"
+    path = "/jobs"
+    mixed_catalog = True
+    listing_complete = True
+    regular_only = True
+    scope_description = "云鲸智能北森混合目录精确筛 Category=2 后完整遍历；排除实习"
+
+
+class XagCampus(Zhiye):
+    name = "zhiye-xag-campus"
+    host = "zhaopin.xa.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "极飞科技北森 Category=2 校招全目录；性质与标题双重排除实习"
+
+
 TENANTS = (
     YmtcCampus,
     CxmtCampus,
@@ -1028,6 +1078,12 @@ TENANTS = (
     JunlebaoCampus,
     SvoltCampus,
     HairoboticsCampus,
+    FoxEssCampus,
+    GalaxeaCampus,
+    HuiceCampus,
+    SpacesailCampus,
+    NarwalCampus,
+    XagCampus,
     ShenghongCampus,
     BusyMingCampus,
     SunartCampus,

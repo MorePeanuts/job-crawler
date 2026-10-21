@@ -75,7 +75,8 @@ class Desaysv(Adapter):
                 title = text(row.get("title"))
                 duties = text(row.get("description"))
                 requirements = text(row.get("requirement"))
-                check(bool(title) and bool(duties), "飞书岗位标题或职责缺失")
+                internship = any("实习" in value for value in (subject_name, recruit_name, title))
+                check(bool(title) and (bool(duties) or internship), "飞书正式岗位标题或职责缺失")
                 cities = row.get("city_list") or []
                 check(isinstance(cities, list), "飞书岗位城市结构改变")
                 location = "、".join(
@@ -89,11 +90,7 @@ class Desaysv(Adapter):
                     title=title,
                     source_url=page,
                     apply_url=page,
-                    work_type=(
-                        "实习"
-                        if any("实习" in value for value in (subject_name, recruit_name, title))
-                        else "校招"
-                    ),
+                    work_type="实习" if internship else "校招",
                     batch=subject_name,
                     category_raw=text(function.get("name") or category.get("name")),
                     location=location,
@@ -227,6 +224,91 @@ class DewuCampus(Desaysv):
     scope_description = "得物飞书校园项目 portal_type=6 全目录；按源招聘类型排除实习"
 
 
+class ZeronCampus(Desaysv):
+    name = "feishu-zeron-campus"
+    host = "zeron.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "零一汽车飞书 2027 校园门户 portal_type=6 全目录；按源类型排除实习"
+
+
+class AgibotCampus(Desaysv):
+    name = "feishu-agibot-campus"
+    host = "agirobot.jobs.feishu.cn"
+    path = "/campusrecruitment/position/list"
+    detail_prefix = "/campusrecruitment/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "智元机器人官网链接的集团飞书校园门户全目录；含官网披露的旗下业务，实习排除"
+
+
+class KuroCampus(Desaysv):
+    name = "feishu-kuro-campus"
+    host = "kurogame.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "库洛游戏 2027 校园门户全目录；按项目和标题排除日常实习"
+
+
+class DcarCampus(Desaysv):
+    name = "feishu-dcar-campus"
+    host = "dcar.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "懂车帝官方飞书 campus 门户无筛选全目录；按项目与标题排除实习"
+
+
+class MomentaCampus(Desaysv):
+    name = "feishu-momenta-campus"
+    host = "momenta.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "Momenta 飞书校园门户全目录；按项目与标题排除日常实习"
+
+
+class NeolixCampus(Desaysv):
+    name = "feishu-neolix-campus"
+    host = "r3c0qt6yjw.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "新石器 2027 飞书校园门户全目录；按源招聘类型和项目排除实习"
+
+
+class X2RobotCampus(Desaysv):
+    name = "feishu-x2robot-campus"
+    host = "x2-robot.jobs.feishu.cn"
+    path = "/912130/position/list"
+    detail_prefix = "/912130/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "自变量机器人官网所链飞书 27 届校园门户全目录；排除实习项目"
+
+
+class BaichuanOriginCampus(Desaysv):
+    name = "feishu-baichuan-origin-campus"
+    host = "cq6qe6bvfr6.jobs.feishu.cn"
+    path = "/646926/"
+    detail_prefix = "/646926/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "百川智能源点顶尖人才计划公开全目录；只纳入应届正式岗位"
+
+
+class DuxiaomanCampus(Desaysv):
+    name = "feishu-duxiaoman-campus"
+    host = "campus.duxiaoman.com"
+    path = "/051736/position/list"
+    detail_prefix = "/051736/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "度小满独立校园站飞书 portal_type=6 全目录；排除实习标题"
+
+
+class EcoflowCampus(Desaysv):
+    name = "feishu-ecoflow-campus"
+    host = "jobs.ecoflow.com"
+    path = "/602892/position/list"
+    detail_prefix = "/602892/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "正浩创新官网所链飞书 2027 校招全目录；排除日常及校招实习"
+
+
 TENANTS = (
     Desaysv,
     Xpeng,
@@ -239,4 +321,14 @@ TENANTS = (
     SpiritAICampus,
     YuanqiCampus,
     DewuCampus,
+    ZeronCampus,
+    AgibotCampus,
+    KuroCampus,
+    DcarCampus,
+    MomentaCampus,
+    NeolixCampus,
+    X2RobotCampus,
+    BaichuanOriginCampus,
+    DuxiaomanCampus,
+    EcoflowCampus,
 )

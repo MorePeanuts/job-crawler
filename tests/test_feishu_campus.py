@@ -4,13 +4,22 @@ from pathlib import Path
 from typing import Any
 
 from job_crawler.adapters.feishu import (
+    AgibotCampus,
+    BaichuanOriginCampus,
+    DcarCampus,
     DewuCampus,
+    DuxiaomanCampus,
     Innolight,
     Jtexpress,
+    KuroCampus,
+    MomentaCampus,
+    NeolixCampus,
     NineDragons,
     SpiritAICampus,
+    X2RobotCampus,
     Xiaomi,
     YuanqiCampus,
+    ZeronCampus,
 )
 from job_crawler.models import Source
 
@@ -259,3 +268,249 @@ async def test_dewu_578078_campus_portal(tmp_path: Path, now: datetime) -> None:
     assert not result.coverage_issues()
     assert result.jobs[0].work_type == "校招"
     assert result.jobs[0].source_url == "https://poizon.jobs.feishu.cn/578078/position/123/detail"
+
+
+class ZeronSession(YuanqiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://zeron.jobs.feishu.cn/campus/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "k11pnjpvz1.jobs.feishu.cn", "zeron.jobs.feishu.cn"
+        )
+        return response
+
+
+async def test_zeron_campus_portal(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0803",
+        company_id="COM0803",
+        company="江苏零一汽车科技股份有限公司",
+        url="https://zeron.jobs.feishu.cn/campus/position/list",
+    )
+    result = await ZeronCampus(source, ZeronSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].source_url == "https://zeron.jobs.feishu.cn/campus/position/123/detail"
+
+
+class AgibotSession(YuanqiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://agirobot.jobs.feishu.cn/campusrecruitment/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "k11pnjpvz1.jobs.feishu.cn", "agirobot.jobs.feishu.cn"
+        )
+        return response
+
+
+async def test_agibot_group_campus_portal(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0616",
+        company_id="COM0616",
+        company="智元机器人",
+        url="https://agirobot.jobs.feishu.cn/campusrecruitment/position/list",
+    )
+    result = await AgibotCampus(source, AgibotSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].source_url.endswith("/campusrecruitment/position/123/detail")
+
+
+class AgibotBlankInternSession(AgibotSession):
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        payload = json.loads(response["body"])
+        row = payload["data"]["job_post_list"][0]
+        row["title"] = "结构开发实习生"
+        row["description"] = ""
+        row["requirement"] = ""
+        row["recruit_type"]["name"] = "实习"
+        response["body"] = json.dumps(payload)
+        return response
+
+
+async def test_agibot_blank_intern_does_not_truncate_catalog(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0616",
+        company_id="COM0616",
+        company="智元机器人",
+        url="https://agirobot.jobs.feishu.cn/campusrecruitment/position/list",
+    )
+    result = await AgibotCampus(source, AgibotBlankInternSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "实习"
+    assert result.jobs[0].duties == ""
+
+
+class KuroSession(YuanqiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://kurogame.jobs.feishu.cn/campus/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "k11pnjpvz1.jobs.feishu.cn", "kurogame.jobs.feishu.cn"
+        )
+        return response
+
+
+async def test_kuro_campus_excludes_intern_project(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0648",
+        company_id="COM0648",
+        company="广州库洛科技有限公司",
+        url="https://kurogame.jobs.feishu.cn/campus/position/list",
+    )
+    result = await KuroCampus(source, KuroSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].source_url == "https://kurogame.jobs.feishu.cn/campus/position/123/detail"
+
+
+class DcarSession(YuanqiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://dcar.jobs.feishu.cn/campus/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "k11pnjpvz1.jobs.feishu.cn", "dcar.jobs.feishu.cn"
+        )
+        return response
+
+
+async def test_dcar_campus_portal(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0570",
+        company_id="COM0570",
+        company="懂车帝",
+        url="https://dcar.jobs.feishu.cn/campus/position/list",
+    )
+    result = await DcarCampus(source, DcarSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].source_url == "https://dcar.jobs.feishu.cn/campus/position/123/detail"
+
+
+class MomentaSession(YuanqiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://momenta.jobs.feishu.cn/campus/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "k11pnjpvz1.jobs.feishu.cn", "momenta.jobs.feishu.cn"
+        )
+        payload = json.loads(response["body"])
+        payload["data"]["job_post_list"][0]["job_subject"] = {"name": {"zh_cn": "Mstar计划"}}
+        response["body"] = json.dumps(payload)
+        return response
+
+
+async def test_momenta_campus_mstar_scope(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0539",
+        company_id="COM0539",
+        company="Momenta",
+        url="https://momenta.jobs.feishu.cn/campus/position/list",
+    )
+    result = await MomentaCampus(source, MomentaSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].batch == "Mstar计划"
+    assert result.jobs[0].source_url == "https://momenta.jobs.feishu.cn/campus/position/123/detail"
+
+
+class NeolixSession(YuanqiSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://r3c0qt6yjw.jobs.feishu.cn/campus/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "k11pnjpvz1.jobs.feishu.cn", "r3c0qt6yjw.jobs.feishu.cn"
+        )
+        payload = json.loads(response["body"])
+        payload["data"]["job_post_list"][0]["job_subject"] = {
+            "name": {"zh_cn": "2027届全球校园招聘"}
+        }
+        response["body"] = json.dumps(payload)
+        return response
+
+
+async def test_neolix_campus_formal_project(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0800",
+        company_id="COM0800",
+        company="新石器无人车",
+        url="https://r3c0qt6yjw.jobs.feishu.cn/campus/position/list",
+    )
+    result = await NeolixCampus(source, NeolixSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].batch == "2027届全球校园招聘"
+
+
+class NewUnicornSession(Session):
+    def __init__(self, output: Path, host: str, path: str, project: str) -> None:
+        super().__init__(output)
+        self.host = host
+        self.path = path
+        self.project = project
+
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == f"https://{self.host}{self.path}"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace("jtexpress.jobs.feishu.cn", self.host)
+        payload = json.loads(response["body"])
+        row = payload["data"]["job_post_list"][0]
+        row["recruit_type"]["name"] = "正式"
+        row["job_subject"] = {"name": {"zh_cn": self.project}}
+        response["body"] = json.dumps(payload)
+        return response
+
+
+async def test_new_unicorn_feishu_projects(tmp_path: Path, now: datetime) -> None:
+    for adapter, source_id, company, host, path, project in (
+        (
+            X2RobotCampus,
+            "COM0693",
+            "自变量机器人",
+            "x2-robot.jobs.feishu.cn",
+            "/912130/position/list",
+            "27届校园招聘",
+        ),
+        (
+            BaichuanOriginCampus,
+            "COM0593",
+            "百川智能",
+            "cq6qe6bvfr6.jobs.feishu.cn",
+            "/646926/",
+            "源点顶尖人才计划-应届生",
+        ),
+        (
+            DuxiaomanCampus,
+            "COM0661",
+            "度小满金融",
+            "campus.duxiaoman.com",
+            "/051736/position/list",
+            "2027届校园招聘",
+        ),
+    ):
+        source = Source(
+            source_id=source_id,
+            company_id=source_id,
+            company=company,
+            url=f"https://{host}{path}",
+        )
+        result = await adapter(
+            source, NewUnicornSession(tmp_path, host, path, project), now
+        ).collect()
+        assert not result.coverage_issues()
+        assert result.jobs[0].work_type == "校招"
+        assert result.jobs[0].batch == project
