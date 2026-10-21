@@ -14,6 +14,7 @@ from job_crawler.adapters.hotjob import (
     DbnCampus,
     EveEnergy,
     FarEastListedCampus,
+    GoermicroCampus2027,
     Goertek,
     GwmListed,
     HaiTian,
@@ -31,6 +32,7 @@ from job_crawler.adapters.hotjob import (
     Skyworth,
     Tbea,
     TclIndustries,
+    UnisocCampus2027,
     Wanhua2027,
     Zoomlion2027,
     detail_body,
@@ -1279,3 +1281,73 @@ def test_fareast_public_field_fixture(now: datetime) -> None:
     assert "【能力要求】" in job.duties and job.requirements == ""
     assert job.published == "2026-10-15 15:20:15"
     assert job.deadline == "2027-01-15 23:59:59"
+
+
+class UnisocReplay(Replay):
+    def __init__(self, *, wrong_company: bool = False, wrong_project: bool = False) -> None:
+        super().__init__()
+        self.wrong_company = wrong_company
+        self.wrong_project = wrong_project
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row["company"] = "其他企业" if self.wrong_company and post_id == "b" else "紫光展锐"
+        row["projectName"] = "实习" if self.wrong_project and post_id == "b" else "2027届秋招"
+        return row
+
+
+@pytest.mark.parametrize("fault", ["", "wrong_company", "wrong_project"])
+async def test_unisoc_campus_scope_and_identity(fault: str, now: datetime) -> None:
+    source = Source(
+        source_id="COM0524",
+        company_id="COM0524",
+        company="紫光展锐",
+        url=f"https://wecruit.hotjob.cn/{UnisocCampus2027.suite}/pb/index.html",
+    )
+    replay = UnisocReplay(
+        wrong_company=fault == "wrong_company", wrong_project=fault == "wrong_project"
+    )
+    result = await UnisocCampus2027(source, replay, now).collect()
+    assert replay.opens[0].endswith("/pb/school.html")
+    if fault:
+        assert result.coverage_issues()
+    else:
+        assert not result.coverage_issues()
+        assert result.scopes[0].expected == 3 and result.scopes[0].terminal
+        assert len(result.jobs) == 3
+        assert result.jobs[0].published == "2026-10-10 09:00:00"
+
+
+class GoermicroReplay(Replay):
+    def __init__(self, *, wrong_company: bool = False) -> None:
+        super().__init__()
+        self.wrong_company = wrong_company
+
+    def _listing(self, post_id: str) -> dict[str, Any]:
+        row = super()._listing(post_id)
+        row["company"] = "其他企业" if self.wrong_company and post_id == "c" else "歌尔微电子"
+        row["postTypeName"] = "校园精英招聘" if post_id == "c" else "校园招聘"
+        row["postName"] = f"{'2026届' if post_id == 'b' else '2027届'}精英计划-{post_id}"
+        row["projectName"] = "日常招聘"
+        return row
+
+
+@pytest.mark.parametrize("wrong_company", [False, True])
+async def test_goermicro_2027_scope(now: datetime, wrong_company: bool) -> None:
+    source = Source(
+        source_id="COM0556",
+        company_id="COM0556",
+        company="歌尔微电子",
+        url=f"https://wecruit.hotjob.cn/{GoermicroCampus2027.suite}/pb/school.html",
+    )
+    result = await GoermicroCampus2027(
+        source, GoermicroReplay(wrong_company=wrong_company), now
+    ).collect()
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert result.scopes[0].skipped_out_of_scope == 1
+    if wrong_company:
+        assert result.coverage_issues()
+    else:
+        assert not result.coverage_issues()
+        assert [job.title for job in result.jobs] == ["2027届精英计划-a", "2027届精英计划-c"]
+        assert result.jobs[0].published == "2026-10-10 09:00:00"
