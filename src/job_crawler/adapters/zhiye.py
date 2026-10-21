@@ -901,7 +901,133 @@ class GuotaiHuashengCampus(Zhiye):
         return True
 
 
+class YmtcCampus(Zhiye):
+    name = "zhiye-ymtc-campus"
+    host = "ymtc.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "长江存储北森 Category=2 公开校园全目录；排除实习与社会招聘"
+
+
+class CxmtCampus(Zhiye):
+    name = "zhiye-cxmt-campus"
+    host = "cxmt.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "长鑫存储技术有限公司北森 Category=2 公开校园全目录；排除实习与社会招聘"
+
+
+class DreameCampus(Zhiye):
+    name = "zhiye-dreame-campus"
+    host = "dreame.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "追觅招聘北森 Category=2 公开校园全目录；首页混合社招不在范围"
+
+
+class AescCampus(Zhiye):
+    name = "zhiye-aesc-campus"
+    host = "aesc-group.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "远景动力北森 Category=2 公开校园全目录；以无筛选列表和源总数核对"
+
+
+class GalaxyCampus(Zhiye):
+    name = "zhiye-galaxy-campus"
+    host = "galaxy.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "银河航天北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class LeheCampus(Zhiye):
+    name = "zhiye-lehe-campus"
+    host = "lehe.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "乐禾集团北森 Category=2 公开校园全目录；来源无发布日期时保留空值"
+
+
+class AispeechCampus(Zhiye):
+    name = "zhiye-aispeech-campus"
+    host = "aispeech.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "思必驰科技北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class ZhihuiyaCampus(Zhiye):
+    name = "zhiye-zhihuiya-campus"
+    host = "zhihuiya.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "智慧芽北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class HellobikeCampus(Zhiye):
+    name = "zhiye-hellobike-campus"
+    host = "hellobike.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "哈啰北森 Category=2 公开校园全目录；实习有独立入口"
+
+
+class CasSpaceCampus(Zhiye):
+    name = "zhiye-cas-space-campus"
+    host = "cas-space.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "中科宇航北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class IrootechCampus(Zhiye):
+    name = "zhiye-irootech-campus"
+    host = "irootech.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "树根互联北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class JunlebaoCampus(Zhiye):
+    name = "zhiye-junlebao-campus"
+    host = "junlebaoruye.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "君乐宝乳业北森 Category=2 公开校园全目录；排除实习与社招"
+
+
+class SvoltCampus(Zhiye):
+    name = "zhiye-svolt-campus"
+    host = "svolt.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "蜂巢能源北森 Category=2 应届生公开全目录；排除实习与社招"
+
+
+class HairoboticsCampus(Zhiye):
+    name = "zhiye-hairobotics-campus"
+    host = "hairobotics.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "海柔创新北森 Category=2 公开校园全目录；海外地点保留原文"
+
+
 TENANTS = (
+    YmtcCampus,
+    CxmtCampus,
+    DreameCampus,
+    AescCampus,
+    GalaxyCampus,
+    LeheCampus,
+    AispeechCampus,
+    ZhihuiyaCampus,
+    HellobikeCampus,
+    CasSpaceCampus,
+    IrootechCampus,
+    JunlebaoCampus,
+    SvoltCampus,
+    HairoboticsCampus,
     ShenghongCampus,
     BusyMingCampus,
     SunartCampus,

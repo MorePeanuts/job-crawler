@@ -1166,7 +1166,78 @@ class GpcHeadquarters2027(Hotjob):
         return job
 
 
+class UnisocCampus2027(Hotjob):
+    name = "hotjob-unisoc-campus-2027"
+    suite = "SU629649680dcad452299568a2"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "紫光展锐官方 Hotjob 2027 届校园招聘 recruitType=1 全目录；不含社招"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(text(row.get("company")) == "紫光展锐", "紫光展锐校园目录混入其他主体")
+        check(text(row.get("projectName")) == "2027届秋招", "紫光展锐校园项目范围变化")
+        return True
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                all(
+                    text(row.get(key)) == text(listing.get(key))
+                    for key in ("postId", "postName", "company", "projectName")
+                ),
+                "紫光展锐详情与列表身份不一致",
+            )
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
+        job.field_sources["published"] = "首次发布日期 publishFirstDate；缺失则为空"
+        return job
+
+
+class GoermicroCampus2027(Hotjob):
+    name = "hotjob-goermicro-campus-2027"
+    suite = "SU65fba2e21c240e0a227cf96f"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "歌尔微电子 Hotjob 校园全目录中的 2027届正式校招；排除其他届别"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(text(row.get("company")) == "歌尔微电子", "歌尔微电子校招目录混入其他公司")
+        check(
+            text(row.get("postTypeName")) in {"校园招聘", "校园精英招聘"},
+            "歌尔微电子混入其他招聘类型",
+        )
+        return text(row.get("postName")).startswith("2027届")
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                all(
+                    text(row.get(key)) == text(listing.get(key))
+                    for key in ("postId", "postName", "company")
+                ),
+                "歌尔微电子详情与列表身份不一致",
+            )
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
+        job.field_sources["published"] = "首次发布日期 publishFirstDate；缺失则为空"
+        return job
+
+
 TENANTS = (
+    GoermicroCampus2027,
+    UnisocCampus2027,
     Lining2027,
     GpcHeadquarters2027,
     FarEastListedCampus,

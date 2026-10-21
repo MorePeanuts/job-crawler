@@ -200,4 +200,43 @@ class NineDragons(Desaysv):
     scope_description = "玖龙纸业飞书校招 portal_type=6 无筛选全目录；实习由公共筛选排除"
 
 
-TENANTS = (Desaysv, Xpeng, Nio, Jtexpress, Xiaomi, Aac, Innolight, NineDragons)
+class SpiritAICampus(Desaysv):
+    name = "feishu-spirit-ai-campus"
+    host = "nwd4iy9rd2s.jobs.feishu.cn"
+    path = "/campusofSpiritAI/position/list"
+    detail_prefix = "/campusofSpiritAI/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "千寻智能飞书校招 portal_type=6 无筛选全目录；实习由公共筛选排除"
+
+
+class YuanqiCampus(Desaysv):
+    name = "feishu-yuanqi-campus"
+    host = "k11pnjpvz1.jobs.feishu.cn"
+    path = "/352020/position/list"
+    detail_prefix = "/352020/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "元气森林 352020 校园项目 portal_type=6 全目录；另一个实习门户不在范围"
+
+
+class DewuCampus(Desaysv):
+    name = "feishu-dewu-campus"
+    host = "poizon.jobs.feishu.cn"
+    path = "/578078/position/list"
+    detail_prefix = "/578078/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "得物飞书校园项目 portal_type=6 全目录；按源招聘类型排除实习"
+
+
+TENANTS = (
+    Desaysv,
+    Xpeng,
+    Nio,
+    Jtexpress,
+    Xiaomi,
+    Aac,
+    Innolight,
+    NineDragons,
+    SpiritAICampus,
+    YuanqiCampus,
+    DewuCampus,
+)

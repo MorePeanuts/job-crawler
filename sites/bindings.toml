@@ -1250,3 +1250,80 @@ version = "1"
 [sources.COM0453]
 adapter = "hotjob-lining-2027"
 version = "1"
+
+[sources.COM0510]
+adapter = "zhiye-ymtc-campus"
+version = "1"
+
+[sources.COM0513]
+adapter = "zhiye-cxmt-campus"
+version = "1"
+company_name = "长鑫存储技术有限公司"
+
+[sources.COM0518]
+adapter = "zhiye-dreame-campus"
+version = "1"
+
+[sources.COM0522]
+adapter = "zhiye-aesc-campus"
+version = "1"
+
+[sources.COM0524]
+adapter = "hotjob-unisoc-campus-2027"
+version = "1"
+
+[sources.COM0658]
+adapter = "zhiye-galaxy-campus"
+version = "1"
+
+[sources.COM0719]
+adapter = "zhiye-lehe-campus"
+version = "1"
+
+[sources.COM0730]
+adapter = "zhiye-aispeech-campus"
+version = "1"
+
+[sources.COM0743]
+adapter = "zhiye-zhihuiya-campus"
+version = "1"
+
+[sources.COM0566]
+adapter = "zhiye-hellobike-campus"
+version = "1"
+
+[sources.COM0605]
+adapter = "zhiye-cas-space-campus"
+version = "1"
+
+[sources.COM0615]
+adapter = "zhiye-irootech-campus"
+version = "1"
+
+[sources.COM0654]
+adapter = "zhiye-junlebao-campus"
+version = "1"
+
+[sources.COM0556]
+adapter = "hotjob-goermicro-campus-2027"
+version = "1"
+
+[sources.COM0599]
+adapter = "feishu-spirit-ai-campus"
+version = "1"
+
+[sources.COM0528]
+adapter = "zhiye-svolt-campus"
+version = "1"
+
+[sources.COM0521]
+adapter = "feishu-yuanqi-campus"
+version = "1"
+
+[sources.COM0653]
+adapter = "zhiye-hairobotics-campus"
+version = "1"
+
+[sources.COM0523]
+adapter = "feishu-dewu-campus"
+version = "1"

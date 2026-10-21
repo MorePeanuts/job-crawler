@@ -44,6 +44,15 @@ education_policy = "minimum_eligible"
 # [mapping.locations]
 # "深圳" = "广东省/深圳市"
 
+[mapping.locations]
+"湖北省·武汉市" = "湖北省/武汉市"
+"四川省·成都市" = "四川省/成都市"
+"广东省·深圳市" = "广东省/深圳市"
+"安徽省·合肥市" = "安徽省/合肥市"
+"江苏省·苏州市" = "江苏省/苏州市"
+"江苏省·苏州市·吴中区" = "江苏省/苏州市/吴中区"
+"江苏省·无锡市·江阴市" = "江苏省/无锡市/江阴市"
+
 # Generated from job-position.js; edit by scripts/import_taxonomy.py.
 [mapping.category_paths]
 "互联网/AI" = ["软件研发", "前端开发", "移动研发", "人工智能", "数据工程师", "运维支持", "测试工程师", "售前售后工程师"]
