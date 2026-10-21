@@ -10,8 +10,13 @@ from job_crawler.storage import Store, redact
 
 def test_initial_inventory() -> None:
     sources, issues = read_sources(Path("sites/sources.csv"))
-    assert len(sources) == 500
+    assert len(sources) >= 807
     assert sum(bool(s.url) for s in sources) >= 237
+    unicorn = [source for source in sources if "SPEC-275" in source.notes]
+    assert len(unicorn) == 307
+    assert unicorn[0].source_id == "COM0501" and unicorn[0].company == "字节跳动"
+    assert unicorn[-1].source_id == "COM0807" and unicorn[-1].company == "玻色量子"
+    assert sum(bool(source.url) for source in unicorn) >= 100
     assert issues == []
 
 
