@@ -669,6 +669,40 @@ class Hithium2027(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "海辰储能详情标题不匹配")
 
 
+class Dji2027(Moka):
+    name = "moka-dji-2027"
+    host = "apply.careers.dji.com"
+    org = "dji"
+    site_id = 143359
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "大疆官网所链白标 Moka 校园门户无筛选全目录；实习按源性质排除"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "大疆详情标题不匹配")
+
+
+class Huolala2027(Moka):
+    name = "moka-huolala-2027"
+    org = "huolalahr"
+    site_id = 98660
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "货拉拉官网所链 Moka 校园门户无筛选全目录；兼职和实习按源性质排除"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "货拉拉详情标题不匹配")
+
+
+class Aerofugia2027(Moka):
+    name = "moka-aerofugia-2027"
+    org = "geely"
+    site_id = 94419
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "沃飞长空官网所链 Moka 独立校园站 94419 全目录；不纳入吉利其他站点"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "沃飞长空详情标题不匹配")
+
+
 class Shein2027(Moka):
     name = "moka-shein-2027"
     org = "shein"
@@ -770,6 +804,9 @@ class Deeproute2027(Moka):
 
 
 TENANTS = (
+    Aerofugia2027,
+    Dji2027,
+    Huolala2027,
     EnvisionDigital2027,
     EnvisionEnergy2027,
     Galbot2027,

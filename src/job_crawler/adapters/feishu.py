@@ -309,7 +309,36 @@ class EcoflowCampus(Desaysv):
     scope_description = "正浩创新官网所链飞书 2027 校招全目录；排除日常及校招实习"
 
 
+class LilithCampus(Desaysv):
+    name = "feishu-lilith-campus"
+    host = "lilithgames.jobs.feishu.cn"
+    path = "/campus"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "莉莉丝官网所链飞书 2027 秋招正式校园门户全目录"
+
+
+class LandspaceCampus(Desaysv):
+    name = "feishu-landspace-campus"
+    host = "uq1h428xyc.jobs.feishu.cn"
+    path = "/522146/position/list"
+    detail_prefix = "/522146/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "蓝箭航天官网所链 2027 届飞书校园门户全目录；实习标题排除"
+
+
+class ZkjCampus(Desaysv):
+    name = "feishu-zkj-campus"
+    host = "weikezhijia.jobs.feishu.cn"
+    path = "/952383/position/list"
+    detail_prefix = "/952383/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "中关村科金官网所链 952383 飞书校园门户无筛选全目录"
+
+
 TENANTS = (
+    ZkjCampus,
+    LilithCampus,
+    LandspaceCampus,
     Desaysv,
     Xpeng,
     Nio,

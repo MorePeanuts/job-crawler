@@ -1235,7 +1235,70 @@ class GoermicroCampus2027(Hotjob):
         return job
 
 
+class Honor2027(Hotjob):
+    name = "hotjob-honor-2027"
+    host = "career.honor.com"
+    suite = "SU60eea919bef57c1023f6fe78"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "荣耀官网应届生 Hotjob 2027 届正式校招全目录"
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        project = text(listing.get("projectName"))
+        check(project.startswith("2027届") and "实习" not in project, "荣耀应届生目录混入其他项目")
+        check(text(listing.get("workTypeStr")) == "全职", "荣耀应届生目录混入非全职岗位")
+        return super()._job(row, listing, evidence, locations, location_evidence)
+
+
+class GsRobotCampus(Hotjob):
+    name = "hotjob-gsrobot-campus"
+    suite = "SU6629d2ce1eb8053acd8065ac"
+    path = f"/{suite}/pb/school.html"
+    scope_description = "高仙机器人官网 Hotjob recruitType=1 校园频道全部岗位；不含社招"
+
+    def include_listing(self, row: dict[str, Any]) -> bool:
+        check(
+            text(row.get("company")) == "上海高仙自动化科技发展股份有限公司",
+            "高仙校园目录混入其他主体",
+        )
+        return True
+
+    def _job(
+        self,
+        row: dict[str, Any],
+        listing: dict[str, Any],
+        evidence: str,
+        locations: dict[str, str],
+        location_evidence: str,
+    ) -> Job:
+        if "workContent" in row:
+            check(
+                all(
+                    text(row.get(key)) == text(listing.get(key))
+                    for key in ("postId", "postName", "company")
+                ),
+                "高仙详情与列表身份不一致",
+            )
+        job = super()._job(row, listing, evidence, locations, location_evidence)
+        job.published = text(row.get("publishFirstDate") or listing.get("publishFirstDate"))
+        job.field_sources["published"] = "首次发布日期 publishFirstDate；不使用更新日 publishDate"
+        if job.deadline.startswith("3000-"):
+            job.deadline = ""
+            job.field_sources["deadline"] = "source_missing:3000-01-01 为站点占位值"
+        if "实习" in job.title or "实习" in job.batch:
+            job.work_type = "实习"
+        return job
+
+
 TENANTS = (
+    Honor2027,
+    GsRobotCampus,
     GoermicroCampus2027,
     UnisocCampus2027,
     Lining2027,

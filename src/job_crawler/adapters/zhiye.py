@@ -1063,7 +1063,16 @@ class XagCampus(Zhiye):
     scope_description = "极飞科技北森 Category=2 校招全目录；性质与标题双重排除实习"
 
 
+class CixinCampus(Zhiye):
+    name = "zhiye-cixin-campus"
+    host = "cixin.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    scope_description = "此芯科技官网所链北森 Category=2 公开校园全目录；排除实习"
+
+
 TENANTS = (
+    CixinCampus,
     YmtcCampus,
     CxmtCampus,
     DreameCampus,

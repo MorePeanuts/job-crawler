@@ -1,5 +1,6 @@
 """Explicit adapter registration; unknown sites never fall through to guessing."""
 
+from job_crawler.adapters.aacoptics import AacOpticsCampus
 from job_crawler.adapters.aisidi import AisidiCampus
 from job_crawler.adapters.anker import AnkerCampus
 from job_crawler.adapters.ansteel import Ansteel
@@ -57,6 +58,7 @@ from job_crawler.adapters.datang import Datang2027
 from job_crawler.adapters.dfzq import DfzqCampus
 from job_crawler.adapters.dingsheng import DingshengCampus
 from job_crawler.adapters.dongfeng_liuzhou import DongfengLiuzhou2027
+from job_crawler.adapters.duoyi import DuoyiCampus
 from job_crawler.adapters.extra_catalogs import TENANTS as EXTRA_TENANTS
 from job_crawler.adapters.faw import FawCampus
 from job_crawler.adapters.feishu import TENANTS as FEISHU_TENANTS
@@ -108,6 +110,7 @@ from job_crawler.adapters.linkerbot import LinkerbotCampus
 from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.longi_legacy import LongiLegacyCampus
 from job_crawler.adapters.meituan import Meituan
+from job_crawler.adapters.mihoyo import Mihoyo2027
 from job_crawler.adapters.mingtai import MingtaiCampus
 from job_crawler.adapters.moka import TENANTS as MOKA_TENANTS
 from job_crawler.adapters.mtr import MtrGraduate
@@ -118,6 +121,7 @@ from job_crawler.adapters.nci import NciCampus
 from job_crawler.adapters.netease import NeteaseCampus
 from job_crawler.adapters.newhope import NewHopeCampus
 from job_crawler.adapters.newworld import NewWorldCareers
+from job_crawler.adapters.oppo import Oppo2027
 from job_crawler.adapters.originqc import OriginQCCampus
 from job_crawler.adapters.pccw import PccwGraduate
 from job_crawler.adapters.pdd import PddCampus
@@ -143,6 +147,7 @@ from job_crawler.adapters.sihc import SihcCampus
 from job_crawler.adapters.sinopec import SinopecCampus
 from job_crawler.adapters.sinopharm import SinopharmCampus
 from job_crawler.adapters.sjm import SjmPublicJobs
+from job_crawler.adapters.skywell import SkywellCampus
 from job_crawler.adapters.smic import SmicCampus
 from job_crawler.adapters.spic2027 import Spic2027
 from job_crawler.adapters.static_campus import TENANTS as STATIC_TENANTS
@@ -158,14 +163,17 @@ from job_crawler.adapters.tongwei_share import TongweiShare2027
 from job_crawler.adapters.uni_president import UniPresidentCareers
 from job_crawler.adapters.uniontech import UnionTechCampus
 from job_crawler.adapters.viiyong import ViiyongCampus
+from job_crawler.adapters.wind import Wind2027
 from job_crawler.adapters.workday import AiaWorkday, FwdWorkday, HkexWorkday, MelcoWorkday
 from job_crawler.adapters.wtmec import Wtmec
 from job_crawler.adapters.xfusion import XfusionCampus
+from job_crawler.adapters.xiaohongshu import Xiaohongshu2027
 from job_crawler.adapters.xingfa import XingfaCampus
 from job_crawler.adapters.xmwy import XiamenTungsten2027
 from job_crawler.adapters.yankuang_uibe import YankuangUibe2027
 from job_crawler.adapters.yili import YiliHeadquarters
 from job_crawler.adapters.yingte import YingteCampus
+from job_crawler.adapters.yitu import Yitu2027
 from job_crawler.adapters.yto_zju import YtoZju2027
 from job_crawler.adapters.yuexiu2027 import YuexiuProperty2027
 from job_crawler.adapters.yuneng_csu import (
@@ -191,12 +199,14 @@ from job_crawler.adapters.ztt import ZttCampus
 REGISTRY = {
     adapter.name: adapter
     for adapter in (
+        AacOpticsCampus,
         AnkerCampus,
         MtrGraduate,
         AvaryCampus,
         QdbankCampus,
         DingshengCampus,
         MingtaiCampus,
+        Mihoyo2027,
         MysteelCampus,
         SbpCampus,
         JointownCampus,
@@ -222,7 +232,9 @@ REGISTRY = {
         CtripCampus,
         Alibaba,
         Wtmec,
+        Wind2027,
         XfusionCampus,
+        Xiaohongshu2027,
         XingfaCampus,
         XiamenTungsten2027,
         ZttCampus,
@@ -249,6 +261,7 @@ REGISTRY = {
         HongqiaoCup2027,
         YankuangUibe2027,
         YtoZju2027,
+        Yitu2027,
         SatelliteHust2027,
         HengtongGdut2027,
         BgyfwXasyxy2027,
@@ -263,6 +276,7 @@ REGISTRY = {
         JxccCampus,
         Tencent,
         SF,
+        SkywellCampus,
         SdhsgCampus,
         SdicPowerCampus,
         SaicCampus,
@@ -310,6 +324,7 @@ REGISTRY = {
         PowerchinaEightCsu2027,
         CtgneLiaoningDlmu2027,
         DongfengLiuzhou2027,
+        DuoyiCampus,
         TiandiInternational2027,
         ChujiangUstcCampus,
         QingshanUstc2027,
@@ -354,6 +369,7 @@ REGISTRY = {
         NciCampus,
         NeteaseCampus,
         OriginQCCampus,
+        Oppo2027,
         ViiyongCampus,
         LinkerbotCampus,
         UnionTechCampus,

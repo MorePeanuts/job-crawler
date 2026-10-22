@@ -1451,3 +1451,71 @@ version = "1"
 [sources.COM0550]
 adapter = "ziroom-campus"
 version = "1"
+
+[sources.COM0519]
+adapter = "moka-dji-2027"
+version = "1"
+
+[sources.COM0525]
+adapter = "moka-huolala-2027"
+version = "1"
+
+[sources.COM0571]
+adapter = "feishu-lilith-campus"
+version = "1"
+
+[sources.COM0574]
+adapter = "feishu-landspace-campus"
+version = "1"
+
+[sources.COM0659]
+adapter = "moka-aerofugia-2027"
+version = "1"
+
+[sources.COM0612]
+adapter = "feishu-zkj-campus"
+version = "1"
+
+[sources.COM0617]
+adapter = "hotjob-gsrobot-campus"
+version = "1"
+
+[sources.COM0729]
+adapter = "zhiye-cixin-campus"
+version = "1"
+
+[sources.COM0506]
+adapter = "xiaohongshu-2027"
+version = "1"
+
+[sources.COM0508]
+adapter = "hotjob-honor-2027"
+version = "1"
+
+[sources.COM0608]
+adapter = "yitu-2027"
+version = "1"
+
+[sources.COM0594]
+adapter = "aacoptics-campus"
+version = "1"
+
+[sources.COM0535]
+adapter = "wind-2027"
+version = "1"
+
+[sources.COM0507]
+adapter = "oppo-2027"
+version = "1"
+
+[sources.COM0509]
+adapter = "mihoyo-2027"
+version = "1"
+
+[sources.COM0666]
+adapter = "skywell-campus"
+version = "1"
+
+[sources.COM0558]
+adapter = "duoyi-campus"
+version = "1"
