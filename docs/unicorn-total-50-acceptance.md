@@ -1,40 +1,87 @@
-# SPEC-277 2026-10-22 累计 50 家目标阶段验收
+# SPEC-277 2026-10-22 累计 50 家最终验收
 
-## 当前交付
+## 交付结果
 
-用户将目标调整为今天累计接入 50 家，并允许从原始 78 家以外的待接入企业补足。本日已有 **22 家**不同企业完成公开企业招聘入口的全量实采验收，其中前阶段 17 家、本阶段 5 家；距离目标仍差 **28 家**。未绑定企业、重复的历史已接入企业、零正式岗位及主体不明的集团岗位均未计数。
+用户将当日目标调整为累计新增并验收 50 家有正式校招岗位的不同企业，且允许从其他待接入企业补足。最终 **50/50 家**均有独立的 2026-10-22 真实采集快照、`coverage=complete`、终止的源目录和至少 1 条有效岗位；没有用昨日快照或零岗位来源补数。
 
-`all` 窗口从 22 份 2026-10-22 当日采集快照离线汇总，源目录共收集 1,164 条，筛选后 **1,129 条有效岗位**进入[岗位信息表](../outputs/2026-10-22/今日累计22家-20261022-岗位信息汇总.xlsx)，其中 **282 条**进入[严格导入表](../outputs/2026-10-22/今日累计22家-20261022-严格导入.xlsx)，**847 条**待补全。35 条不满足正式、未截止等筛选条件。汇总时间 2026-10-22T11:53:42+08:00；这表示当日在招存量，不表示全部岗位当日新发布。缺失发布日期维持源站空值。
+50 份快照汇总共收集 **1,784** 条源记录，筛选出 **1,721 条有效岗位**，全部进入[今日岗位信息表](../outputs/2026-10-22/今日累计50家-20261022-岗位信息汇总.xlsx)。其中 **414 条**满足导入约束，进入[严格导入表](../outputs/2026-10-22/今日累计50家-20261022-严格导入.xlsx)；**1,307 条**在 `review.json` 待补全。其余 63 条未通过正式校招、在招状态等范围筛选。岗位属于 `all` 窗口的当日在招存量，不能称为全部当日新发布；源未给发布日期的岗位维持空值。
 
-只读审计 `.runtime/batches/unicorn50-20261022/delivery-audit.json` 返回 `ok=true`、22 个不同公司 ID、22 个来源、1,129 条信息行与 282 条严格导入行一致。最终归档索引根路径为 `.runtime/runs/unicorn50-20261022-final`，原始实采与来源时间保存在归档 manifest 和 report。前阶段 17 家的逐源入口、源计数及限制见[前阶段记录](unicorn-remaining-58-acceptance.md)；上面的 22 家总表使用恢复的当日快照加上本阶段新快照，没有重抓既有成功站点。
+逐源实采时间（上海）：`2026-10-22T10:22:20.986561+08:00` 至 `2026-10-22T13:53:46.937381+08:00`；最终离线汇总时间：`2026-10-22T13:56:31.086951+08:00`。
 
-## 本阶段新增 5 家
+只读审计 `.runtime/batches/unicorn50-20261022/delivery-audit-final.json` 返回 `ok=true`，50 个不同企业 ID、50 个来源，信息表 1,721 行、严格导入表 414 行与快照报告一致。最终归档为 `.runtime/runs/unicorn50-20261022-delivery50`，由 `.runtime/archive-index.json` 定位压缩文件。批次基线、逐站输入和审计分别保存在 `.runtime/batches/unicorn50-20261022/baseline.json`、`inputs-50.json`、`delivery-audit-final.json`。
 
-| ID | 企业 | 企业官网所链入口与范围 | 源目录闭合 | 有效 | 严格导入 | 待补全 | 实采时间（上海） |
-| --- | --- | --- | ---: | ---: | ---: | ---: | --- |
-| COM0511 | Vivo | `hr-campus.vivo.com/campus/jobs`；北森 Category=2，限标题 27 届正式岗位 | 36/36/36 | 36 | 8 | 28 | 11:16:57 |
-| COM0784 | 微店 | `hr.weidian.com/campus/jobs`；北森 2027 届，排除 3 条实习 | 9/9/9 | 6 | 0 | 6 | 11:19:48 |
-| COM0530 | 正泰安能 | `campus.chint.com` 正泰安能法人分支 `departmentId=725411`；排除 1 条非正式范围 | 46/46/46 | 45 | 41 | 4 | 11:31:03 |
-| COM0575 | KK集团 | 官网“校园招聘”按钮直链 `kkguan.zhiye.com/campus/jobs`，9 条 27 届管培生/校招 | 9/9/9 | 9 | 1 | 8 | 11:48:34 |
-| COM0319 | 苏宁易购 | 官网“校园招聘”直链 `campus.suning.cn` 的 1200 招聘无筛选目录；11 条逐岗详情 | 11/11/11 | 11 | 0 | 11 | 11:49:05 |
+## 逐源岗位统计
 
-“源目录闭合”依次为 `expected/listed/unique`；全部 `details=unique`、`terminal=true`、`coverage=complete` 且无覆盖 issues。岗位性质、截止、最低学历、正文和地址仍逐条按源字段与公共筛选处理；`report.status=partial` 是导入字段待补全，不表示源目录残缺。KK 集团的 `Kind/Org` 源字段为空，官方独立租户及全部 `【27...】` 标题证明项目范围，单位显示“KK集团”；苏宁职位详情没有发布日期，不以访问时间替代。苏宁首轮误读隐藏学历选项导致 11 条详情拒收，该快照未入总表；修复为页面显示的 `#degreeText` 后，第二轮 11/11 通过。
+以下计数来自各独立运行报告。每站 `coverage=complete`，所有 scope 都 `terminal=true`；导入待补全属于字段质量问题，未将目录残缺视为成功。入口链接以当前正式来源文件为准。
 
-## 本阶段排除与后续条件
+| 来源 ID | 企业 | 招聘入口 | 有效岗位 | 严格导入 | 待补全 | 实采时间（上海） |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| COM0519 | 大疆 | [apply.careers.dji.com](https://apply.careers.dji.com/campus-recruitment/dji/143359?locale=zh-CN#/jobs) | 142 | 141 | 1 | 10:22:20 |
+| COM0525 | 货拉拉 | [app.mokahr.com](https://app.mokahr.com/campus-recruitment/huolalahr/98660#/jobs) | 41 | 23 | 18 | 10:22:20 |
+| COM0571 | 莉莉丝 | [lilithgames.jobs.feishu.cn](https://lilithgames.jobs.feishu.cn/campus) | 19 | 0 | 19 | 10:25:06 |
+| COM0574 | 蓝箭航天 | [uq1h428xyc.jobs.feishu.cn](https://uq1h428xyc.jobs.feishu.cn/522146/position/list) | 71 | 0 | 71 | 10:25:06 |
+| COM0659 | 沃飞长空 | [app.mokahr.com](https://app.mokahr.com/campus-recruitment/geely/94419#/jobs) | 32 | 32 | 0 | 10:27:24 |
+| COM0612 | 中关村科金 | [weikezhijia.jobs.feishu.cn](https://weikezhijia.jobs.feishu.cn/952383/position/list) | 25 | 0 | 25 | 10:31:27 |
+| COM0617 | 高仙机器人 | [wecruit.hotjob.cn](https://wecruit.hotjob.cn/SU6629d2ce1eb8053acd8065ac/pb/school.html) | 31 | 31 | 0 | 10:31:27 |
+| COM0729 | 此芯科技 | [cixin.zhiye.com](https://cixin.zhiye.com/campus/jobs) | 21 | 5 | 16 | 10:31:27 |
+| COM0506 | 小红书 | [job.xiaohongshu.com](https://job.xiaohongshu.com/campus/position) | 166 | 0 | 166 | 10:37:44 |
+| COM0508 | 荣耀 | [career.honor.com](https://career.honor.com/SU60eea919bef57c1023f6fe78/pb/school.html) | 101 | 0 | 101 | 10:40:49 |
+| COM0608 | 依图科技 | [www.yitutech.com](https://www.yitutech.com/cn/career?mode=campus) | 3 | 0 | 3 | 10:44:37 |
+| COM0594 | 辰瑞光学 | [www.aacoptics.com](https://www.aacoptics.com/?page_id=1517) | 2 | 0 | 2 | 10:52:20 |
+| COM0535 | 万得 | [www.wind.com.cn](https://www.wind.com.cn/mobile/JoinUS/RecruitDetail/zh.html?entry=school) | 16 | 0 | 16 | 10:55:14 |
+| COM0507 | Oppo | [careers.oppo.com](https://careers.oppo.com/university/oppo/campus/post) | 146 | 0 | 146 | 10:59:01 |
+| COM0509 | 米哈游 | [jobs.mihoyo.com](https://jobs.mihoyo.com/#/campus/position?jobName=&projectIds%5B0%5D=13) | 129 | 0 | 129 | 10:50:17 |
+| COM0666 | 开沃汽车 | [www.skywellcorp.com](https://www.skywellcorp.com/website/skywellcorp/recruitment?tab=2) | 44 | 0 | 44 | 11:03:26 |
+| COM0558 | 多益网络 | [sz.duoyi.com](https://sz.duoyi.com/v40/#/positions?recruit=10) | 33 | 0 | 33 | 11:06:04 |
+| COM0511 | Vivo | [hr-campus.vivo.com](https://hr-campus.vivo.com/campus/jobs) | 36 | 8 | 28 | 11:16:57 |
+| COM0784 | 微店 | [hr.weidian.com](https://hr.weidian.com/campus/jobs) | 6 | 0 | 6 | 11:19:48 |
+| COM0530 | 正泰安能 | [campus.chint.com](https://campus.chint.com/campus-recruitment/chint/40745/#/jobs?department%5B0%5D=725411) | 45 | 41 | 4 | 11:31:03 |
+| COM0575 | KK集团 | [kkguan.zhiye.com](https://kkguan.zhiye.com/campus/jobs) | 9 | 1 | 8 | 11:48:34 |
+| COM0319 | 苏宁易购集团股份有限公司 | [campus.suning.cn](https://campus.suning.cn/rps-campus/ftl/campus/managePlan.htm?type=manage) | 11 | 0 | 11 | 11:49:05 |
+| COM0630 | 芯驰科技 | [app.mokahr.com](https://app.mokahr.com/campus_apply/semidrive/42941#/) | 7 | 1 | 6 | 12:11:08 |
+| COM0622 | 波克 | [boke.jobs.feishu.cn](https://boke.jobs.feishu.cn/581609/position/list) | 100 | 0 | 100 | 12:10:53 |
+| COM0585 | 转转 | [zhuanzhuan.zhiye.com](https://zhuanzhuan.zhiye.com/campus/jobs) | 11 | 1 | 10 | 12:14:41 |
+| COM0598 | 燧原科技 | [app.mokahr.com](https://app.mokahr.com/campus-recruitment/enflame/168420#/jobs/) | 48 | 26 | 22 | 12:13:48 |
+| COM0682 | 认养一头牛 | [ryytn.zhiye.com](https://ryytn.zhiye.com/campus/jobs) | 15 | 0 | 15 | 12:17:09 |
+| COM0603 | 星星充电 | [talent.wbstar.com](https://talent.wbstar.com/campus/jobs) | 22 | 0 | 22 | 12:19:43 |
+| COM0679 | 镁伽 | [megarobo.zhiye.com](https://megarobo.zhiye.com/campus/jobs) | 20 | 11 | 9 | 12:28:44 |
+| COM0748 | e签宝 | [esign.zhiye.com](https://esign.zhiye.com/campus/jobs) | 7 | 0 | 7 | 12:33:12 |
+| COM0756 | 飞骧科技 | [www.lansus.com](https://www.lansus.com/about/careers/campus-jobs) | 15 | 0 | 15 | 12:37:49 |
+| COM0538 | 智己汽车 | [saic-recruit.saicmotor.com](https://saic-recruit.saicmotor.com/recruit/pc/#/collegeRecruit) | 2 | 2 | 0 | 12:48:53 |
+| COM0785 | 享道出行 | [saic-recruit.saicmotor.com](https://saic-recruit.saicmotor.com/recruit/pc/#/collegeRecruit) | 8 | 4 | 4 | 12:49:12 |
+| COM0726 | 傅利叶 | [app.mokahr.com](https://app.mokahr.com/campus-recruitment/fftai/147078#/jobs/) | 15 | 15 | 0 | 12:51:27 |
+| COM0750 | XTransfer | [xtransfer.zhiye.com](https://xtransfer.zhiye.com/campus/jobs) | 5 | 1 | 4 | 12:55:26 |
+| COM0602 | 兆芯集成 | [campus.51job.com](https://campus.51job.com/zhaoxin2027/job.html) | 24 | 0 | 24 | 12:59:18 |
+| COM0721 | 思朗科技 | [smartlogictech.jobs.feishu.cn](https://smartlogictech.jobs.feishu.cn/xiaozhao/position/list) | 44 | 0 | 44 | 13:01:30 |
+| COM0700 | 加特兰 | [app.mokahr.com](https://app.mokahr.com/campus_apply/calterah/1109#/) | 26 | 17 | 9 | 13:09:54 |
+| COM0685 | 芯粤能 | [app.mokahr.com](https://app.mokahr.com/campus-recruitment/ascenpower/166280#/) | 10 | 9 | 1 | 13:10:10 |
+| COM0680 | 镁信健康 | [meditrusthealth.m.zhiye.com](https://meditrusthealth.m.zhiye.com/yjlist.html) | 8 | 0 | 8 | 13:12:04 |
+| COM0582 | 芯迈 | [campus.51job.com](https://campus.51job.com/SiliconMagic2026/job.html) | 26 | 0 | 26 | 13:16:24 |
+| COM0707 | 数坤 | [shukun.zhiye.com](https://shukun.zhiye.com/campus/detail?jobAdId=24544e10-8954-4ff6-ad43-ae646a4c5c04) | 13 | 0 | 13 | 13:19:24 |
+| COM0611 | 粤芯半导体 | [cansemitech.zhiye.com](https://cansemitech.zhiye.com/campus/jobs) | 20 | 0 | 20 | 13:22:07 |
+| COM0505 | 微众银行 | [app-tc.mokahr.com](https://app-tc.mokahr.com/campus-recruitment/webankhr/20060?locale=zh-CN#/jobs) | 9 | 9 | 0 | 13:25:10 |
+| COM0540 | 宇树科技 | [unitree.zhiye.com](https://unitree.zhiye.com/campus/jobs) | 35 | 0 | 35 | 13:26:39 |
+| COM0321 | 碧桂园服务控股有限公司 | [app.mokahr.com](https://app.mokahr.com/campus-recruitment/bgyfw/47073/#/jobs) | 16 | 0 | 16 | 13:28:44 |
+| COM0692 | 智平方 | [ai2robotics.jobs.feishu.cn](https://ai2robotics.jobs.feishu.cn/094992/position/list) | 18 | 0 | 18 | 13:49:19 |
+| COM0675 | 联合飞机 | [www.uatair.com](https://www.uatair.com/about/school.html) | 39 | 15 | 24 | 13:50:18 |
+| COM0620 | 蕉内 | [bananain.zhiye.com](https://bananain.zhiye.com/campus/jobs) | 23 | 18 | 5 | 13:51:49 |
+| COM0529 | 嘉立创 | [jlcehr.zhiye.com](https://jlcehr.zhiye.com/campus/jobs) | 6 | 3 | 3 | 13:53:46 |
 
-- COM0376 旭阳集团北森目录 65 条混有多个法人，列表不标逐岗单位；COM0322 中伟 Hotjob 目录含控股集团及不明部门；COM0319 “应届生招聘”页的单条租赁经理属于苏宁置业。这些岗位不能并入对应名录主体；苏宁仅计独立易购校园门户。
-- COM0502 蚂蚁集团官网校园入口当前渲染空白；COM0536 昆仑芯校园门户返回空白/访问阻断；COM0436 华侨城入口 403。不能据此报零岗位或启用绑定。
-- COM0505 微众银行、COM0547 阿维塔等当前校招目录零岗位，COM0580 平凯仅实习，均不满足“有岗位企业”计数。
-- COM0462 山鹰国际已核对官网所链 Moka 入口是社招 47 条；同站点校园路由 404，现有高校公告不能替代企业官网完整目录。COM0319 苏宁独立校园 11 岗已接入。
-- COM0184 台达官网 2027 项目与各地 51job 目录交叉，尚未核清全公司范围；COM0157 浪潮集团统一入口尚未核清名录上市主体分支；COM0377 太阳纸业高校公告提到的北森域名当前 `/campus/jobs` 为 404。须有企业官方可遍历目录和主体边界后继续。
-- COM0240 圆通的前程无忧旧活动页职位栏目未加载岗位，COM0305 广东能源集团活动页显示暂无数据且与名录股份主体不同；COM0740 名录天瞳威视 URL 实际展示华信永道，应更正入口后再适配。
-- 本阶段还抽查了 COM0529 嘉立创、COM0517 广汽埃安、COM0671 比亚迪半导体、COM0683 生工生物、COM0589 高景太阳能、COM0677 六合宁远等官网；目前没有同时满足明确正式校招、主体匹配和全目录可核验的公开岗位，不加入 22 家。
-- 继续查证其他待接入企业：COM0006 工商银行页面仅空壳，COM0007 农业银行入口返回空响应，COM0011 中国银行 2027 活动页未渲染目录；COM0004 中国建筑跳登录，COM0017 中信集团公开页只见招聘渠道声明。COM0049 纬创的“校园招聘”按钮要求微信 OAuth；COM0025 山东能源原 51job 活动页 404。COM0092 延长石油校园列表当前明确 0 条，COM0266 大冶有色官网校园栏目只有 2022–2024 旧公告；COM0415 湖南裕能“校招网申通道”链接又回到同一空页面。COM0014 中国移动、COM0024 南方电网、COM0030 中国电建虽有集团校园入口，尚未取得可验证的全单位目录；没有把首页栏目或少量热招卡片算作集团采集完成。证据保存在 `probe-broad-D`、`probe-broad-E`、`probe-depth-D`。
+## 目录边界与限制
 
-原始 78 家中未完成的逐家初始障碍仍见前阶段记录；本阶段新增候选的原始抓取证据位于 `.runtime/batches/unicorn50-20261022/`。网页可见一条岗位或高校公告不等于企业官网全量验收。后续每新增来源仍需独立实采、正数有效岗位、完整 coverage，再合入累计表；目标 50 家尚未达成。
+- 最后接入的 10 家为芯迈、数坤、粤芯、微众银行、宇树科技、碧桂园服务、智平方、联合飞机、蕉内、嘉立创。各站源计数、筛选与岗位字段契约分别见 SPEC-289 至 SPEC-298；其中 COM0529 嘉立创北森独立品牌租户的租户标题、隐私政策和岗位正文可识别企业与 2027 届，但企业官网没有直接指向该租户的链接，证据边界已在 SPEC-298 记录。
+- 原始独角兽剩余入口中仍有空目录、仅实习、集团法人范围不清及访问阻断来源；未计数也未启用这些候选。具体已尝试入口和障碍见[原始候选验收记录](unicorn-remaining-58-acceptance.md)及 [SPEC-277](../specs/277-unicorn-remaining-fifty-eight.md)。先前阶段记录中的“当前不足 50”是当时状态，以本最终审计为准。
+- 1,307 条待补全记录保存在最终归档 `review.json`。缺失地点、分类、学历或发布日期等源字段没有编造；后续获得可靠数据可从归档恢复后重新导出。
 
-## 验证与复现
+## 复核与质量门禁
 
-- 本阶段平台回放覆盖：北森独立租户和实习筛选、Moka 公司分支参数及法人验证、苏宁职位 ID/详情一致性和隐藏学历显示值。两轮苏宁实采分别保留，只有成功轮进入最终输入清单。
-- 批次开始已绑定 381 家，前阶段已接入 17 家；本阶段新增 5 家后正式绑定 386 家。批次基线在 `.runtime/batches/unicorn50-20261022/baseline.json`，22 个快照路径在同目录 `inputs.json`；已归档路径须按索引 `restore` 后再 `bundle`，历史快照恢复不等于重新采集。
-- 质量门禁：`uv sync --locked`、`uv run ruff format --check .`、`uv run ruff check .`、`uv run ty check`、`uv run pytest`。验收脚本的目标参数按实际通过数 `--expected-companies 22`，审计通过不代表 50 家目标完成。
+```sh
+uv run job-crawler restore .runtime/runs/unicorn50-20261022-delivery50 \
+  --output .runtime/runs/unicorn50-20261022-verify
+uv run python .agents/skills/add-recruitment-adapters/scripts/audit_delivery.py \
+  .runtime/runs/unicorn50-20261022-verify --expected-companies 50
+```
+
+上述复核复用本日快照，不会重新访问招聘站点。若要重新汇总，按归档索引恢复 `inputs-50.json` 中已归档的输入路径，再执行 `bundle`。新采集应重新访问网站确认届时在招状态。
+
+完整质量门禁：`uv sync --locked`、`uv run ruff format --check .`、`uv run ruff check .`、`uv run ty check`、`uv run pytest`。
