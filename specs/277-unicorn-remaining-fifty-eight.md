@@ -1,6 +1,6 @@
 # SPEC-277 独角兽来源第二批 50 家接入与当日岗位汇总
 
-状态：2026-10-22 阶段验收 22/50，尚差 28 家。用户将当日目标从 58 家调整为累计 50 家，并允许从其他待接入企业补足；前一轮 17 家验收见 `docs/unicorn-remaining-58-acceptance.md`，本轮累计验收见 `docs/unicorn-total-50-acceptance.md`。
+状态：2026-10-22 最终验收 50/50 家；累计 1,721 条有效岗位、414 条严格导入。用户将当日目标从 58 家调整为累计 50 家，并允许从其他待接入企业补足；前一轮 17 家验收见 `docs/unicorn-remaining-58-acceptance.md`，本轮累计验收见 `docs/unicorn-total-50-acceptance.md`。
 
 ## 目标与非目标
 
