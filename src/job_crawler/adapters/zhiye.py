@@ -27,6 +27,7 @@ class Zhiye(Adapter):
     category_field = "ClassificationOne"
     expected_org = ""
     page_size = 20
+    catalog_payload: dict[str, Any] | None = None
     ready_endpoints = ("/api/Jobad/GetJobAdPageList",)
     scope_description = "北森公开校园招聘 Category=2 全目录；保留实际租户/门户范围，不含社招和实习"
 
@@ -37,7 +38,14 @@ class Zhiye(Adapter):
         return True
 
     async def harvest(self) -> None:
-        observed = await self.session.observed("/api/Jobad/GetJobAdPageList")
+        observed = (
+            {
+                "url": f"https://{self.host}/api/Jobad/GetJobAdPageList",
+                "post_data": json.dumps(self.catalog_payload),
+            }
+            if self.catalog_payload is not None
+            else await self.session.observed("/api/Jobad/GetJobAdPageList")
+        )
         payload = json.loads(observed["post_data"])
         if self.mixed_catalog:
             check(
@@ -847,6 +855,22 @@ class Vanchen2027(Zhiye):
         return True
 
 
+class XtransferCampus(Zhiye):
+    name = "zhiye-xtransfer-campus"
+    host = "xtransfer.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "XTransfer"
+    scope_description = (
+        "XTransfer 官网直链北森 Category=2 全目录；排除实习和标题明确为 2026 校招的旧批次"
+    )
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "XTransfer 校招类别变化")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "XTransfer 职位性质变化")
+        return "2026校招" not in text(row.get("JobAdName"))
+
+
 class TongkunCampus(Zhiye):
     name = "zhiye-tongkun-campus"
     host = "hr-zjtkjt.zhiye.com"
@@ -1114,7 +1138,173 @@ class KkGroup2027(Zhiye):
         return title.startswith("【27") and "实习" not in title
 
 
+class ZhuanzhuanCampus(Zhiye):
+    name = "zhiye-zhuanzhuan-campus"
+    host = "zhuanzhuan.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "转转"
+    scope_description = "转转官网招聘菜单直链的独立北森 Category=2 校园全目录；实习按源性质排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "转转目录混入非校招类别")
+        return True
+
+
+class AdoptACow2027(Zhiye):
+    name = "zhiye-adopt-a-cow-2027"
+    host = "ryytn.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "认养一头牛"
+    scope_description = "认养一头牛驿站独立北森 Category=2 校园全目录，仅纳入明确 2027 届正式岗位"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "认养一头牛目录混入非校招类别")
+        return "2027" in (text(row.get("Duty")) + text(row.get("Require")))
+
+
+class StarChargeCampus(Zhiye):
+    name = "zhiye-star-charge-campus"
+    host = "talent.wbstar.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "星星充电"
+    scope_description = "星星充电招聘官网北森 Category=2 正式校园岗位无筛选全目录"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "星星充电目录混入非校招类别")
+        return True
+
+
+class Megarobo2027(Zhiye):
+    name = "zhiye-megarobo-2027"
+    host = "megarobo.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "镁伽"
+    scope_description = "镁伽科技招聘简章所列独立北森 Category=2 的 2027 校园全目录"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "镁伽目录混入非校招类别")
+        return "2027校招" in text(row.get("JobAdName"))
+
+
+class Esign2027(Zhiye):
+    name = "zhiye-esign-2027"
+    host = "esign.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "e签宝"
+    scope_description = "e签宝官网直链独立北森 Category=2 的 27 届正式校园全目录"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "e签宝目录混入非校招类别")
+        return "27届" in text(row.get("JobAdName"))
+
+
+class ShukunCampus(Zhiye):
+    name = "zhiye-shukun-campus"
+    host = "shukun.zhiye.com"
+    path = "/campus/detail?jobAdId=24544e10-8954-4ff6-ad43-ae646a4c5c04"
+    ready_endpoints = ("/api/JobAd/GetJobAdInfo",)
+    regular_only = True
+    catalog_payload = {
+        "PageIndex": 0,
+        "PageSize": 20,
+        "Category": ["2"],
+        "KeyWords": "",
+        "SpecialType": 0,
+        "PortalId": "",
+        "DisplayFields": ["Category", "Kind", "LocId", "PostDate", "WorkWeChatQrCode"],
+    }
+    scope_description = "数坤官网所链北森校园 Category=2 全目录；排除实习及无校招标记的旧职位"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "数坤校园目录混入其他类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "数坤岗位性质未知")
+        title = text(row.get("JobAdName"))
+        return "校招" in title or "实习" in title
+
+
+class Cansemi2027(Zhiye):
+    name = "zhiye-cansemi-2027"
+    host = "cansemitech.zhiye.com"
+    path = "/campus/detail?jobAdId=9df5cf8b-2cd1-4939-87f6-4defda533e4b"
+    ready_endpoints = ("/api/JobAd/GetJobAdInfo",)
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "粤芯半导体技术股份有限公司"
+    catalog_payload = ShukunCampus.catalog_payload
+    scope_description = "粤芯官方北森 2027 校园 Category=2 公开全目录；排除实习"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "粤芯目录混入非校招类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "粤芯岗位性质未知")
+        return True
+
+
+class UnitreeCampus(Zhiye):
+    name = "zhiye-unitree-campus"
+    host = "unitree.zhiye.com"
+    path = "/campus/detail?jobAdId=37e315eb-3314-4b35-9680-3876c5d19221"
+    ready_endpoints = ("/api/JobAd/GetJobAdInfo",)
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "杭州宇树科技股份有限公司"
+    catalog_payload = ShukunCampus.catalog_payload
+    scope_description = "宇树科技官方北森校园 Category=2 无筛选公开全目录；保留源发布日期"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "宇树目录混入非校招类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "宇树岗位性质未知")
+        return True
+
+
+class Bananain2027(Zhiye):
+    name = "zhiye-bananain-2027"
+    host = "bananain.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "蕉内"
+    scope_description = "蕉内 2027 官方北森校园 Category=2 无筛选公开全目录；排除实习"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "蕉内目录混入非校招类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "蕉内岗位性质未知")
+        return True
+
+
+class JlcEhr2027(Zhiye):
+    name = "zhiye-jlcehr-2027"
+    host = "jlcehr.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "嘉立创"
+    scope_description = "嘉立创独立北森校园 Category=2 全目录；仅 2027 届全职岗位"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "嘉立创目录混入非校招类别")
+        kind = text(row.get("Kind"))
+        check(kind in {"全职", "实习", "其他"}, "嘉立创岗位性质未知")
+        if kind != "全职":
+            return False
+        body = text(row.get("JobAdName")) + " " + text(row.get("Require"))
+        return "2027" in body or "27届" in body
+
+
 TENANTS = (
+    JlcEhr2027,
+    Bananain2027,
+    UnitreeCampus,
+    Cansemi2027,
+    ShukunCampus,
+    XtransferCampus,
+    Esign2027,
+    Megarobo2027,
+    StarChargeCampus,
+    AdoptACow2027,
+    ZhuanzhuanCampus,
     KkGroup2027,
     Weidian2027,
     Vivo2027,

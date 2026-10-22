@@ -6,6 +6,7 @@ from typing import Any
 from job_crawler.adapters.feishu import (
     AgibotCampus,
     BaichuanOriginCampus,
+    BokeCampus,
     DcarCampus,
     DewuCampus,
     DuxiaomanCampus,
@@ -178,6 +179,36 @@ async def test_nine_dragons_campus_route_and_formal_type(tmp_path: Path, now: da
         result.jobs[0].source_url
         == "https://ninedragonspaper.jobs.feishu.cn/502309/position/123/detail"
     )
+
+
+class BokeSession(NineDragonsSession):
+    async def open(self, url: str, *, ready_endpoints: tuple[str, ...] = ()) -> None:
+        assert url == "https://boke.jobs.feishu.cn/581609/position/list"
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        response = await super().observed(needle)
+        response["url"] = response["url"].replace(
+            "ninedragonspaper.jobs.feishu.cn", "boke.jobs.feishu.cn"
+        )
+        payload = json.loads(response["body"])
+        row = payload["data"]["job_post_list"][0]
+        row["title"] = "2027届秋招-游戏策划"
+        row["recruit_type"]["name"] = "正式"
+        response["body"] = json.dumps(payload)
+        return response
+
+
+async def test_boke_official_campus_route(tmp_path: Path, now: datetime) -> None:
+    source = Source(
+        source_id="COM0622",
+        company_id="COM0622",
+        company="波克",
+        url="https://boke.jobs.feishu.cn/581609/position/list",
+    )
+    result = await BokeCampus(source, BokeSession(tmp_path), now).collect()
+    assert not result.coverage_issues()
+    assert result.jobs[0].work_type == "校招"
+    assert result.jobs[0].source_url == "https://boke.jobs.feishu.cn/581609/position/123/detail"
 
 
 class SpiritAISession(Session):

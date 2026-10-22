@@ -335,7 +335,37 @@ class ZkjCampus(Desaysv):
     scope_description = "中关村科金官网所链 952383 飞书校园门户无筛选全目录"
 
 
+class BokeCampus(Desaysv):
+    name = "feishu-boke-campus"
+    host = "boke.jobs.feishu.cn"
+    path = "/581609/position/list"
+    detail_prefix = "/581609/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "波克官网所链飞书 581609 校园门户公开无筛选全目录；实习按源性质排除"
+
+
+class SmartlogicCampus(Desaysv):
+    name = "feishu-smartlogic-campus"
+    host = "smartlogictech.jobs.feishu.cn"
+    path = "/xiaozhao/position/list"
+    detail_prefix = "/xiaozhao/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "思朗科技 2027 飞书校园门户 portal_type=6 无筛选全目录；实习按源性质排除"
+
+
+class Ai2RoboticsCampus(Desaysv):
+    name = "feishu-ai2robotics-campus"
+    host = "ai2robotics.jobs.feishu.cn"
+    path = "/094992/position/list"
+    detail_prefix = "/094992/position"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "智平方独立飞书校园门户 portal_type=6 全目录；实习按源性质排除"
+
+
 TENANTS = (
+    Ai2RoboticsCampus,
+    SmartlogicCampus,
+    BokeCampus,
     ZkjCampus,
     LilithCampus,
     LandspaceCampus,

@@ -1276,6 +1276,66 @@ version = "1"
 adapter = "zhiye-galaxy-campus"
 version = "1"
 
+[sources.COM0630]
+adapter = "moka-semidrive-campus"
+version = "1"
+
+[sources.COM0622]
+adapter = "feishu-boke-campus"
+version = "1"
+
+[sources.COM0585]
+adapter = "zhiye-zhuanzhuan-campus"
+version = "1"
+
+[sources.COM0598]
+adapter = "moka-enflame-campus"
+version = "1"
+
+[sources.COM0682]
+adapter = "zhiye-adopt-a-cow-2027"
+version = "1"
+
+[sources.COM0603]
+adapter = "zhiye-star-charge-campus"
+version = "1"
+
+[sources.COM0679]
+adapter = "zhiye-megarobo-2027"
+version = "1"
+
+[sources.COM0748]
+adapter = "zhiye-esign-2027"
+version = "1"
+
+[sources.COM0756]
+adapter = "lansus-campus"
+version = "1"
+
+[sources.COM0538]
+adapter = "saic-immotors-campus"
+version = "1"
+
+[sources.COM0785]
+adapter = "saic-xiangdao-campus"
+version = "1"
+
+[sources.COM0726]
+adapter = "moka-fourier-campus"
+version = "1"
+
+[sources.COM0750]
+adapter = "zhiye-xtransfer-campus"
+version = "1"
+
+[sources.COM0602]
+adapter = "coapi-zhaoxin-2027"
+version = "1"
+
+[sources.COM0721]
+adapter = "feishu-smartlogic-campus"
+version = "1"
+
 [sources.COM0719]
 adapter = "zhiye-lehe-campus"
 version = "1"
@@ -1538,4 +1598,56 @@ version = "1"
 
 [sources.COM0319]
 adapter = "suning-1200-campus"
+version = "1"
+
+[sources.COM0700]
+adapter = "moka-calterah-campus"
+version = "1"
+
+[sources.COM0685]
+adapter = "moka-ascenpower-campus"
+version = "1"
+
+[sources.COM0680]
+adapter = "meditrust-2027-campus"
+version = "1"
+
+[sources.COM0582]
+adapter = "coapi-siliconmagic-2027"
+version = "1"
+
+[sources.COM0707]
+adapter = "zhiye-shukun-campus"
+version = "1"
+
+[sources.COM0611]
+adapter = "zhiye-cansemi-2027"
+version = "1"
+
+[sources.COM0505]
+adapter = "moka-webank-2027"
+version = "1"
+
+[sources.COM0540]
+adapter = "zhiye-unitree-campus"
+version = "1"
+
+[sources.COM0321]
+adapter = "moka-bgyfw-campus"
+version = "1"
+
+[sources.COM0692]
+adapter = "feishu-ai2robotics-campus"
+version = "1"
+
+[sources.COM0675]
+adapter = "uatair-campus"
+version = "1"
+
+[sources.COM0620]
+adapter = "zhiye-bananain-2027"
+version = "1"
+
+[sources.COM0529]
+adapter = "zhiye-jlcehr-2027"
 version = "1"

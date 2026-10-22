@@ -608,4 +608,189 @@ class Cimc2027(Coapi):
         scope.terminal = True
 
 
-TENANTS = (Nbhx, Wanxiang, Cofco, Scg, Cqrcb2027, Cimc2027)
+class Zhaoxin2027(Coapi):
+    name = "coapi-zhaoxin-2027"
+    host = "campus.51job.com"
+    path = "/zhaoxin2027/job.html"
+    ctmid = "8844488"
+    scope_description = (
+        "兆芯 2027 活动站 COAPI 无筛选全目录；页面卡片、租户、正文与应届全职逐岗核对"
+    )
+
+    async def harvest(self) -> None:
+        session = cast(BrowserSession, self.session)
+        check(session.page is not None, "兆芯活动页不存在")
+        assert session.page is not None
+        html = await session.page.content()
+        check("zhaoxin2027" in self.source.url, "兆芯入口不是 2027 届活动站")
+        cards = [
+            str(card["data-jobid"])
+            for card in BeautifulSoup(html, "html.parser").select(".jobBox .jobtit[data-jobid]")
+        ]
+        check(bool(cards) and len(cards) == len(set(cards)), "兆芯活动页卡片缺失或重复")
+        session.consume_request()
+        await asyncio.sleep(session.config.delay)
+        response = await session.page.evaluate(
+            LIST_JS,
+            {
+                "ctmid": self.ctmid,
+                "jobarea": "",
+                "poscode": "",
+                "sort": "joborder",
+                "sequence": "1",
+            },
+        )
+        check(
+            isinstance(response, dict)
+            and response.get("status") == "1"
+            and isinstance(response.get("resultbody"), dict),
+            "兆芯 COAPI 列表失败",
+        )
+        body = response["resultbody"]
+        rows = body["joblist"]
+        expected = int(body["totalnum"])
+        check(0 < expected == len(rows) == len(cards), "兆芯目录存在未处理分页")
+        check({str(row["jobid"]) for row in rows} == set(cards), "兆芯页面卡片与 COAPI 目录不一致")
+        evidence = session.output / "coapi-zhaoxin-list.json"
+        write_json(evidence, response)
+        session.last_evidence = str(evidence)
+        scope = Scope(name="zhaoxin-2027-all-jobs", expected=expected)
+        self.result.scopes.append(scope)
+        seen: set[str] = set()
+        self.add_page(scope, rows, seen, lambda row: str(row["jobid"]))
+        for row in rows:
+            key = str(row["jobid"])
+            try:
+                check(
+                    str(row.get("ctmid")) == self.ctmid
+                    and text(row.get("coname")) == "上海兆芯集成电路股份有限公司"
+                    and text(row.get("term")) == "全职"
+                    and "应届生" in text(row.get("workyearname")),
+                    "兆芯列表岗位租户、公司或校招性质异常",
+                )
+                listing = self.listing_job(key, row)
+                resolved = self.before_detail(
+                    f"job:{key}", row, scope, listing, evidence=str(evidence)
+                )
+                if resolved is not None:
+                    self.result.jobs.extend(resolved)
+                    continue
+                detail, detail_evidence = await self.detail(key)
+                check(
+                    text(detail.get("jobname")) == text(row.get("jobname"))
+                    and text(detail.get("coname")) == text(row.get("coname"))
+                    and text(detail.get("term")) == "全职",
+                    "兆芯详情标题、公司或性质与列表不符",
+                )
+                normalized = {
+                    **detail,
+                    "jobinfo": str(detail["jobinfo"]).replace("职务描述：", "工作职责："),
+                }
+                job = self.complete_job(key, row, normalized, detail_evidence, str(evidence))
+                check(bool(job.duties and job.requirements), "兆芯岗位职责或任职要求缺失")
+                self.result.jobs.append(job)
+                scope.details += 1
+                self.remember(f"job:{key}", row, [job])
+            except Exception as exc:
+                self.error(exc, key)
+        scope.terminal = True
+
+
+class SiliconMagic2027(Coapi):
+    name = "coapi-siliconmagic-2027"
+    host = "campus.51job.com"
+    path = "/SiliconMagic2026/job.html"
+    ctmid = "6389574"
+    scope_description = (
+        "芯迈 2027 校招前程无忧活动站研发、销售、技术管理三目录；同名多城市按独立岗位 ID 保留"
+    )
+
+    async def harvest(self) -> None:
+        session = cast(BrowserSession, self.session)
+        check(session.page is not None, "芯迈活动页不存在")
+        assert session.page is not None
+        document = BeautifulSoup(await session.page.content(), "html.parser")
+        tabs = {
+            text(item): str(item.get("data-poscode", "")) for item in document.select(".jobtype li")
+        }
+        check(
+            tabs == {"研发类": "001", "销售类": "002", "技术类/管理类": "003"},
+            "芯迈校招目录分类变化",
+        )
+        first_page_ids = {
+            apply_id(str(link.get("href", "")))
+            for link in document.select(".jobs .jobinfo .apply a[href]")
+        }
+        check(bool(first_page_ids) and "" not in first_page_ids, "芯迈首屏职位申请 ID 缺失")
+        global_ids: set[str] = set()
+        for label, poscode in tabs.items():
+            session.consume_request()
+            await asyncio.sleep(session.config.delay)
+            response = await session.page.evaluate(
+                LIST_JS,
+                {
+                    "ctmid": self.ctmid,
+                    "pagesize": "2000",
+                    "poscode": poscode,
+                    "sort": "joborder",
+                    "sequence": 1,
+                },
+            )
+            check(
+                isinstance(response, dict)
+                and response.get("status") == "1"
+                and isinstance(response.get("resultbody"), dict),
+                f"芯迈{label} COAPI 列表失败",
+            )
+            body = response["resultbody"]
+            rows = body.get("joblist")
+            check(isinstance(rows, list), "芯迈 COAPI 职位列表不是数组")
+            expected = int(body["totalnum"])
+            check(0 < expected == len(rows) < 2000, "芯迈目录计数无效或存在未处理分页")
+            ids = {str(row["jobid"]) for row in rows}
+            check(len(ids) == expected and not (ids & global_ids), "芯迈目录 ID 重复")
+            if poscode == "001":
+                check(first_page_ids == ids, "芯迈首屏申请链接与研发类源目录不一致")
+            global_ids.update(ids)
+            evidence = session.output / f"coapi-siliconmagic-{poscode}.json"
+            write_json(evidence, response)
+            session.last_evidence = str(evidence)
+            scope = Scope(name=f"siliconmagic-{poscode}-{label}", expected=expected)
+            self.result.scopes.append(scope)
+            seen: set[str] = set()
+            self.add_page(scope, rows, seen, lambda row: str(row["jobid"]))
+            for row in rows:
+                key = str(row["jobid"])
+                try:
+                    check(
+                        str(row.get("ctmid")) == self.ctmid
+                        and text(row.get("coname")) == "芯迈半导体技术（杭州）股份有限公司"
+                        and text(row.get("term")) == "全职"
+                        and "应届生" in text(row.get("workyearname"))
+                        and text(row.get("poscode")) == poscode,
+                        "芯迈列表租户、企业或正式校招性质异常",
+                    )
+                    listing = self.listing_job(key, row)
+                    resolved = self.before_detail(
+                        f"job:{key}", row, scope, listing, evidence=str(evidence)
+                    )
+                    if resolved is not None:
+                        self.result.jobs.extend(resolved)
+                        continue
+                    detail, detail_evidence = await self.detail(key)
+                    check(
+                        text(detail.get("jobname")) == text(row.get("jobname"))
+                        and text(detail.get("coname")) == text(row.get("coname"))
+                        and text(detail.get("term")) == "全职",
+                        "芯迈详情标题、公司或岗位性质与列表不符",
+                    )
+                    job = self.complete_job(key, row, detail, detail_evidence, str(evidence))
+                    self.result.jobs.append(job)
+                    scope.details += 1
+                    self.remember(f"job:{key}", row, [job])
+                except Exception as exc:
+                    self.error(exc, key)
+            scope.terminal = True
+
+
+TENANTS = (SiliconMagic2027, Zhaoxin2027, Nbhx, Wanxiang, Cofco, Scg, Cqrcb2027, Cimc2027)

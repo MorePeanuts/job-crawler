@@ -80,6 +80,8 @@ class Moka(Adapter):
     site_id = 0
     route = "campus-recruitment"
     module_id = ""
+    module_group_type = "zhineng"
+    module_commitments = ("全职",)
     catalog_department_id = ""
     path = ""
     ready_endpoints = ("/api/outer/ats-apply/website/jobs/v2",)
@@ -112,8 +114,14 @@ class Moka(Adapter):
         check(str(payload.get("siteId")) == str(self.site_id), "Moka 站点不匹配")
         if self.module_id:
             check(str(payload.get("moduleId")) == self.module_id, "Moka 招聘模块不匹配")
-            check(payload.get("commitments") == ["全职"], "Moka 招聘模块不是正式岗位")
-            check(payload.get("needGroupType") == "zhineng", "Moka 招聘模块类别改变")
+            check(
+                payload.get("commitments", []) == list(self.module_commitments),
+                "Moka 招聘模块岗位性质筛选变化",
+            )
+            check(
+                payload.get("needGroupType") == self.module_group_type,
+                "Moka 招聘模块类别改变",
+            )
         else:
             check(payload.get("site") == "campus", "Moka 入口不是校园站点")
         if self.catalog_department_id:
@@ -625,6 +633,82 @@ class SunnyOptical(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "舜宇详情标题不匹配")
 
 
+class SemidriveCampus(Moka):
+    name = "moka-semidrive-campus"
+    org = "semidrive"
+    site_id = 42941
+    route = "campus_apply"
+    module_id = "0001295480"
+    module_group_type = "list"
+    path = f"/{route}/{org}/{site_id}#/"
+    ready_endpoints = ("/api/outer/ats-apply/website/jobs/module",)
+    scope_description = "芯驰科技独立 Moka 校招站全职模块完整目录；实习模块另列并排除"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "芯驰详情标题不匹配")
+
+
+class EnflameCampus(Moka):
+    name = "moka-enflame-campus"
+    org = "enflame"
+    site_id = 168420
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs/"
+    scope_description = (
+        "燧原科技独立 Moka 校园站全目录，仅纳入列表部门属于上海燧原科技股份有限公司的岗位"
+    )
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        department = row.get("department") or {}
+        check(isinstance(department, dict), "燧原列表部门结构改变")
+        return text(department.get("name")) == "上海燧原科技股份有限公司"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "燧原详情标题不匹配")
+        check(detail.get("department") == listing.get("department"), "燧原详情主体不匹配")
+
+
+class FourierCampus(Moka):
+    name = "moka-fourier-campus"
+    org = "fftai"
+    site_id = 147078
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs/"
+    scope_description = "傅利叶智能独立 Moka 校园站无筛选全目录；按源职位性质排除实习"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "傅利叶详情标题不匹配")
+
+
+class CalterahCampus(Moka):
+    name = "moka-calterah-campus"
+    org = "calterah"
+    site_id = 1109
+    route = "campus_apply"
+    module_id = "5441735827"
+    module_group_type = "list"
+    module_commitments = ()
+    path = f"/{route}/{org}/{site_id}#/"
+    ready_endpoints = ("/api/outer/ats-apply/website/jobs/module",)
+    scope_description = "加特兰独立 Moka 校招模块无筛选全目录；按岗位性质排除实习"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "加特兰详情标题不匹配")
+
+
+class AscenpowerCampus(Moka):
+    name = "moka-ascenpower-campus"
+    org = "ascenpower"
+    site_id = 166280
+    module_id = "6198202737"
+    module_group_type = "list"
+    module_commitments = ()
+    path = f"/campus-recruitment/{org}/{site_id}#/"
+    ready_endpoints = ("/api/outer/ats-apply/website/jobs/module",)
+    scope_description = "芯粤能独立 Moka 校招模块无筛选全目录；按岗位性质排除实习"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "芯粤能详情标题不匹配")
+
+
 class Seazen2027(Moka):
     name = "moka-seazen-2027"
     org = "seazen"
@@ -831,7 +915,40 @@ class Deeproute2027(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "元戎启行详情标题不一致")
 
 
+class Webank2027(Moka):
+    name = "moka-webank-2027"
+    host = "app-tc.mokahr.com"
+    org = "webankhr"
+    site_id = 20060
+    path = f"/campus-recruitment/{org}/{site_id}?locale=zh-CN#/jobs"
+    scope_description = "微众银行 2027 届官方 Moka 校园站无筛选公开全目录"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "微众银行详情标题不一致")
+
+
+class BgyfwCampus(Moka):
+    name = "moka-bgyfw-campus"
+    org = "bgyfw"
+    site_id = 47073
+    path = f"/campus-recruitment/{org}/{site_id}/#/jobs"
+    scope_description = "碧桂园服务官网直链 Moka 校园站无筛选目录；排除校园大使与实习"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        return "校园大使" not in text(row.get("title"))
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "碧桂园服务详情标题不一致")
+
+
 TENANTS = (
+    BgyfwCampus,
+    Webank2027,
+    CalterahCampus,
+    AscenpowerCampus,
+    FourierCampus,
+    EnflameCampus,
+    SemidriveCampus,
     ChintAnengCampus,
     Aerofugia2027,
     Dji2027,

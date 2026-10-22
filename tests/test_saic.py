@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from typing import Any
 
-from job_crawler.adapters.saic import SaicCampus
+from job_crawler.adapters.saic import SaicCampus, SaicImmotors, SaicXiangdao
 from job_crawler.models import Source
 
 
@@ -111,3 +111,88 @@ async def test_saic_detail_id_mismatch_marks_partial(now: datetime) -> None:
     result = await SaicCampus(source(), Replay(wrong_detail=True), now).collect()
     assert result.coverage_issues()
     assert result.scopes[0].details == 14
+
+
+class ScopedReplay(Replay):
+    def __init__(self, company_id: str, company_name: str, *, wrong_company: bool = False):
+        super().__init__()
+        self.company_id = company_id
+        self.company_name = company_name
+        self.wrong_company = wrong_company
+
+    async def observed(self, needle: str) -> dict[str, Any]:
+        if needle.endswith("/companyList"):
+            return {
+                "body": json.dumps(
+                    {
+                        "code": 200,
+                        "data": [
+                            {"id": self.company_id, "companyName": self.company_name},
+                            *(
+                                {"id": f"other-{i}", "companyName": f"其他公司{i}"}
+                                for i in range(34)
+                            ),
+                        ],
+                    }
+                )
+            }
+        return await super().observed(needle)
+
+    async def request(
+        self, url: str, *, payload: dict[str, Any] | None = None, detail: bool = False
+    ) -> dict[str, Any]:
+        if detail:
+            key = int(url.rsplit("=", 1)[-1])
+            return {
+                "code": 200,
+                "data": {
+                    "id": key,
+                    "posName": f"校招岗位{key}",
+                    "posCompanyId": self.company_id,
+                    "posCompanyName": self.company_name,
+                    "posType": "1",
+                    "posDesc": "正式岗位职责",
+                    "posRequire": "本科及以上",
+                    "posCreatorDate": "2026-10-01 00:00:00",
+                },
+            }
+        assert payload is not None
+        assert payload["companyId"] == [self.company_id] and payload["posType"] == [1]
+        rows = [
+            {
+                "posId": str(key),
+                "posName": f"校招岗位{key}",
+                "posCompanyId": "other" if self.wrong_company and key == 2 else self.company_id,
+                "posCompanyName": self.company_name,
+                "posType": "校园招聘",
+                "posCity": "上海",
+                "state": "true",
+            }
+            for key in (1, 2)
+        ]
+        return {
+            "code": 200,
+            "data": {"total": 2, "pages": 1, "current": 1, "size": 15, "records": rows},
+        }
+
+
+async def test_saic_company_scopes_and_rejects_other_company(now: datetime) -> None:
+    for adapter in (SaicImmotors, SaicXiangdao):
+        selected = Source(
+            source_id="COM0538",
+            company_id="COM0538",
+            company=adapter.company_name,
+            url=source().url,
+        )
+        result = await adapter(
+            selected, ScopedReplay(adapter.company_id, adapter.company_name), now
+        ).collect()
+        assert not result.coverage_issues()
+        assert result.scopes[0].expected == result.scopes[0].unique == result.scopes[0].details == 2
+        assert all(job.unit == adapter.company_name and job.published == "" for job in result.jobs)
+        failed = await adapter(
+            selected,
+            ScopedReplay(adapter.company_id, adapter.company_name, wrong_company=True),
+            now,
+        ).collect()
+        assert failed.coverage_issues()

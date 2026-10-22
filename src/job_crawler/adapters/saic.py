@@ -16,6 +16,8 @@ class SaicCampus(Adapter):
     path = "/recruit/pc/#/collegeRecruit"
     ready_endpoints = ("/recruit/api/recruit/position/deliver/list",)
     scope_description = "上汽集团官方校招目录，35 家公开招聘公司全部覆盖；实习计划明确排除"
+    company_id = ""
+    company_name = ""
 
     async def harvest(self) -> None:
         company_observed = await self.session.observed("/position/publishPosition/companyList")
@@ -23,6 +25,8 @@ class SaicCampus(Adapter):
         check(companies_response.get("code") == 200, "上汽招聘公司目录业务失败")
         companies = {str(row["id"]): text(row["companyName"]) for row in companies_response["data"]}
         check(len(companies) == 35, "上汽招聘公司目录结构改变")
+        if self.company_id:
+            check(companies.get(self.company_id) == self.company_name, "上汽招聘公司 ID 与主体不符")
         observed = await self.session.observed("/position/deliver/list")
         payload = json.loads(observed["post_data"])
         check(
@@ -37,7 +41,11 @@ class SaicCampus(Adapter):
             },
             "上汽校招目录带有筛选或入口变化",
         )
-        scope = Scope(name="college-all-companies")
+        if self.company_id:
+            payload = {**payload, "companyId": [self.company_id], "posType": [1]}
+        scope = Scope(
+            name=f"college-{self.company_name}" if self.company_id else "college-all-companies"
+        )
         self.result.scopes.append(scope)
         seen: set[str] = set()
         page = 1
@@ -67,6 +75,11 @@ class SaicCampus(Adapter):
                     unit_id = str(row["posCompanyId"])
                     unit = text(row["posCompanyName"])
                     check(companies.get(unit_id) == unit, "上汽职位招聘公司不在官方公司目录")
+                    if self.company_id:
+                        check(
+                            unit_id == self.company_id and unit == self.company_name,
+                            "上汽列表混入其他公司",
+                        )
                     check(str(row.get("state")).lower() == "true", "上汽列表出现未开放职位")
                     nature = text(row.get("posType"))
                     check(nature in {"校园招聘", "实习计划"}, "上汽职位性质异常")
@@ -140,3 +153,17 @@ class SaicCampus(Adapter):
                 break
             check(bool(rows) and scope.unique < expected, "上汽校招分页提前为空")
             page += 1
+
+
+class SaicImmotors(SaicCampus):
+    name = "saic-immotors-campus"
+    company_id = "9e0c1407-9faf-41c3-8ccc-465e144cc1e7"
+    company_name = "智己汽车"
+    scope_description = "上汽官方校园目录仅智己汽车公司 ID；实习与集团其他公司排除"
+
+
+class SaicXiangdao(SaicCampus):
+    name = "saic-xiangdao-campus"
+    company_id = "6abd4875-5923-4404-8973-058295300c8b"
+    company_name = "享道出行"
+    scope_description = "上汽官方校园目录仅享道出行公司 ID；实习与集团其他公司排除"

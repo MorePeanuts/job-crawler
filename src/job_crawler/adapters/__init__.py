@@ -104,11 +104,13 @@ from job_crawler.adapters.jianlong import JianlongCampus
 from job_crawler.adapters.jointown import JointownCampus
 from job_crawler.adapters.jxcc import JxccCampus
 from job_crawler.adapters.kingboard import KingboardCareers
+from job_crawler.adapters.lansus import LansusCampus
 from job_crawler.adapters.laopu import LaopuCampus
 from job_crawler.adapters.lenovo import Lenovo
 from job_crawler.adapters.linkerbot import LinkerbotCampus
 from job_crawler.adapters.lixiang import LiAutoCampus
 from job_crawler.adapters.longi_legacy import LongiLegacyCampus
+from job_crawler.adapters.meditrust import MeditrustCampus
 from job_crawler.adapters.meituan import Meituan
 from job_crawler.adapters.mihoyo import Mihoyo2027
 from job_crawler.adapters.mingtai import MingtaiCampus
@@ -129,7 +131,7 @@ from job_crawler.adapters.platforms import CCB, CNPC, Alibaba, Pingan
 from job_crawler.adapters.qdbank import QdbankCampus
 from job_crawler.adapters.risun_hebut import RisunDingzhouHebut2027
 from job_crawler.adapters.rongsheng_hebut import RongshengHebut2027
-from job_crawler.adapters.saic import SaicCampus
+from job_crawler.adapters.saic import SaicCampus, SaicImmotors, SaicXiangdao
 from job_crawler.adapters.sangang_cup import SangangMingguang2027
 from job_crawler.adapters.sasdragon import SasDragonCareers
 from job_crawler.adapters.satellite_hust import SatelliteHust2027
@@ -161,6 +163,7 @@ from job_crawler.adapters.tfme import TfmeCampus
 from job_crawler.adapters.tiandi_international import TiandiInternational2027
 from job_crawler.adapters.tianshan_hebut import TianshanHebutCampus
 from job_crawler.adapters.tongwei_share import TongweiShare2027
+from job_crawler.adapters.uatair import UatairCampus
 from job_crawler.adapters.uni_president import UniPresidentCareers
 from job_crawler.adapters.uniontech import UnionTechCampus
 from job_crawler.adapters.viiyong import ViiyongCampus
@@ -310,6 +313,7 @@ REGISTRY = {
         CspcCampus,
         GemCampus,
         GdhMobileCampus,
+        MeditrustCampus,
         GemdaleCampus,
         SjmPublicJobs,
         PccwGraduate,
@@ -373,6 +377,10 @@ REGISTRY = {
         OriginQCCampus,
         Oppo2027,
         ViiyongCampus,
+        LansusCampus,
+        UatairCampus,
+        SaicImmotors,
+        SaicXiangdao,
         LinkerbotCampus,
         UnionTechCampus,
         AstronergyCampus,

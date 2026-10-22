@@ -14,11 +14,15 @@ from job_crawler.adapters.moka import (
     HFSP,
     STO,
     Anta2027,
+    AscenpowerCampus,
+    BgyfwCampus,
+    CalterahCampus,
     ChintAnengCampus,
     Dasenlin,
     Deeproute2027,
     Digiloong,
     EastchinaPharm,
+    EnflameCampus,
     EnvisionDigital2027,
     EnvisionEnergy2027,
     Fehorizon,
@@ -33,12 +37,14 @@ from job_crawler.adapters.moka import (
     Moka,
     Sanhua,
     Seazen2027,
+    SemidriveCampus,
     Shein2027,
     Smartmore2027,
     Stepfun2027,
     Sungrow,
     SunnyOptical,
     TrinaSolar,
+    Webank2027,
     Yadea,
     Yunshenchu2027,
     Zczl2027,
@@ -189,6 +195,114 @@ class SunnyReplay(Replay):
         return await super().observed_path(needle)
 
 
+class SemidriveReplay(SunnyReplay):
+    def __init__(self, *, bad_group: bool = False):
+        super().__init__()
+        self.org = "semidrive"
+        self.site_id = 42941
+        self.bad_group = bad_group
+
+    async def observed_path(self, needle: str) -> dict[str, Any]:
+        response = await super().observed_path(needle)
+        if needle.endswith("jobs/module"):
+            payload = json.loads(response["post_data"])
+            payload.update(
+                orgId="semidrive",
+                siteId=42941,
+                moduleId="0001295480",
+                needGroupType="zhineng" if self.bad_group else "list",
+            )
+            response["post_data"] = json.dumps(payload)
+        return response
+
+
+async def test_semidrive_full_time_module_and_detail_identity(now: datetime) -> None:
+    source = Source(
+        source_id="COM0630",
+        company_id="COM0630",
+        company="芯驰科技",
+        url="https://app.mokahr.com/campus_apply/semidrive/42941#/",
+    )
+    result = await SemidriveCampus(source, SemidriveReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].unique == result.scopes[0].details == 3
+    assert all(job.work_type == "校招" for job in result.jobs)
+    assert all("campus_apply/semidrive/42941" in job.source_url for job in result.jobs)
+    rejected = await SemidriveCampus(source, SemidriveReplay(bad_group=True), now).collect()
+    assert rejected.coverage_issues()
+
+
+class UnfilteredModuleReplay(Replay):
+    def __init__(self, adapter: type[Moka], *, bad_filter: bool = False):
+        super().__init__(adapter.org, adapter.site_id)
+        self.adapter = adapter
+        self.bad_filter = bad_filter
+
+    async def observed_path(self, needle: str) -> dict[str, Any]:
+        if needle.endswith("jobs/module"):
+            return {
+                "url": "https://app.mokahr.com/api/outer/ats-apply/website/jobs/module",
+                "post_data": json.dumps(
+                    {
+                        "orgId": self.adapter.org,
+                        "siteId": self.adapter.site_id,
+                        "moduleId": self.adapter.module_id,
+                        "needGroupType": "list",
+                        "commitments": ["全职"] if self.bad_filter else [],
+                        "keyword": "",
+                        "departmentIds": [],
+                        "limit": 2,
+                        "offset": 0,
+                    }
+                ),
+            }
+        return await super().observed_path(needle)
+
+
+@pytest.mark.parametrize("adapter", [CalterahCampus, AscenpowerCampus])
+async def test_unfiltered_campus_module_checks_each_job_commitment(
+    adapter: type[Moka], now: datetime
+) -> None:
+    source = Source(
+        source_id="SITE",
+        company_id="SITE",
+        company="企业",
+        url=f"https://app.mokahr.com/{adapter.route}/{adapter.org}/{adapter.site_id}#/",
+    )
+    result = await adapter(source, UnfilteredModuleReplay(adapter), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].details == 3
+    assert [job.work_type for job in result.jobs] == ["校招", "实习", "校招"]
+    rejected = await adapter(
+        source, UnfilteredModuleReplay(adapter, bad_filter=True), now
+    ).collect()
+    assert rejected.coverage_issues()
+
+
+class EnflameReplay(Replay):
+    def __init__(self):
+        super().__init__("enflame", 168420)
+
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        row["department"] = {"name": "其他法人" if job_id == "b" else "上海燧原科技股份有限公司"}
+        return row
+
+
+async def test_enflame_excludes_other_company_department(now: datetime) -> None:
+    source = Source(
+        source_id="COM0598",
+        company_id="COM0598",
+        company="燧原科技",
+        url="https://app.mokahr.com/campus-recruitment/enflame/168420#/jobs/",
+    )
+    result = await EnflameCampus(source, EnflameReplay(), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].unique == 3
+    assert result.scopes[0].skipped_out_of_scope == 1
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
+
+
 class ChintReplay(Replay):
     def __init__(self, *, wrong_company: bool = False, missing_filter: bool = False):
         super().__init__("chint", 40745, host="campus.chint.com")
@@ -293,6 +407,8 @@ async def test_sunny_rejects_internship_module(now: datetime) -> None:
         Seazen2027,
         Lingyi2027,
         Zczl2027,
+        Webank2027,
+        BgyfwCampus,
     ],
 )
 async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: datetime) -> None:
@@ -315,6 +431,27 @@ async def test_moka_pagination_detail_and_job_type(adapter: type[Moka], now: dat
         f"https://{adapter.host}/{adapter.route}/{adapter.org}/{adapter.site_id}#/job/"
     )
     assert [call["offset"] for call in session.calls if "offset" in call] == [0, 2]
+
+
+async def test_bgyfw_excludes_campus_ambassador(now: datetime) -> None:
+    class BgyfwReplay(Replay):
+        def _row(self, job_id: str) -> dict[str, Any]:
+            row = super()._row(job_id)
+            if job_id == "b":
+                row["title"] = "校园大使"
+            return row
+
+    source = Source(
+        source_id="COM0321",
+        company_id="COM0321",
+        company="碧桂园服务",
+        url="https://app.mokahr.com/campus-recruitment/bgyfw/47073/#/jobs",
+    )
+    result = await BgyfwCampus(source, BgyfwReplay("bgyfw", 47073), now).collect()
+    assert not result.coverage_issues()
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert result.scopes[0].skipped_out_of_scope == 1
+    assert [job.source_key for job in result.jobs] == ["a", "c"]
 
 
 async def test_moka_rejects_duplicate_page(now: datetime) -> None:
@@ -389,7 +526,17 @@ class TitleMismatch(Replay):
 
 @pytest.mark.parametrize(
     "adapter",
-    [Seazen2027, Lingyi2027, Zczl2027, Hithium2027, Shein2027, Stepfun2027, Smartmore2027],
+    [
+        Seazen2027,
+        Lingyi2027,
+        Zczl2027,
+        Hithium2027,
+        Shein2027,
+        Stepfun2027,
+        Smartmore2027,
+        Webank2027,
+        BgyfwCampus,
+    ],
 )
 async def test_moka_rejects_detail_title_mismatch(adapter: type[Moka], now: datetime) -> None:
     source = Source(
