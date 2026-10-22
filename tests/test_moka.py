@@ -14,6 +14,7 @@ from job_crawler.adapters.moka import (
     HFSP,
     STO,
     Anta2027,
+    ChintAnengCampus,
     Dasenlin,
     Deeproute2027,
     Digiloong,
@@ -186,6 +187,54 @@ class SunnyReplay(Replay):
                 ),
             }
         return await super().observed_path(needle)
+
+
+class ChintReplay(Replay):
+    def __init__(self, *, wrong_company: bool = False, missing_filter: bool = False):
+        super().__init__("chint", 40745, host="campus.chint.com")
+        self.wrong_company = wrong_company
+        self.missing_filter = missing_filter
+
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        row["department"] = {
+            "id": 725999 if self.wrong_company and job_id == "b" else 725411,
+            "name": "正泰安能数字能源（浙江）股份有限公司",
+        }
+        return row
+
+    async def observed_path(self, needle: str) -> dict[str, Any]:
+        response = await super().observed_path(needle)
+        if needle.endswith("jobs/v2"):
+            payload = json.loads(response["post_data"])
+            if not self.missing_filter:
+                payload["departmentIds"] = ["725411"]
+            response["post_data"] = json.dumps(payload)
+        return response
+
+
+async def test_chint_aneng_uses_company_filter_and_rejects_other_company(
+    now: datetime,
+) -> None:
+    source = Source(
+        source_id="COM0530",
+        company_id="COM0530",
+        company="正泰安能",
+        url="https://campus.chint.com/campus-recruitment/chint/40745/#/jobs?department%5B0%5D=725411",
+    )
+    replay = ChintReplay()
+    result = await ChintAnengCampus(source, replay, now).collect()
+    assert not result.coverage_issues()
+    assert [call["departmentIds"] for call in replay.calls if "offset" in call] == [
+        ["725411"],
+        ["725411"],
+    ]
+    assert len(result.jobs) == 3
+
+    wrong_filter = await ChintAnengCampus(source, ChintReplay(missing_filter=True), now).collect()
+    assert wrong_filter.coverage_issues()
+    wrong_company = await ChintAnengCampus(source, ChintReplay(wrong_company=True), now).collect()
+    assert wrong_company.coverage_issues()
 
 
 async def test_sunny_module_catalog(now: datetime) -> None:

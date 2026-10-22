@@ -80,6 +80,7 @@ class Moka(Adapter):
     site_id = 0
     route = "campus-recruitment"
     module_id = ""
+    catalog_department_id = ""
     path = ""
     ready_endpoints = ("/api/outer/ats-apply/website/jobs/v2",)
     scope_description = (
@@ -115,11 +116,19 @@ class Moka(Adapter):
             check(payload.get("needGroupType") == "zhineng", "Moka 招聘模块类别改变")
         else:
             check(payload.get("site") == "campus", "Moka 入口不是校园站点")
+        if self.catalog_department_id:
+            check(
+                [str(value) for value in payload.get("departmentIds", [])]
+                == [self.catalog_department_id],
+                "Moka 公司分支筛选不匹配",
+            )
+        else:
+            check(not payload.get("departmentIds"), "Moka 目录带有未知公司筛选")
         check(int(payload.get("offset", -1)) == 0, "Moka 列表不是第一页")
         check(
             not payload.get("jobIdTopList") and not payload.get("customFields"), "Moka 目录带有筛选"
         )
-        for key in ("keyword", "locations", "zhineng", "commitment", "departmentIds"):
+        for key in ("keyword", "locations", "zhineng", "commitment"):
             check(not payload.get(key), f"Moka 目录带有筛选 {key}")
         limit = int(payload["limit"])
         check(0 < limit <= 100, "Moka 分页大小异常")
@@ -692,6 +701,25 @@ class Huolala2027(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "货拉拉详情标题不匹配")
 
 
+class ChintAnengCampus(Moka):
+    name = "moka-chint-aneng-campus"
+    host = "campus.chint.com"
+    org = "chint"
+    site_id = 40745
+    catalog_department_id = "725411"
+    path = f"/campus-recruitment/{org}/{site_id}/#/jobs?department%5B0%5D={catalog_department_id}"
+    scope_description = "正泰集团官网 Moka 校园站仅正泰安能数字能源（浙江）股份有限公司分支"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        department = row.get("department") or {}
+        check(
+            str(department.get("id")) == self.catalog_department_id
+            and text(department.get("name")) == "正泰安能数字能源（浙江）股份有限公司",
+            "正泰安能筛选结果混入其他公司",
+        )
+        return True
+
+
 class Aerofugia2027(Moka):
     name = "moka-aerofugia-2027"
     org = "geely"
@@ -804,6 +832,7 @@ class Deeproute2027(Moka):
 
 
 TENANTS = (
+    ChintAnengCampus,
     Aerofugia2027,
     Dji2027,
     Huolala2027,

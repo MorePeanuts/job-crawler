@@ -1519,3 +1519,23 @@ version = "1"
 [sources.COM0558]
 adapter = "duoyi-campus"
 version = "1"
+
+[sources.COM0511]
+adapter = "zhiye-vivo-2027"
+version = "1"
+
+[sources.COM0784]
+adapter = "zhiye-weidian-2027"
+version = "1"
+
+[sources.COM0530]
+adapter = "moka-chint-aneng-campus"
+version = "1"
+
+[sources.COM0575]
+adapter = "zhiye-kkgroup-2027"
+version = "1"
+
+[sources.COM0319]
+adapter = "suning-1200-campus"
+version = "1"

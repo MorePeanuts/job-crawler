@@ -317,7 +317,7 @@ COM0315,COM0315,香港中华煤气有限公司,https://www.towngas.com/en/Career
 COM0316,COM0316,河南豫光金铅股份有限公司,,
 COM0317,COM0317,晶澳太阳能科技股份有限公司,,
 COM0318,COM0318,中通快递（开曼）有限公司,https://hr.zto.com/campus,; SPEC-156 B: official recruitment entrance verified 2026-10-18; adapter pending
-COM0319,COM0319,苏宁易购集团股份有限公司,https://careers.suning.cn/graduates/,
+COM0319,COM0319,苏宁易购集团股份有限公司,https://campus.suning.cn/rps-campus/ftl/campus/managePlan.htm?type=manage,SPEC-277；苏宁易购官网校园招聘直链；2026-10-22 真实全量验收11岗
 COM0320,COM0320,云南云天化股份有限公司,https://yythzb3.zhiye.com/campus/jobs,
 COM0321,COM0321,碧桂园服务控股有限公司,,企业官方招聘入口待查；高校或公共人才网来源已停用；SPEC-274
 COM0322,COM0322,中伟新材料股份有限公司,https://wecruit.hotjob.cn/SU61ebbdfdbef57c632beecbc5/pb/school.html,原企业入口待重新验收；高校或公共人才网来源已停用；SPEC-274
@@ -509,7 +509,7 @@ COM0507,COM0507,Oppo,https://careers.oppo.com/university/oppo/campus/post,SPEC-2
 COM0508,COM0508,荣耀,https://career.honor.com/SU60eea919bef57c1023f6fe78/pb/school.html,SPEC-275；2026独角兽榜单附录第1页第8行；官网 https://www.honor.com/cn/career/ 应届生链接；SPEC-277 2026-10-22 全量实采通过
 COM0509,COM0509,米哈游,https://jobs.mihoyo.com/#/campus/position?jobName=&projectIds%5B0%5D=13,SPEC-275；2026独角兽榜单附录第1页第9行；官网 https://campus.mihoyo.com/ 跳转至此 2027 项目筛选；SPEC-277 2026-10-22 全量实采通过
 COM0510,COM0510,长江存储科技有限责任公司,https://ymtc.zhiye.com/campus/jobs,SPEC-275；2026独角兽榜单附录第1页第10行；榜单候选；SPEC-276 2026-10-21 已核实招聘入口和全量校园目录，适配器已绑定；主体据长江存储官网企业简介核实
-COM0511,COM0511,Vivo,https://career.vivo.com/,SPEC-275；2026独角兽榜单附录第1页第11行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；适配器待接入
+COM0511,COM0511,Vivo,https://hr-campus.vivo.com/campus/jobs,SPEC-275；2026独角兽榜单附录第1页第11行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；SPEC-277 vivo 官网所链独立校园门户；2026-10-22 全量验收36岗
 COM0512,COM0512,月之暗面,https://careers.kimi.com/campus,SPEC-275；2026独角兽榜单附录第1页第12行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；适配器待接入
 COM0513,COM0513,长鑫存储技术有限公司,https://cxmt.zhiye.com/campus/jobs,SPEC-275；2026独角兽榜单附录第1页第13行；榜单候选；SPEC-276 2026-10-21 已核实招聘入口和全量校园目录，适配器已绑定；主体据招聘门户页脚核实
 COM0514,COM0514,京东科技,https://zhaopin.jd.com/home,SPEC-275；2026独角兽榜单附录第1页第14行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；适配器待接入；京东集团共享招聘门户，业务归属待验
@@ -528,7 +528,7 @@ COM0526,COM0526,卡游,,SPEC-275；2026独角兽榜单附录第1页第26行；�
 COM0527,COM0527,阶跃星辰,https://app.mokahr.com/campus-recruitment/step/94905#/jobs,SPEC-275；2026独角兽榜单附录第1页第27行；多所高校 2027 校招公告给出 Moka 入口；2026-10-21 实采验收完整
 COM0528,COM0528,蜂巢能源科技股份有限公司,https://svolt.zhiye.com/campus/jobs,SPEC-275；2026独角兽榜单附录第1页第28行；榜单候选；SPEC-276 2026-10-21 已核实招聘入口和全量校园目录，适配器已绑定；主体据高校正式招聘公告核实
 COM0529,COM0529,嘉立创,https://www.jlc.com/portal/recruitment,SPEC-275；2026独角兽榜单附录第1页第29行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；适配器待接入
-COM0530,COM0530,正泰安能,https://chintanneng.com/about/join.html,SPEC-275；2026独角兽榜单附录第1页第30行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；适配器待接入
+COM0530,COM0530,正泰安能,https://campus.chint.com/campus-recruitment/chint/40745/#/jobs?department%5B0%5D=725411,SPEC-275；2026独角兽榜单附录第1页第30行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；SPEC-277 正泰集团官网独立法人筛选 725411；2026-10-22 全量验收45个正式岗位
 COM0531,COM0531,旷视科技,,SPEC-275；2026独角兽榜单附录第1页第32行；榜单显示名，主体待核实；2026-10-21 已检索：未找到可确认的招聘站；待复核
 COM0532,COM0532,京东产发,https://zhaopin.jd.com/home,SPEC-275；2026独角兽榜单附录第1页第33行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21；适配器待接入；京东集团共享招聘门户，业务归属待验
 COM0533,COM0533,车好多,,SPEC-275；2026独角兽榜单附录第1页第34行；榜单显示名，主体待核实；2026-10-21 已检索：未找到可确认的招聘站；待复核
@@ -573,7 +573,7 @@ COM0571,COM0571,莉莉丝,https://lilithgames.jobs.feishu.cn/campus,SPEC-275；2
 COM0572,COM0572,蘑菇车联,,SPEC-275；2026独角兽榜单附录第2页第37行；榜单显示名，主体待核实；2026-10-21 已检索：官网给出招聘邮箱，高校公告有 ATS 地址，官网关联未核；待复核
 COM0573,COM0573,天合富家,,SPEC-275；2026独角兽榜单附录第2页第38行；榜单显示名，主体待核实；2026-10-21 已检索：天合集团招聘入口，富家岗位范围待核；待复核
 COM0574,COM0574,蓝箭航天,https://uq1h428xyc.jobs.feishu.cn/522146/position/list,SPEC-275；2026独角兽榜单附录第2页第39行；榜单显示名，主体待核实；官网 https://www.landspace.com/index.php?lang=gbjob 指向此飞书校招门户；SPEC-277 2026-10-22 全量实采通过
-COM0575,COM0575,KK集团,https://www.kkgroup.cn/zh-CN/join,SPEC-275；2026独角兽榜单附录第3页第1行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21（企业官网招聘入口）；适配器待接入
+COM0575,COM0575,KK集团,https://kkguan.zhiye.com/campus/jobs,SPEC-275/277；官网校园按钮直链北森独立租户；2026-10-22 真实全量验收9岗
 COM0576,COM0576,斑马智行,https://bmsjb.ebanma.com/joinus.html,SPEC-275；2026独角兽榜单附录第3页第2行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21（企业官网招聘入口）；适配器待接入
 COM0577,COM0577,滴滴货运,,SPEC-275；2026独角兽榜单附录第3页第3行；榜单显示名，主体待核实；2026-10-21 已检索：滴滴集团共用入口；货运主体范围待核；待复核
 COM0578,COM0578,蕉下,,SPEC-275；2026独角兽榜单附录第3页第4行；榜单显示名，主体待核实；2026-10-21 已检索：只有高校招聘资料，未核实官方入口；待复核
@@ -782,7 +782,7 @@ COM0780,COM0780,腾云天下,,SPEC-275；2026独角兽榜单附录第8页第11�
 COM0781,COM0781,途家网,,SPEC-275；2026独角兽榜单附录第8页第12行；榜单显示名，主体待核实；2026-10-21 已检索，官方招聘入口未证实；待复核
 COM0782,COM0782,推想科技,,SPEC-275；2026独角兽榜单附录第8页第13行；榜单显示名，主体待核实；2026-10-21 已检索，官方招聘入口未证实；待复核
 COM0783,COM0783,威高介入,,SPEC-275；2026独角兽榜单附录第8页第14行；榜单显示名，主体待核实；2026-10-21 已检索，官方招聘入口未证实；待复核
-COM0784,COM0784,微店,https://hr.weidian.com/home,SPEC-275；2026独角兽榜单附录第8页第15行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21（企业招聘页）；适配器待接入
+COM0784,COM0784,微店,https://hr.weidian.com/campus/jobs,SPEC-275；2026独角兽榜单附录第8页第15行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21（企业招聘页）；SPEC-277 微店独立 2027 校园门户；2026-10-22 全量验收6个正式岗位
 COM0785,COM0785,享道出行,,SPEC-275；2026独角兽榜单附录第8页第16行；榜单显示名，主体待核实；2026-10-21 已检索，官方招聘入口未证实；待复核
 COM0786,COM0786,芯华章,,SPEC-275；2026独角兽榜单附录第8页第17行；榜单显示名，主体待核实；2026-10-21 已检索，官方招聘入口未证实；待复核
 COM0787,COM0787,芯旺微电子,https://www.chipon-ic.com/AboutUs/Join,SPEC-275；2026独角兽榜单附录第8页第18行；榜单显示名，主体待核实；招聘入口已查证 2026-10-21（企业招聘页）；适配器待接入

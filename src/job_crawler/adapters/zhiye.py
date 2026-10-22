@@ -1071,7 +1071,53 @@ class CixinCampus(Zhiye):
     scope_description = "此芯科技官网所链北森 Category=2 公开校园全目录；排除实习"
 
 
+class Vivo2027(Zhiye):
+    name = "zhiye-vivo-2027"
+    host = "hr-campus.vivo.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "vivo"
+    scope_description = "vivo 官网所链独立北森校园门户 Category=2 全目录；仅纳入 2027 届正式岗位"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "vivo 校园目录混入其他类别")
+        title = text(row.get("JobAdName"))
+        return "27届" in title and "实习" not in title
+
+
+class Weidian2027(Zhiye):
+    name = "zhiye-weidian-2027"
+    host = "hr.weidian.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "微店"
+    scope_description = "微店官网 2027 届北森 Category=2 校园全目录；排除实习"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "微店校园目录混入其他类别")
+        return "2027" in text(row.get("JobAdName"))
+
+
+class KkGroup2027(Zhiye):
+    name = "zhiye-kkgroup-2027"
+    host = "kkguan.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "KK集团"
+    scope_description = (
+        "KK集团官网所链北森 Category=2 公开校园全目录；仅纳入标题明确的 27 届正式岗位"
+    )
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "KK集团校园目录混入其他类别")
+        title = text(row.get("JobAdName"))
+        return title.startswith("【27") and "实习" not in title
+
+
 TENANTS = (
+    KkGroup2027,
+    Weidian2027,
+    Vivo2027,
     CixinCampus,
     YmtcCampus,
     CxmtCampus,
