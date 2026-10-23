@@ -1651,3 +1651,203 @@ version = "1"
 [sources.COM0529]
 adapter = "zhiye-jlcehr-2027"
 version = "1"
+
+[sources.COM0808]
+adapter = "moka-voyah-2027"
+version = "1"
+
+[sources.COM0810]
+adapter = "moka-shanghai-huali-2027"
+version = "1"
+
+[sources.COM0812]
+adapter = "moka-deli-2027"
+version = "1"
+
+[sources.COM0813]
+adapter = "moka-ruijie-2027"
+version = "1"
+
+[sources.COM0823]
+adapter = "zhiye-sanan-2027"
+version = "1"
+
+[sources.COM0827]
+adapter = "zhiye-genvict-2027"
+version = "1"
+
+[sources.COM0828]
+adapter = "zhiye-bomc-2027"
+version = "1"
+
+[sources.COM0829]
+adapter = "zhiye-aimer-2027"
+version = "1"
+
+[sources.COM0830]
+adapter = "zhiye-leadchina-2027"
+version = "1"
+
+[sources.COM0831]
+adapter = "zhiye-lanxincn-campus"
+version = "1"
+
+[sources.COM0832]
+adapter = "zhiye-dobot-2027"
+version = "1"
+
+[sources.COM0833]
+adapter = "zhiye-ti5robot-campus"
+version = "1"
+
+[sources.COM0834]
+adapter = "zhiye-nexchip-2027"
+version = "1"
+
+[sources.COM0835]
+adapter = "zhiye-luxpowertek-2027"
+version = "1"
+
+[sources.COM0836]
+adapter = "moka-sina-campus"
+version = "1"
+
+[sources.COM0837]
+adapter = "moka-kfconcept-2027"
+version = "1"
+
+[sources.COM0838]
+adapter = "moka-zhihu-2027"
+version = "1"
+
+[sources.COM0839]
+adapter = "moka-vertiv-2027"
+version = "1"
+
+[sources.COM0840]
+adapter = "moka-visionox-2027"
+version = "1"
+
+[sources.COM0841]
+adapter = "zhiye-qxkj-2027"
+version = "1"
+
+[sources.COM0842]
+adapter = "zhiye-njcttq-2027"
+version = "1"
+
+[sources.COM0843]
+adapter = "zhiye-iwhalecloud-2027"
+version = "1"
+
+[sources.COM0844]
+adapter = "zhiye-spacestar-2027"
+version = "1"
+
+[sources.COM0845]
+adapter = "zhiye-warrant-2027"
+version = "1"
+
+[sources.COM0846]
+adapter = "zhiye-cetctj-2027"
+version = "1"
+
+[sources.COM0847]
+adapter = "zhiye-dzwy-2027"
+version = "1"
+
+[sources.COM0858]
+adapter = "zhiye-awinic-2027"
+version = "1"
+
+[sources.COM0864]
+adapter = "zhiye-dynanonic-2027"
+version = "1"
+
+[sources.COM0870]
+adapter = "moka-gaotu-2027"
+version = "1"
+
+[sources.COM0871]
+adapter = "feishu-rigol-campus"
+version = "1"
+
+[sources.COM0872]
+adapter = "feishu-moonton-2027"
+version = "1"
+
+[sources.COM0873]
+adapter = "feishu-modelbest-2027"
+version = "1"
+
+[sources.COM0876]
+adapter = "moka-gufen-2027"
+version = "1"
+
+[sources.COM0877]
+adapter = "moka-supcon-2027"
+version = "1"
+
+[sources.COM0878]
+adapter = "moka-threatbook-2027"
+version = "1"
+
+[sources.COM0879]
+adapter = "moka-manbang-2027"
+version = "1"
+
+[sources.COM0880]
+adapter = "moka-tuyoogame-2027"
+version = "1"
+
+[sources.COM0881]
+adapter = "moka-didiglobal-2027"
+version = "1"
+
+[sources.COM0882]
+adapter = "moka-qianli1-2027"
+version = "1"
+
+[sources.COM0883]
+adapter = "moka-gtx-2027"
+version = "1"
+
+[sources.COM0885]
+adapter = "moka-wison-2027"
+version = "1"
+
+[sources.COM0886]
+adapter = "moka-kingdeehr-2027"
+version = "1"
+
+[sources.COM0888]
+adapter = "moka-pwrd-2027"
+version = "1"
+
+[sources.COM0889]
+adapter = "moka-hypergryph-2027"
+version = "1"
+
+[sources.COM0890]
+adapter = "moka-amec-2027"
+version = "1"
+
+[sources.COM0891]
+adapter = "moka-tsinghuaic-2027"
+version = "1"
+
+[sources.COM0892]
+adapter = "moka-pharmaron-2027"
+version = "1"
+
+[sources.COM0893]
+adapter = "moka-dhrobotics-2027"
+version = "1"
+
+[sources.COM0894]
+adapter = "moka-sineng-2027"
+version = "1"
+
+[sources.COM0895]
+adapter = "moka-37-2027"
+version = "1"

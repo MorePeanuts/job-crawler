@@ -941,7 +941,346 @@ class BgyfwCampus(Moka):
         check(text(detail.get("title")) == text(listing.get("title")), "碧桂园服务详情标题不一致")
 
 
+class SinaCampus(Moka):
+    name = "moka-sina-campus"
+    org = "sina"
+    site_id = 43536
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "新浪与微博共同校园招聘 Moka 公开无筛选目录；保留源部门，排除实习"
+
+
+class Gaotu2027(Moka):
+    name = "moka-gaotu-2027"
+    org = "bjhl"
+    site_id = 102145
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "高途 Moka 2027 校园站公开无筛选全目录；正式岗位和实习依源性质区分"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title
+
+
+class Kfconcept2027(Moka):
+    name = "moka-kfconcept-2027"
+    org = "kfconcept"
+    site_id = 144795
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "卓尔摄影器材 Moka 2027 校园站公开无筛选全目录"
+
+
+class Zhihu2027(Moka):
+    name = "moka-zhihu-2027"
+    org = "zhihu"
+    site_id = 68321
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "知乎 Moka 公开校招全目录；只纳入明确 27 届正式校招，实习排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "27届" in title or "2027" in title
+
+
+class Vertiv2027(Moka):
+    name = "moka-vertiv-2027"
+    org = "vertiv"
+    site_id = 118713
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "维谛技术 Moka 2027 校园站无筛选全目录；保留实际来源部门"
+
+
+class Visionox2027(Moka):
+    name = "moka-visionox-2027"
+    org = "newvisionox"
+    site_id = 24735
+    route = "campus_apply"
+    path = f"/campus_apply/{org}/{site_id}/#/jobs"
+    scope_description = "维信诺 Moka 校园站 27 届正式岗位全目录；排除实习、校园大使与旧批次"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return ("27届" in title or "2027" in title) and "校园大使" not in title
+
+
+class Voyah2027(Moka):
+    name = "moka-voyah-2027"
+    org = "voyah"
+    site_id = 146293
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "岚图汽车 2027 校招与博士项目公开全目录；实习项目按岗位性质排除"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "岚图详情标题不匹配")
+
+
+class ShanghaiHuali2027(Moka):
+    name = "moka-shanghai-huali-2027"
+    org = "huahong"
+    site_id = 70000
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "上海华力品牌官方 Moka 2027 校园站无筛选全目录；不归作华虹集团岗位"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "上海华力详情标题不匹配")
+
+
+class Deli2027(Moka):
+    name = "moka-deli-2027"
+    org = "nbdeli"
+    site_id = 70019
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "得力集团官网 2027 校园招聘 Moka 站点无筛选完整目录；实习按源性质排除"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "得力详情标题不匹配")
+
+
+class Ruijie2027(Moka):
+    name = "moka-ruijie-2027"
+    org = "ruijie"
+    site_id = 136206
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "锐捷网络官网 2027 校园招聘 Moka 站点无筛选完整目录；实习按源性质排除"
+
+    def verify_detail(self, listing: dict[str, Any], detail: dict[str, Any]) -> None:
+        check(text(detail.get("title")) == text(listing.get("title")), "锐捷详情标题不匹配")
+
+
+class Crland2027(Moka):
+    name = "moka-crland-2027"
+    org = "crland"
+    site_id = 168540
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "华润置地公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class DongfengGufen2027(Moka):
+    name = "moka-gufen-2027"
+    org = "gufen"
+    site_id = 143531
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "东风汽车股份有限公司公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class Supcon2027(Moka):
+    name = "moka-supcon-2027"
+    org = "supcon"
+    site_id = 172631
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "中控技术公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class Threatbook2027(Moka):
+    name = "moka-threatbook-2027"
+    org = "threatbook"
+    site_id = 39679
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "微步在线公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Manbang2027(Moka):
+    name = "moka-manbang-2027"
+    org = "manbang"
+    site_id = 94191
+    route = "campus_apply"
+    path = f"/campus_apply/{org}/{site_id}#/jobs"
+    scope_description = "满帮集团公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class Tuyoo2027(Moka):
+    name = "moka-tuyoogame-2027"
+    org = "tuyoogame"
+    site_id = 146219
+    route = "campus_apply"
+    path = f"/campus_apply/{org}/{site_id}#/jobs"
+    scope_description = "途游游戏公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Didi2027(Moka):
+    name = "moka-didiglobal-2027"
+    org = "didiglobal"
+    site_id = 96064
+    route = "campus_apply"
+    path = f"/campus_apply/{org}/{site_id}#/jobs"
+    scope_description = "滴滴出行公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Qianli2027(Moka):
+    name = "moka-qianli1-2027"
+    org = "qianli1"
+    site_id = 147197
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "千里智驾公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class Gtx2027(Moka):
+    name = "moka-gtx-2027"
+    org = "gtx"
+    site_id = 102188
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "上海光通信有限公司公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Easpring2027(Moka):
+    name = "moka-easpring-2027"
+    org = "easpring"
+    site_id = 102152
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "当升科技公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class Wison2027(Moka):
+    name = "moka-wison-2027"
+    org = "wison"
+    site_id = 115998
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "惠生工程公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Kingdee2027(Moka):
+    name = "moka-kingdeehr-2027"
+    org = "kingdeehr"
+    site_id = 166565
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "金蝶公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class Pwrd2027(Moka):
+    name = "moka-pwrd-2027"
+    org = "pwrd"
+    site_id = 172467
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "完美世界公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Hypergryph2027(Moka):
+    name = "moka-hypergryph-2027"
+    org = "hypergryph"
+    site_id = 26326
+    route = "campus_apply"
+    path = f"/campus_apply/{org}/{site_id}#/jobs"
+    scope_description = "鹰角网络公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+
+class Amec2027(Moka):
+    name = "moka-amec-2027"
+    org = "amec"
+    site_id = 4362
+    route = "campus_apply"
+    path = f"/campus_apply/{org}/{site_id}#/jobs"
+    scope_description = "中微公司公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Tsinghuaic2027(Moka):
+    name = "moka-tsinghuaic-2027"
+    org = "tsinghuaic"
+    site_id = 39656
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "紫光同芯微电子有限公司公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Pharmaron2027(Moka):
+    name = "moka-pharmaron-2027"
+    org = "pharmaron"
+    site_id = 45318
+    route = "campus_apply"
+    path = f"/campus_apply/{org}/{site_id}#/jobs"
+    scope_description = "康龙化成公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        title = text(row.get("title"))
+        return "2027" in title or "27届" in title or "27秋" in title or "2027校招" in title
+
+
+class Dhrobotics2027(Moka):
+    name = "moka-dhrobotics-2027"
+    org = "dhrobotics"
+    site_id = 168695
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = (
+        "深圳市大寰机器人科技有限公司公开 Moka 校园站无筛选全目录；实习与非当届岗位排除"
+    )
+
+
+class Sineng2027(Moka):
+    name = "moka-sineng-2027"
+    org = "sineng"
+    site_id = 172108
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "上能电气 2027 校园站公开无筛选全目录；按源性质排除实习"
+
+
+class Sanqi2027(Moka):
+    name = "moka-37-2027"
+    org = "37"
+    site_id = 58016
+    path = f"/campus-recruitment/{org}/{site_id}#/jobs"
+    scope_description = "三七互娱 2027 校园站公开无筛选全目录；按源性质排除实习"
+
+
 TENANTS = (
+    Sineng2027,
+    Sanqi2027,
+    Crland2027,
+    DongfengGufen2027,
+    Supcon2027,
+    Threatbook2027,
+    Manbang2027,
+    Tuyoo2027,
+    Didi2027,
+    Qianli2027,
+    Gtx2027,
+    Easpring2027,
+    Wison2027,
+    Kingdee2027,
+    Pwrd2027,
+    Hypergryph2027,
+    Amec2027,
+    Tsinghuaic2027,
+    Pharmaron2027,
+    Dhrobotics2027,
+    Gaotu2027,
+    SinaCampus,
+    Kfconcept2027,
+    Zhihu2027,
+    Vertiv2027,
+    Visionox2027,
+    Voyah2027,
+    ShanghaiHuali2027,
+    Deli2027,
+    Ruijie2027,
     BgyfwCampus,
     Webank2027,
     CalterahCampus,

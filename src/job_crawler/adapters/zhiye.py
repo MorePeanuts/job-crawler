@@ -1293,7 +1293,188 @@ class JlcEhr2027(Zhiye):
         return "2027" in body or "27届" in body
 
 
+class Title2027Campus(Zhiye):
+    listing_complete = True
+    regular_only = True
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "2027 校园目录混入非校招类别")
+        kind = text(row.get("Kind"))
+        check(kind in {"", "全职", "实习"}, "2027 校园目录职位性质未知")
+        title = text(row.get("JobAdName"))
+        return kind != "实习" and ("2027" in title or "27届" in title)
+
+
+class Genvict2027(Title2027Campus):
+    name = "zhiye-genvict-2027"
+    host = "genvict1.zhiye.com"
+    listing_unit_fallback = "金溢科技"
+    scope_description = "金溢科技独立北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Awinic2027(Title2027Campus):
+    name = "zhiye-awinic-2027"
+    host = "awinic.zhiye.com"
+    listing_unit_fallback = "艾为电子"
+    scope_description = "艾为电子北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Dynanonic2027(Title2027Campus):
+    name = "zhiye-dynanonic-2027"
+    host = "dynanonic.zhiye.com"
+    listing_unit_fallback = "德方纳米"
+    scope_description = "德方纳米北森 Category=2 全目录；只纳入 2027 届正式校招，保留源项目"
+
+
+class Qxkj2027(Title2027Campus):
+    name = "zhiye-qxkj-2027"
+    host = "qxkj1.zhiye.com"
+    listing_unit_fallback = "南京全信传输科技股份有限公司"
+    scope_description = "全信传输北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Njcttq2027(Title2027Campus):
+    name = "zhiye-njcttq-2027"
+    host = "njcttq.zhiye.com"
+    listing_unit_fallback = "南京正大天晴制药有限公司"
+    scope_description = "南京正大天晴北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Iwhalecloud2027(Title2027Campus):
+    name = "zhiye-iwhalecloud-2027"
+    host = "iwhalecloud1.zhiye.com"
+    listing_unit_fallback = "浩鲸科技"
+    scope_description = "浩鲸科技北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Spacestar2027(Title2027Campus):
+    name = "zhiye-spacestar-2027"
+    host = "spacestar.zhiye.com"
+    listing_unit_fallback = "航天恒星"
+    scope_description = "航天恒星北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Warrant2027(Title2027Campus):
+    name = "zhiye-warrant-2027"
+    host = "warrant.zhiye.com"
+    scope_description = "华纳大药厂北森 Category=2 全目录；排除实习和旧批次"
+
+
+class Cetctj2027(Title2027Campus):
+    name = "zhiye-cetctj-2027"
+    host = "cetctj.zhiye.com"
+    listing_unit_fallback = "中电太极集团"
+    scope_description = "中电太极集团北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Dzwy2027(Title2027Campus):
+    name = "zhiye-dzwy-2027"
+    host = "dzwy.zhiye.com"
+    listing_unit_fallback = "新大正物业集团"
+    scope_description = "新大正物业集团北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Bomc2027(Title2027Campus):
+    name = "zhiye-bomc-2027"
+    host = "bomc.zhiye.com"
+    expected_org = "大洋电机股份有限公司"
+    scope_description = "大洋电机独立北森 Category=2 全目录；保留源 Org，只纳入 2027 届正式校招"
+
+
+class Aimer2027(Title2027Campus):
+    name = "zhiye-aimer-2027"
+    host = "aimer.zhiye.com"
+    listing_unit_fallback = "爱慕集团"
+    scope_description = "爱慕集团独立北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Leadchina2027(Title2027Campus):
+    name = "zhiye-leadchina-2027"
+    host = "leadchina.zhiye.com"
+    listing_unit_fallback = "先导智能"
+    scope_description = "先导智能独立北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Dobot2027(Title2027Campus):
+    name = "zhiye-dobot-2027"
+    host = "dobot.zhiye.com"
+    listing_unit_fallback = "越疆机器人"
+    scope_description = "越疆机器人独立北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class Nexchip2027(Title2027Campus):
+    name = "zhiye-nexchip-2027"
+    host = "nexchip.zhiye.com"
+    listing_unit_fallback = "合肥晶合集成电路股份有限公司"
+    scope_description = (
+        "晶合集成独立北森 Category=2 全目录；源 Kind 缺失，仅纳入标题明确的 2027 校招"
+    )
+
+
+class Luxpowertek2027(Title2027Campus):
+    name = "zhiye-luxpowertek-2027"
+    host = "luxpowertek.zhiye.com"
+    listing_unit_fallback = "鹏城新能"
+    scope_description = "鹏城新能独立北森 Category=2 全目录；只纳入 2027 届正式校招"
+
+
+class LanxincnCampus(Zhiye):
+    name = "zhiye-lanxincn-campus"
+    host = "lanxincn.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "蓝芯机器人"
+    scope_description = "蓝芯机器人独立北森 Category=2 全目录；仅纳入全职校园岗位，源日期原样保留"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "校园目录混入非校招类别")
+        check(text(row.get("Kind")) in {"全职", "实习"}, "校园职位性质未知")
+        return text(row.get("Kind")) == "全职"
+
+
+class Ti5RobotCampus(LanxincnCampus):
+    name = "zhiye-ti5robot-campus"
+    host = "ti5robot1.zhiye.com"
+    listing_unit_fallback = "钛虎机器人科技（上海）有限公司"
+    scope_description = "钛虎机器人独立北森 Category=2 全目录；只纳入全职校园岗位，缺失日期留空"
+
+
+class Sanan2027(Zhiye):
+    name = "zhiye-sanan-2027"
+    host = "sanan-e.zhiye.com"
+    listing_complete = True
+    regular_only = True
+    listing_unit_fallback = "三安光电股份有限公司"
+    scope_description = "三安光电官方北森 Category=2 全目录；只纳入标题明确的 2027 届全职校招岗位"
+
+    def in_scope(self, row: dict[str, Any]) -> bool:
+        check(str(row.get("CategoryId")) == "2", "三安目录混入非校招类别")
+        kind = text(row.get("Kind"))
+        check(kind in {"全职", "实习"}, "三安职位性质未知")
+        title = text(row.get("JobAdName"))
+        return kind == "全职" and ("2027" in title or "27届" in title)
+
+
 TENANTS = (
+    Dynanonic2027,
+    Awinic2027,
+    Qxkj2027,
+    Njcttq2027,
+    Iwhalecloud2027,
+    Spacestar2027,
+    Warrant2027,
+    Cetctj2027,
+    Dzwy2027,
+    Genvict2027,
+    Bomc2027,
+    Aimer2027,
+    Leadchina2027,
+    LanxincnCampus,
+    Dobot2027,
+    Ti5RobotCampus,
+    Nexchip2027,
+    Luxpowertek2027,
+    Sanan2027,
     JlcEhr2027,
     Bananain2027,
     UnitreeCampus,

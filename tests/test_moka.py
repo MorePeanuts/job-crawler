@@ -43,6 +43,7 @@ from job_crawler.adapters.moka import (
     Stepfun2027,
     Sungrow,
     SunnyOptical,
+    Threatbook2027,
     TrinaSolar,
     Webank2027,
     Yadea,
@@ -162,6 +163,32 @@ class Replay:
                 },
             }
         )
+
+
+class ThreatbookReplay(Replay):
+    def __init__(self):
+        super().__init__("threatbook", 39679)
+
+    def _row(self, job_id: str) -> dict[str, Any]:
+        row = super()._row(job_id)
+        row["title"] = "2026届旧职位" if job_id == "c" else "安全研究员（27届）"
+        return row
+
+
+async def test_threatbook_campus_replays_all_pages_but_skips_old_batch(now: datetime) -> None:
+    source = Source(
+        source_id="COM0878",
+        company_id="COM0878",
+        company="微步在线",
+        url="https://app.mokahr.com/campus-recruitment/threatbook/39679#/jobs",
+    )
+    replay = ThreatbookReplay()
+    result = await Threatbook2027(source, replay, now).collect()
+    assert not result.coverage_issues()
+    assert [call["offset"] for call in replay.calls if "offset" in call] == [0, 2]
+    assert result.scopes[0].expected == result.scopes[0].unique == 3
+    assert result.scopes[0].skipped_out_of_scope == 1
+    assert [job.work_type for job in result.jobs] == ["校招", "实习"]
 
 
 class SunnyReplay(Replay):

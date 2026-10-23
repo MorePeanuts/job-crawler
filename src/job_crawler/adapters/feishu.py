@@ -45,6 +45,9 @@ class Desaysv(Adapter):
     ready_endpoints = (f"https://{host}{LIST_PATH}?",)
     scope_description = "德赛西威飞书校招门户公开全目录；由站点 UI 签名分页，实习由公共筛选排除"
 
+    def in_scope(self, row: dict[str, Any], subject_name: str) -> bool:
+        return True
+
     async def harvest(self) -> None:
         session = cast(BrowserSession, self.session)
         observed = await self.session.observed(f"{LIST_PATH}?")
@@ -70,6 +73,9 @@ class Desaysv(Adapter):
                 key = str(row["id"])
                 subject = row.get("job_subject") or {}
                 subject_name = text((subject.get("name") or {}).get("zh_cn"))
+                if not self.in_scope(row, subject_name):
+                    scope.skipped_out_of_scope += 1
+                    continue
                 recruit_type = row.get("recruit_type") or {}
                 recruit_name = text(recruit_type.get("name"))
                 title = text(row.get("title"))
@@ -362,7 +368,37 @@ class Ai2RoboticsCampus(Desaysv):
     scope_description = "智平方独立飞书校园门户 portal_type=6 全目录；实习按源性质排除"
 
 
+class RigolCampus(Desaysv):
+    name = "feishu-rigol-campus"
+    host = "rigolportal.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "普源精电独立飞书校园门户 portal_type=6 无筛选全目录；实习排除"
+
+
+class Moonton2027(Desaysv):
+    name = "feishu-moonton-2027"
+    host = "moonton.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "沐瞳科技 2027 飞书校园门户 portal_type=6 全目录；排除实习"
+
+
+class Modelbest2027(Desaysv):
+    name = "feishu-modelbest-2027"
+    host = "modelbest.jobs.feishu.cn"
+    path = "/campus/position/list"
+    ready_endpoints = (f"https://{host}{LIST_PATH}?",)
+    scope_description = "面壁智能飞书校园门户 portal_type=6 全目录；只纳入 2027 校园项目正式岗位"
+
+    def in_scope(self, row: dict[str, Any], subject_name: str) -> bool:
+        return "2027" in subject_name
+
+
 TENANTS = (
+    RigolCampus,
+    Moonton2027,
+    Modelbest2027,
     Ai2RoboticsCampus,
     SmartlogicCampus,
     BokeCampus,
