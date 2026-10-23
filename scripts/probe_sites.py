@@ -21,10 +21,11 @@ async def main() -> None:
     parser.add_argument("--settle", type=float, default=0)
     parser.add_argument("--click", default="")
     parser.add_argument("--url")
+    parser.add_argument("--sources", type=Path, default=Path("sites/sources.csv"))
     parser.add_argument("--route", help="使用每个来源的原域名和指定路径进行同平台目录探测")
     parser.add_argument("--fragment", help="替换每个来源 URL 的 fragment；用于多租户 SPA 路由")
     args = parser.parse_args()
-    sources, _ = read_sources(Path("sites/sources.csv"))
+    sources, _ = read_sources(args.sources)
     limit = asyncio.Semaphore(2)
 
     async def probe(source: Source) -> None:
